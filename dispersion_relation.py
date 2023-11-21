@@ -181,6 +181,23 @@ class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 		
 		self.D = 1
 
+def oplot_dr_f(dr, plot):
+	"""
+	Overplot the dispersion relation corresponding to the f mode
+	
+	Arguments:
+		dr: disp_rel_from_yaver instance
+		plot: contourplot_container instance
+	
+	Dispersion relation is omega^2 = g*kx (note that the density contrast is not accounted for here)
+	"""
+	g = np.abs(dr.param.gravz)
+	k_tilde = np.linspace(*plot.ax.get_xlim(), 100)
+	kx = k_tilde/dr.L_0
+	omega = np.sqrt(g*kx)
+	omega_tilde = omega/dr.omega_0
+	return plot.ax.plot(k_tilde, omega_tilde, ls='--', c='k', alpha=0.3)
+
 if __name__ == "__main__":
 	dr = disp_rel_from_yaver()
 	dr.plot_komega(1)
