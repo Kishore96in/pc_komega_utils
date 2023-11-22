@@ -231,7 +231,7 @@ class make_model():
 		"""
 		assert len(params_poly) == self.poly_order + 1
 		assert np.shape(params_lorentz) == (self.n_lorentz, 3 )
-		return [*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)]
+		return tuple([*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)])
 	
 	def lorentzian(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om -om_0)**2 + gam**2)
@@ -244,7 +244,7 @@ class make_model():
 		return ret
 	
 	def __call__(self, om, *args):
-		assert self.pack_params(*self.unpack_params(args)) == args
+		assert self.pack_params(*self.unpack_params(args)) == args, f"{args = }\n{self.pack_params(*self.unpack_params(args)) = }"
 		
 		params_poly, params_lorentz = self.unpack_params(args)
 		ret = self.poly(om, *params_poly)
