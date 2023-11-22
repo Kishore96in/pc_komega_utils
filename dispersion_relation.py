@@ -207,6 +207,98 @@ def oplot_dr_f(dr, plot=None, ax=None):
 	omega_tilde = omega/dr.omega_0
 	return ax.plot(k_tilde, omega_tilde, ls='--', c='k', alpha=0.3)
 
+def fit_mode(dr, k_tilde, z, target_om, tol=3):
+	"""
+	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
+	
+	Arguments:
+		dr: disp_rel_from_yaver instance
+		k_tilde: float, wavenumber at which to find the amplitude
+		z: float, z-coordinate at which to read the data
+		target_om: consider the mode whose omega_tilde at the given k_tilde is nearest to target_om.
+		tol: float. If the standard deviation about the continuum is stdev, only consider peaks that are above tol*stdev + continuum
+		TODO: iz: int
+	
+	TODO: SBC15 just say "To determine the shape of the f and p mode eigenfunctions, we derived them from the z-dependent spectrum of uz by selecting kx = 2 and ω = 1.31, 2.09, 2.77, 3.67 corresponding to the f mode and the first three p modes, p0, 1, 2 , respectively". Is that enough?
+	Algorithm:
+		Given a target omega, find the mode near it by the following procedure.
+			1. Find the 'continuum' by averaging over a sufficiently wide band of omega
+			2. Detect 'provisional peaks' by taking all peaks which are sufficiently larger than the continuum
+				Perhaps 'sufficiently larger' can be related to the variance of P near the peak (but need to be a bit careful about this; the band needs to be wide enough that the variance is not affected by the presence of a genuine peak)
+			3. Among the provisional peaks, return the peak which is closest to the target omega.
+	TODO: (20-Nov 2023, meeting) Nishant mentioned that the spectra are always smoothed before fitting the peak. But I find that the peak width drastically changes even for smoothing widths of 3 or 5 points. That in fact suggests that rather than reporting the peak amplitude, we should be reporting the area under the curve above the continuum (or perhaps even some sort of 'equivalent width'). Need to think a bit. Perhaps it is fine, since the mode eigenfunction is undetermined up to a multiplicative factor.
+		Singh et al. (2015, eq. 19) indeed define something called a mode mass.
+	TODO: ()meeting, 21-Nov-2023) Nishant mentioned that to remove the continuum, one can fit a polynomial. Let the user input the band of frequencies. Fit more than one Lorentzian (needed for the fanning part)
+		Singh 2016 (the f-mode paper) mention that the continuum is fit by a parabola.
+	"""
+	iz = np.argmin(np.abs(z - dr.grid.z))
+	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L0))
+	data = np.abs(dr.omega*dr.uz_fft[:,ik,iz]/(dr.omega_0*dr.D**2)) #NOTE: multiplying by omega to take 'running difference'
+	
+	om_tilde = dr.omega/dr.omega_0
+	itarget = np.argmin(np.abs(om_tilde - target_om))
+	
+	data = smooth(data, 3) #smooth the data so that we get neat profiles.
+	#TODO: smoothing as above currently leads to artefacts near omega = +- omega_max
+	
+	bw = 0.5 #half-width of the band in omega_tilde in which the 'continuum' is calculated TODO: make this an arg. TODO: also make this the window about target_om in which a peak will be found? Would I need to try to handle the case where there are multiple peaks within this band?
+	continuum, stdev = get_continuum(data, bw, dr)
+	
+	d_om_tilde = om_tilde[1] - om_tilde[0]
+	bw_i = int(np.round(bw/d_om_tilde))
+	i_min = np.max(itarget - bw_i, 0)
+	i_max = np.min(itarget + bw_i, len(data))
+	data_near_target = (data - continuum)[i_min: i_max]
+	omt_near_target = omega_tilde[i_min: i_max]
+	
+	model = lambda om, om_0, gam, A: (A*gam/np.pi)/((om -om_0)**2 + gam**2) #Lorentzian
+	
+	popt, pcov = scipy.optimize.curve_fit(
+		model,
+		omt_near_target,
+		data_near_target,
+		p0 = np.array([target_om, 0, np.max(data_near_target)]),
+		#TODO: sigma = ?? stdev may not be correct, but not sure what else to put.
+		bounds = (
+			np.array([target_om - bw,-np.inf,-np.inf]),
+			np.array([target_om + bw,np.inf, np.inf]),
+			)
+		)
+	
+	return {
+		'A': popt[2],
+		'omega_tilde': popt[0],
+		'gam': popt[1],
+		}
+
+# def bw_to_i(bw, om_tilde):
+# 	"""
+# 	Given a bandwidth in om_tilde, convert it to the equivalent number of grid points.
+# 	"""
+# 	
+# 	d_om_tilde = om_tilde[1] - om_tilde[0]
+# 	return int(np.round(bw/d_om_tilde))
+
+def get_continuum(data, bw, dr):
+	"""
+	bw: half-width of the band in omega_tilde in which the 'continuum' is calculated
+	"""
+	om_tilde = dr.omega/dr.omega_0
+	d_om_tilde = (dr.omega[1] - dr.omega[0])/dr.omega_0
+	bw_i = int(np.round(bw/d_om_tilde))
+	continuum = smooth(data, bw_i)
+	stdev = np.sqrt(smooth(data**2, bw_i) - continuum**2)
+	return continuum, stdev
+
+def smooth(data, n):
+	"""
+	data: numpy array
+	n: int, half-width of the smoothing filter (top hat)
+	"""
+	weight = np.ones(2*n+1)
+	weight = weight/np.sum(weight)
+	return scipy.signal.convolve(data, weight, mode='same')
+
 if __name__ == "__main__":
 	dr = disp_rel_from_yaver()
 	dr.plot_komega(1)
