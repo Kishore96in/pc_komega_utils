@@ -262,16 +262,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 		z: float, z-coordinate at which to read the data
 		om_tilde_min: float. Consider the part of the data above this frequency
 		om_tilde_max: float. Consider the part of the data below this frequency
-	
-	TODO: SBC15 just say "To determine the shape of the f and p mode eigenfunctions, we derived them from the z-dependent spectrum of uz by selecting kx = 2 and ω = 1.31, 2.09, 2.77, 3.67 corresponding to the f mode and the first three p modes, p0, 1, 2 , respectively". Is that enough?
-	Algorithm:
-		Given a target omega, find the mode near it by the following procedure.
-			1. Find the 'continuum' by averaging over a sufficiently wide band of omega
-			2. Detect 'provisional peaks' by taking all peaks which are sufficiently larger than the continuum
-				Perhaps 'sufficiently larger' can be related to the variance of P near the peak (but need to be a bit careful about this; the band needs to be wide enough that the variance is not affected by the presence of a genuine peak)
-			3. Among the provisional peaks, return the peak which is closest to the target omega.
-	TODO: (meeting, 21-Nov-2023) Nishant mentioned that to remove the continuum, one can fit a polynomial. Let the user input the band of frequencies. Fit more than one Lorentzian (needed for the fanning part)
-		Singh 2016 (the f-mode paper) mention that the continuum is fit by a parabola.
 	"""
 	iz = np.argmin(np.abs(z - dr.grid.z))
 	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L0))
