@@ -219,7 +219,7 @@ class make_model():
 	def unpack_params(self, args):
 		assert len(args) == self.nparams
 		params_poly = args[:self.poly_order+1]
-		params_lorentz = np.reshape(args[self.poly_order+1:], (n_lorentz, 3))
+		params_lorentz = np.reshape(args[self.poly_order+1:], (self.n_lorentz, 3))
 		return params_poly, params_lorentz
 	
 	def pack_params(self, params_poly, params_lorentz):
