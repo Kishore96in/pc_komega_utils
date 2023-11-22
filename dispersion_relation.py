@@ -252,7 +252,7 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
-def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
+def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, tol=3):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
 	
@@ -260,9 +260,8 @@ def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
 		dr: disp_rel_from_yaver instance
 		k_tilde: float, wavenumber at which to find the amplitude
 		z: float, z-coordinate at which to read the data
-		TODO: fix names of the two guys below to clarify that they are actually omega_tilde
-		omega_min: float. Consider the part of the data above this frequency
-		omega_max: float. Consider the part of the data below this frequency
+		om_tilde_min: float. Consider the part of the data above this frequency
+		om_tilde_max: float. Consider the part of the data below this frequency
 		TODO: tol may not be needed any more.
 		tol: float. If the standard deviation about the continuum is stdev, only consider peaks that are above tol*stdev + continuum
 	
@@ -286,8 +285,8 @@ def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
 	data = smooth(data, 3) #smooth the data so that we get neat profiles.
 	#TODO: smoothing as above currently leads to artefacts near omega = +- omega_max
 	
-	i_min = np.argmin(np.abs(om_tilde - omega_min))
-	i_max = np.argmin(np.abs(om_tilde - omega_max))
+	i_min = np.argmin(np.abs(om_tilde - om_tilde_min))
+	i_max = np.argmin(np.abs(om_tilde - om_tilde_max))
 	data_near_target = data[i_min:i_max]
 	omt_near_target = omega_tilde[i_min:i_max]
 	
