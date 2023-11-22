@@ -252,7 +252,7 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
-def fit_mode(dr, k_tilde, z, target_om, tol=3):
+def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
 	
@@ -260,9 +260,11 @@ def fit_mode(dr, k_tilde, z, target_om, tol=3):
 		dr: disp_rel_from_yaver instance
 		k_tilde: float, wavenumber at which to find the amplitude
 		z: float, z-coordinate at which to read the data
-		target_om: consider the mode whose omega_tilde at the given k_tilde is nearest to target_om.
+		TODO: fix names of the two guys below to clarify that they are actually omega_tilde
+		omega_min: float. Consider the part of the data above this frequency
+		omega_max: float. Consider the part of the data below this frequency
+		TODO: tol may not be needed any more.
 		tol: float. If the standard deviation about the continuum is stdev, only consider peaks that are above tol*stdev + continuum
-		TODO: iz: int
 	
 	TODO: SBC15 just say "To determine the shape of the f and p mode eigenfunctions, we derived them from the z-dependent spectrum of uz by selecting kx = 2 and ω = 1.31, 2.09, 2.77, 3.67 corresponding to the f mode and the first three p modes, p0, 1, 2 , respectively". Is that enough?
 	Algorithm:
@@ -286,35 +288,26 @@ def fit_mode(dr, k_tilde, z, target_om, tol=3):
 	data = smooth(data, 3) #smooth the data so that we get neat profiles.
 	#TODO: smoothing as above currently leads to artefacts near omega = +- omega_max
 	
-	bw = 0.5 #half-width of the band in omega_tilde in which the 'continuum' is calculated TODO: make this an arg. TODO: also make this the window about target_om in which a peak will be found? Would I need to try to handle the case where there are multiple peaks within this band?
-	continuum, stdev = get_continuum(data, bw, dr)
+	i_min = np.argmin(np.abs(om_tilde - omega_min))
+	i_max = np.argmin(np.abs(om_tilde - omega_max))
+	data_near_target = data[i_min:i_max]
+	omt_near_target = omega_tilde[i_min:i_max]
 	
-	d_om_tilde = om_tilde[1] - om_tilde[0]
-	bw_i = int(np.round(bw/d_om_tilde))
-	i_min = np.max(itarget - bw_i, 0)
-	i_max = np.min(itarget + bw_i, len(data))
-	data_near_target = (data - continuum)[i_min: i_max]
-	omt_near_target = omega_tilde[i_min: i_max]
-	
-	model = lambda om, om_0, gam, A: (A*gam/np.pi)/((om -om_0)**2 + gam**2) #Lorentzian
+	#TODO: later, try to automatically determine these. Or at least make these args?
+	poly_order = 2
+	n_lorentz = 1
+	model = make_model(2, 1)
 	
 	popt, pcov = scipy.optimize.curve_fit(
 		model,
 		omt_near_target,
 		data_near_target,
-		p0 = np.array([target_om, 0, np.max(data_near_target)]),
+		p0 = np.ones(model.nparams),
 		#TODO: sigma = ?? stdev may not be correct, but not sure what else to put.
-		bounds = (
-			np.array([target_om - bw,-np.inf,-np.inf]),
-			np.array([target_om + bw,np.inf, np.inf]),
-			)
+		#TODO bounds = ?? #May need to set bounds on om_0 of the Lorentzians to rule out crazy solutions.
 		)
 	
-	return {
-		'A': popt[2],
-		'omega_tilde': popt[0],
-		'gam': popt[1],
-		}
+	return model.unpack_params(popt)
 
 # def bw_to_i(bw, om_tilde):
 # 	"""
