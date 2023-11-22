@@ -237,7 +237,7 @@ class make_model():
 		return (A*gam/np.pi)/((om -om_0)**2 + gam**2)
 	
 	def poly(self, om, *params_poly):
-		assert len(params_poly) == self.poly_order
+		assert len(params_poly) == self.poly_order + 1
 		ret = 0
 		for i,a in enumerate(params_poly):
 			ret += a*om**i
