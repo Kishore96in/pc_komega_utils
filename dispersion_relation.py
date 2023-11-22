@@ -40,7 +40,9 @@ class disp_rel_from_yaver():
 		simdir=".", #Location of the simulation to be read
 		t_min=300, #For all calculations, only use data saved after this time
 		t_max=None, #For all calculations, only use data saved before this time
+		k_tilde_min = 0, #plot limit
 		k_tilde_max = 20, #plot limit
+		omega_tilde_min = 0, #plot limit
 		omega_tilde_max = 10, #plot limit
 		fig_savedir = ".", #Where to save the figures
 		field_name = 'uzmxz', #which field to use to plot the dispersion relation
@@ -55,7 +57,9 @@ class disp_rel_from_yaver():
 		self.grid = pc.read.grid(datadir=self.datadir, trim=True, quiet=True)
 		self.t_min = t_min
 		self.t_max = t_max
+		self.k_tilde_min = k_tilde_min
 		self.k_tilde_max = k_tilde_max
+		self.omega_tilde_min = omega_tilde_min
 		self.omega_tilde_max = omega_tilde_max
 		self.fig_savedir = fig_savedir
 		self.field_name = field_name
@@ -126,9 +130,9 @@ class disp_rel_from_yaver():
 		
 		#Find out which segments of the arrays are needed for the plot.
 		ikx_max = np.argmin(np.abs(self.k_tilde_max - self.kx*L_0))
-		ikx_min = np.argmin(np.abs(0 - self.kx*L_0))
+		ikx_min = np.argmin(np.abs(self.k_tilde_min - self.kx*L_0))
 		iomega_max = np.argmin(np.abs(self.omega_tilde_max - self.omega/omega_0))
-		iomega_min = np.argmin(np.abs(0 - self.omega/omega_0))
+		iomega_min = np.argmin(np.abs(self.omega_tilde_min - self.omega/omega_0))
 		
 		kx = self.kx[ikx_min:ikx_max]
 		omega = self.omega[iomega_min:iomega_max]
