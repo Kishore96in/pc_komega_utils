@@ -273,9 +273,7 @@ def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
 			2. Detect 'provisional peaks' by taking all peaks which are sufficiently larger than the continuum
 				Perhaps 'sufficiently larger' can be related to the variance of P near the peak (but need to be a bit careful about this; the band needs to be wide enough that the variance is not affected by the presence of a genuine peak)
 			3. Among the provisional peaks, return the peak which is closest to the target omega.
-	TODO: (20-Nov 2023, meeting) Nishant mentioned that the spectra are always smoothed before fitting the peak. But I find that the peak width drastically changes even for smoothing widths of 3 or 5 points. That in fact suggests that rather than reporting the peak amplitude, we should be reporting the area under the curve above the continuum (or perhaps even some sort of 'equivalent width'). Need to think a bit. Perhaps it is fine, since the mode eigenfunction is undetermined up to a multiplicative factor.
-		Singh et al. (2015, eq. 19) indeed define something called a mode mass.
-	TODO: ()meeting, 21-Nov-2023) Nishant mentioned that to remove the continuum, one can fit a polynomial. Let the user input the band of frequencies. Fit more than one Lorentzian (needed for the fanning part)
+	TODO: (meeting, 21-Nov-2023) Nishant mentioned that to remove the continuum, one can fit a polynomial. Let the user input the band of frequencies. Fit more than one Lorentzian (needed for the fanning part)
 		Singh 2016 (the f-mode paper) mention that the continuum is fit by a parabola.
 	"""
 	iz = np.argmin(np.abs(z - dr.grid.z))
