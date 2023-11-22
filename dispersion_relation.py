@@ -207,6 +207,51 @@ def oplot_dr_f(dr, plot=None, ax=None):
 	omega_tilde = omega/dr.omega_0
 	return ax.plot(k_tilde, omega_tilde, ls='--', c='k', alpha=0.3)
 
+class make_model():
+	"""
+	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
+	"""
+	def __init__(self, poly_order, n_lorentz):
+		self.poly_order = poly_order
+		self.n_lorentz = n_lorentz
+		self.nparams = (1 + self.poly_order) + 3*self.n_lorentz
+	
+	def unpack_params(self, args):
+		assert len(args) == self.nparams
+		params_poly = args[:self.poly_order+1]
+		params_lorentz = np.reshape(args[self.poly_order+1:], (n_lorentz, 3))
+		return params_poly, params_lorentz
+	
+	def pack_params(self, params_poly, params_lorentz):
+		"""
+		params_poly: numpy array of length poly_order + 1
+		params_lorentz: numpy array of shape (n_lorentz, 3)
+		
+		Returns list
+		"""
+		assert len(params_poly) == self.poly_order + 1
+		assert np.shape(params_lorentz) == (self.n_lorentz, 3 )
+		return [*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)]
+	
+	def lorentzian(self, om, A, om_0, gam):
+		return (A*gam/np.pi)/((om -om_0)**2 + gam**2)
+	
+	def poly(self, om, *params_poly):
+		assert len(params_poly) == self.poly_order
+		ret = 0
+		for i,a in enumerate(params_poly):
+			ret += a*om**i
+		return ret
+	
+	def __call__(self, om, *args):
+		assert self.pack_params(*self.unpack_params(args)) == args
+		
+		params_poly, params_lorentz = self.unpack_params(args)
+		ret = self.poly(om, *params_poly)
+		for i in range(self.n_lorentz):
+			ret += self.lorentzian(om, *params_lorentz[i])
+		return ret
+
 def fit_mode(dr, k_tilde, z, target_om, tol=3):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
