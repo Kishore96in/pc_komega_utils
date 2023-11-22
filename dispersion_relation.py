@@ -318,6 +318,8 @@ def fit_mode(dr, k_tilde, z, omega_min, omega_max, tol=3):
 def get_continuum(data, bw, dr):
 	"""
 	bw: half-width of the band in omega_tilde in which the 'continuum' is calculated
+	
+	TODO: no longer used
 	"""
 	om_tilde = dr.omega/dr.omega_0
 	d_om_tilde = (dr.omega[1] - dr.omega[0])/dr.omega_0
