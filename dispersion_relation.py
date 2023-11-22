@@ -252,7 +252,7 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
-def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, tol=3):
+def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
 	
@@ -262,8 +262,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, tol=3):
 		z: float, z-coordinate at which to read the data
 		om_tilde_min: float. Consider the part of the data above this frequency
 		om_tilde_max: float. Consider the part of the data below this frequency
-		TODO: tol may not be needed any more.
-		tol: float. If the standard deviation about the continuum is stdev, only consider peaks that are above tol*stdev + continuum
 	
 	TODO: SBC15 just say "To determine the shape of the f and p mode eigenfunctions, we derived them from the z-dependent spectrum of uz by selecting kx = 2 and ω = 1.31, 2.09, 2.77, 3.67 corresponding to the f mode and the first three p modes, p0, 1, 2 , respectively". Is that enough?
 	Algorithm:
