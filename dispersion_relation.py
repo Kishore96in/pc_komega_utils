@@ -304,14 +304,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 	
 	return model.unpack_params(popt)
 
-# def bw_to_i(bw, om_tilde):
-# 	"""
-# 	Given a bandwidth in om_tilde, convert it to the equivalent number of grid points.
-# 	"""
-# 	
-# 	d_om_tilde = om_tilde[1] - om_tilde[0]
-# 	return int(np.round(bw/d_om_tilde))
-
 def get_continuum(data, bw, dr):
 	"""
 	bw: half-width of the band in omega_tilde in which the 'continuum' is calculated
