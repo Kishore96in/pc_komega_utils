@@ -140,7 +140,6 @@ class disp_rel_from_yaver():
 		
 		iz_surf = np.argmin(np.abs(z - self.grid.z))
 		
-		fig,ax = plt.subplots()
 		data = np.abs(omega[:,None]*uz_fft[:,:,iz_surf]/(omega_0*D**2)) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
@@ -149,6 +148,7 @@ class disp_rel_from_yaver():
 	def plot_komega(self, z):
 		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
 		
+		fig,ax = plt.subplots()
 		im = ax.contourf(
 			k_tilde,
 			omega_tilde,
