@@ -265,6 +265,9 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 		om_tilde_max: float. Consider the part of the data below this frequency
 		poly_order: int. Order of polynomial to use to fit the continuum.
 		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
+	
+	Returns:
+		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
 	"""
 	iz = np.argmin(np.abs(z - dr.grid.z))
 	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L_0))
