@@ -346,6 +346,33 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	
 	return model
 
+def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
+	"""
+	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
+	
+	TODO: at least in preliminary tests, this seems to work well. Now need to check if I can relax the bounds I placed on the parameters in fit_mode without affecting the results of this function.
+	"""
+	#TODO: make these configurable?
+	n_lorentz_max = 3
+	threshold = 0.5 #Improvement in reduced chi-squared needed to accept addition of a Lorentzian.
+	
+	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+	sigma = stdev_central(data_near_target, 0.05)
+	
+	#Function to calculate the reduced chi-square corresponding to a particular fit.
+	chi2r = lambda fit: np.sum(((data_near_target - fit(omt_near_target, *fit.popt) )/sigma)**2)/(len(data_near_target) - fit.nparams)
+	
+	fit_old = None
+	for n_lorentz in range(n_lorentz_max):
+		fit = fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz)
+		
+		if (fit_old is not None) and chi2r(fit)/chi2r(fit_old) > 0.9:
+			return fit_old
+		
+		fit_old = fit
+	
+	raise RuntimeError(f"Improvement in fit has not converged even with {n_lorentz = }")
+
 def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_max):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
