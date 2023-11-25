@@ -267,7 +267,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
 	"""
 	iz = np.argmin(np.abs(z - dr.grid.z))
-	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L0))
+	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L_0))
 	data = np.abs(dr.omega*dr.uz_fft[:,ik,iz]/(dr.omega_0*dr.D**2)) #NOTE: multiplying by omega to take 'running difference'
 	
 	om_tilde = dr.omega/dr.omega_0
