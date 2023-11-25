@@ -302,19 +302,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	
 	return model
 
-def get_continuum(data, bw, dr):
-	"""
-	bw: half-width of the band in omega_tilde in which the 'continuum' is calculated
-	
-	TODO: no longer used
-	"""
-	om_tilde = dr.omega/dr.omega_0
-	d_om_tilde = (dr.omega[1] - dr.omega[0])/dr.omega_0
-	bw_i = int(np.round(bw/d_om_tilde))
-	continuum = smooth(data, bw_i)
-	stdev = np.sqrt(smooth(data**2, bw_i) - continuum**2)
-	return continuum, stdev
-
 def smooth(data, n):
 	"""
 	data: numpy array
