@@ -271,26 +271,28 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 	om_tilde = dr.omega/dr.omega_0
 	# itarget = np.argmin(np.abs(om_tilde - target_om)) # TODO: seems unused.
 	
-	data = smooth(data, 3) #smooth the data so that we get neat profiles.
-	#TODO: smoothing as above currently leads to artefacts near omega = +- omega_max
-	
 	i_min = np.argmin(np.abs(om_tilde - om_tilde_min))
 	i_max = np.argmin(np.abs(om_tilde - om_tilde_max))
 	data_near_target = data[i_min:i_max]
-	omt_near_target = omega_tilde[i_min:i_max]
+	omt_near_target = om_tilde[i_min:i_max]
 	
 	#TODO: later, try to automatically determine these. Or at least make these args?
-	poly_order = 2
+	#TODO: test later with more than the required number of Lorentzians.
+	poly_order = 1
 	n_lorentz = 1
-	model = make_model(2, 1)
+	model = make_model(poly_order, n_lorentz)
+	
+	#initial guess for the parameters.
+	guess_poly = np.zeros(model.poly_order + 1)
+	guess_lor = np.zeros((model.n_lorentz,3))
+	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz) #populate sane guesses for omega_0
+	guess = model.pack_params(guess_poly, guess_lor)
 	
 	popt, pcov = scipy.optimize.curve_fit(
 		model,
 		omt_near_target,
 		data_near_target,
-		p0 = np.ones(model.nparams),
-		#TODO: sigma = ?? stdev may not be correct, but not sure what else to put.
-		#TODO bounds = ?? #May need to set bounds on om_0 of the Lorentzians to rule out crazy solutions.
+		p0 = guess,
 		)
 	
 	return model.unpack_params(popt)
