@@ -290,7 +290,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	#A crude guess for sigma
 	sigma = np.sqrt(np.average(data_near_target**2) - np.average(data_near_target)**2)
 	
-	popt, pcov = scipy.optimize.curve_fit(
+	model.popt, model.pcov = scipy.optimize.curve_fit(
 		model,
 		omt_near_target,
 		data_near_target,
@@ -298,7 +298,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 		sigma = np.full_like(data_near_target, sigma),
 		)
 	
-	return model.unpack_params(popt)
+	return model
 
 def get_continuum(data, bw, dr):
 	"""
