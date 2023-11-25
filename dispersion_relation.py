@@ -274,7 +274,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	data = np.abs(dr.omega*dr.uz_fft[:,ik,iz]/(dr.omega_0*dr.D**2)) #NOTE: multiplying by omega to take 'running difference'
 	
 	om_tilde = dr.omega/dr.omega_0
-	# itarget = np.argmin(np.abs(om_tilde - target_om)) # TODO: seems unused.
 	
 	i_min = np.argmin(np.abs(om_tilde - om_tilde_min))
 	i_max = np.argmin(np.abs(om_tilde - om_tilde_max))
