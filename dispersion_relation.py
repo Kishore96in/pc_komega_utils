@@ -253,7 +253,7 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
-def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
+def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
 	
@@ -263,6 +263,8 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 		z: float, z-coordinate at which to read the data
 		om_tilde_min: float. Consider the part of the data above this frequency
 		om_tilde_max: float. Consider the part of the data below this frequency
+		poly_order: int. Order of polynomial to use to fit the continuum.
+		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
 	"""
 	iz = np.argmin(np.abs(z - dr.grid.z))
 	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L0))
@@ -276,10 +278,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 	data_near_target = data[i_min:i_max]
 	omt_near_target = om_tilde[i_min:i_max]
 	
-	#TODO: later, try to automatically determine these. Or at least make these args?
 	#TODO: test later with more than the required number of Lorentzians.
-	poly_order = 1
-	n_lorentz = 1
 	model = make_model(poly_order, n_lorentz)
 	
 	#initial guess for the parameters.
