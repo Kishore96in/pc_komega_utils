@@ -234,7 +234,7 @@ class make_model():
 		return tuple([*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)])
 	
 	def lorentzian(self, om, A, om_0, gam):
-		return (A*gam/np.pi)/((om -om_0)**2 + gam**2)
+		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
 	def poly(self, om, *params_poly):
 		assert len(params_poly) == self.poly_order + 1
