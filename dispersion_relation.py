@@ -175,6 +175,38 @@ class disp_rel_from_yaver():
 		fig.tight_layout()
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
+	
+	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None):
+		"""
+		Get the values of omega_tilde and P(omega_tilde) at specified k_tilde and z.in the range omega_tilde_min < omega_tilde < omega_tilde_max
+		
+		Arguments:
+			k_tilde: float
+			z: float
+			omega_tilde_min: float
+			omega_tilde_max: float
+		
+		Returns:
+			omt_near_target: numpy array of float
+			data_near_target: numpy array of float
+		"""
+		if omega_tilde_min is None:
+			omega_tilde_min = self.omega_tilde_min
+		if omega_tilde_max is None:
+			omega_tilde_max = self.omega_tilde_max
+		
+		iz = np.argmin(np.abs(z - self.grid.z))
+		ik = np.argmin(np.abs(k_tilde - self.kx*self.L_0))
+		data = np.abs(self.omega*self.uz_fft[:,ik,iz]/(self.omega_0*self.D**2))
+		
+		om_tilde = self.omega/self.omega_0
+		
+		i_min = np.argmin(np.abs(om_tilde - omega_tilde_min))
+		i_max = np.argmin(np.abs(om_tilde - omega_tilde_max))
+		data_near_target = data[i_min:i_max]
+		omt_near_target = om_tilde[i_min:i_max]
+		
+		return omt_near_target, data_near_target
 
 class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 	def get_scales(self):
