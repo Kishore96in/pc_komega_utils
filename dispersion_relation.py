@@ -301,16 +301,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
 	"""
-	iz = np.argmin(np.abs(z - dr.grid.z))
-	ik = np.argmin(np.abs(k_tilde - dr.kx*dr.L_0))
-	data = np.abs(dr.omega*dr.uz_fft[:,ik,iz]/(dr.omega_0*dr.D**2)) #NOTE: multiplying by omega to take 'running difference'
-	
-	om_tilde = dr.omega/dr.omega_0
-	
-	i_min = np.argmin(np.abs(om_tilde - om_tilde_min))
-	i_max = np.argmin(np.abs(om_tilde - om_tilde_max))
-	data_near_target = data[i_min:i_max]
-	omt_near_target = om_tilde[i_min:i_max]
+	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
 	#TODO: test later with more than the required number of Lorentzians.
 	model = make_model(poly_order, n_lorentz)
