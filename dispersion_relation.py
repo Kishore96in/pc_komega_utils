@@ -268,7 +268,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 	data = np.abs(dr.omega*dr.uz_fft[:,ik,iz]/(dr.omega_0*dr.D**2)) #NOTE: multiplying by omega to take 'running difference'
 	
 	om_tilde = dr.omega/dr.omega_0
-	itarget = np.argmin(np.abs(om_tilde - target_om))
+	# itarget = np.argmin(np.abs(om_tilde - target_om)) # TODO: seems unused.
 	
 	data = smooth(data, 3) #smooth the data so that we get neat profiles.
 	#TODO: smoothing as above currently leads to artefacts near omega = +- omega_max
