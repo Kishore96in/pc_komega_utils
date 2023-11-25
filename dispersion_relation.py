@@ -201,6 +201,11 @@ class disp_rel_from_yaver():
 		
 		om_tilde = self.omega/self.omega_0
 		
+		if omega_tilde_min < np.min(om_tilde):
+			raise ValueError(f"omega_tilde_min ({omega_tilde_min:.2e}) needs to be greater than the minimum value of omega_tilde ({np.min(om_tilde):.2e}).")
+		if omega_tilde_max > np.max(om_tilde):
+			raise ValueError(f"omega_tilde_max ({omega_tilde_max:.2e}) needs to be less than the maximum value of omega_tilde ({np.max(om_tilde):.2e}).")
+		
 		i_min = np.argmin(np.abs(om_tilde - omega_tilde_min))
 		i_max = np.argmin(np.abs(om_tilde - omega_tilde_max))
 		data_near_target = data[i_min:i_max]
