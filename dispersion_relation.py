@@ -287,11 +287,15 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz) #populate sane guesses for omega_0
 	guess = model.pack_params(guess_poly, guess_lor)
 	
+	#A crude guess for sigma
+	sigma = np.sqrt(np.average(data_near_target**2) - np.average(data_near_target)**2)
+	
 	popt, pcov = scipy.optimize.curve_fit(
 		model,
 		omt_near_target,
 		data_near_target,
 		p0 = guess,
+		sigma = np.full_like(data_near_target, sigma),
 		)
 	
 	return model.unpack_params(popt)
