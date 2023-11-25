@@ -233,7 +233,8 @@ class make_model():
 		assert np.shape(params_lorentz) == (self.n_lorentz, 3 )
 		return tuple([*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)])
 	
-	def lorentzian(self, om, A, om_0, gam):
+	def lorentzian(self, om, A, om_0, log_gam):
+		gam = np.exp(log_gam)
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
 	def poly(self, om, *params_poly):
