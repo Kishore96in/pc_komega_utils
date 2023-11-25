@@ -378,6 +378,24 @@ def smooth(data, n):
 	weight = weight/np.sum(weight)
 	return scipy.signal.convolve(data, weight, mode='same')
 
+def stdev_central(arr, frac):
+	"""
+	Estimate standard derivation of an array arr, considering only values between the frac*100 and (1-frac)*100 percentiles
+	
+	Arguments:
+		arr: 1D numpy array
+		frac: float
+	
+	Returns:
+		stdev: same as arr.dtype
+	"""
+	sort = np.sort(arr)
+	n = len(arr)
+	i_min = int(np.round(n*frac))
+	i_max = int(np.round(n*(1-frac)))
+	cut = sort[i_min:i_max]
+	return np.std(cut)
+
 if __name__ == "__main__":
 	dr = disp_rel_from_yaver()
 	dr.plot_komega(1)
