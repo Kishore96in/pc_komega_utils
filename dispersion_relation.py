@@ -387,14 +387,27 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 		omt_near_target, _ = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 		
 		if len(params_lorentz) > 0:
-			domega = np.abs(omega_0 - params_lorentz[:,1]) #how far each detected mode is from omega_0
-			imode = np.argmin(domega)
-			print(f"{z = :.2f}, dist_from mode = {domega[imode]:.2e}, omega spacing = {omt_near_target[1] - omt_near_target[0]:.2e}") #debug
+			domega = omt_near_target[1] - omt_near_target[0]
 			
-			mode = fit.lorentzian(omt_near_target, *params_lorentz[imode])
-			mode_mass = np.trapz(mode, omt_near_target)
-		else:
+			d_from_om0 = np.abs(omega_0 - params_lorentz[:,1]) #how far each detected mode is from omega_0
+			imode = np.argmin(d_from_om0)
+			
+			omega_c = params_lorentz[imode,1]
+			d_from_omc = np.abs(omega_c - params_lorentz[:,1])
+			
 			mode_mass = 0
+			#TODO: check with Nishant if summing the peaks as below is the right thing to do.
+			for i in range(fit.n_lorentz):
+				if np.abs(params_lorentz[i,1] - omega_c) < domega:
+					mode = fit.lorentzian(omt_near_target, *params_lorentz[i])
+					mode_mass += np.trapz(mode, omt_near_target)
+			
+		else:
+			"""
+			NOTE
+			Setting these directly to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
+			"""
+			mode_mass = np.nan
 		
 		P_list.append(mode_mass)
 	
