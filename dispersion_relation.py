@@ -350,7 +350,7 @@ def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
 	
-	TODO: at least in preliminary tests, this seems to work well. Now need to check if I can relax the bounds I placed on the parameters in fit_mode without affecting the results of this function.
+	TODO: at least in preliminary tests, this seems to work well. Now need to check if I can relax the bounds I placed on the parameters in fit_mode without affecting the results of this function. Optimization without bounds seems to be noticeably faster.
 	"""
 	#TODO: make these configurable?
 	n_lorentz_max = 3
