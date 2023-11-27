@@ -176,7 +176,7 @@ class disp_rel_from_yaver():
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 	
-	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None, abs=True):
+	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None, absval=True):
 		"""
 		Get the values of omega_tilde and P(omega_tilde) at specified k_tilde and z.in the range omega_tilde_min < omega_tilde < omega_tilde_max
 		
@@ -185,7 +185,7 @@ class disp_rel_from_yaver():
 			z: float
 			omega_tilde_min: float
 			omega_tilde_max: float
-			abs: bool, whether to take the absolute value of the data before returning.
+			absval: bool, whether to take the absolute value of the data before returning.
 		
 		Returns:
 			omt_near_target: numpy array of float
@@ -200,7 +200,7 @@ class disp_rel_from_yaver():
 		ik = np.argmin(np.abs(k_tilde - self.kx*self.L_0))
 		data = self.omega*self.uz_fft[:,ik,iz]/(self.omega_0*self.D**2)
 		
-		if abs:
+		if absval:
 			data = np.abs(data)
 		
 		om_tilde = self.omega/self.omega_0
