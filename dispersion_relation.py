@@ -293,7 +293,15 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
-def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
+def fit_mode(
+	dr,
+	k_tilde,
+	z,
+	om_tilde_min,
+	om_tilde_max,
+	poly_order,
+	n_lorentz,
+	):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
 	
