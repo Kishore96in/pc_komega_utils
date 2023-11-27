@@ -317,6 +317,8 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	#initial guess for the parameters.
 	guess_poly = np.zeros(model.poly_order + 1)
 	guess_lor = np.zeros((model.n_lorentz,3))
+	if model.n_lorentz > 0:
+		guess_lor[0,0] = np.max(data_near_target)
 	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz) #populate sane guesses for omega_0
 	guess_lor[:,2] = np.log(om_tilde_max - om_tilde_min) - 1.1
 	guess = model.pack_params(guess_poly, guess_lor)
