@@ -312,8 +312,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	"""
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
-	data_near_target = smooth(data_near_target,1)
-	
 	model = make_model(poly_order, n_lorentz)
 	
 	#initial guess for the parameters.
@@ -362,8 +360,6 @@ def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
 	threshold = 0.9 #Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
-	
-	data_near_target = smooth(data_near_target, 1)
 	
 	sigma = stdev_central(data_near_target, 0.05)
 	
