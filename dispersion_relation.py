@@ -350,12 +350,9 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
-	
-	TODO: at least in preliminary tests, this seems to work well. Now need to check if I can relax the bounds I placed on the parameters in fit_mode without affecting the results of this function. Optimization without bounds seems to be noticeably faster.
 	"""
-	#TODO: make these configurable?
-	n_lorentz_max = 3
-	threshold = 0.9 #Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
+	n_lorentz_max = 5
+	threshold = 0.5 #Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
