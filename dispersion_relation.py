@@ -347,12 +347,29 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	
 	return model
 
-def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
+def fit_mode_auto(
+	dr,
+	k_tilde,
+	z,
+	om_tilde_min,
+	om_tilde_max,
+	poly_order,
+	n_lorentz_max = 5,
+	threshold = 0.5,
+	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
+	
+	Arguments:
+		dr: disp_rel_from_yaver instance
+		k_tilde: float
+		z: float
+		om_tilde_min: float
+		om_tilde_max: float
+		poly_order: int. Order of the polynomial to use for fitting the continuum.
+		n_lorentz_max: int. Maximum number of Lorentzians that can be used in the fit.
+		threshold: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 	"""
-	n_lorentz_max = 5
-	threshold = 0.5 #Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
