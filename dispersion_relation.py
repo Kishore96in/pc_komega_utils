@@ -403,7 +403,7 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 def smooth(data, n):
 	"""
 	data: numpy array
-	n: int, half-width of the smoothing filter (top hat)
+	n: int, such that width of the smoothing filter (top hat) is 2*n+1
 	"""
 	weight = np.ones(2*n+1)
 	weight = weight/np.sum(weight)
