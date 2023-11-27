@@ -341,7 +341,6 @@ def fit_mode(
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
 	lbound_lor = np.full((model.n_lorentz,3), -np.inf)
-	lbound_lor[:,0] = 0
 	lbound_lor[:,1] = om_tilde_min
 	lbound_lor[:,2] = 0
 	lbound = model.pack_params(lbound_poly, lbound_lor)
