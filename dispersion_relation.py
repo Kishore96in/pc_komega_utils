@@ -331,8 +331,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	ubound_poly = np.full(model.poly_order+1, np.inf)
 	ubound_lor = np.full((model.n_lorentz,3), np.inf)
 	ubound_lor[:,1] = om_tilde_max
-	#TODO: I suppose there is no need for gamma to be log, now that I am anyway putting bounds on the other variables.
-	ubound_lor[:,2] = np.log(om_tilde_max - om_tilde_min) - 1 #don't match 'modes' whose width is of the order of the band of interest
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	#A crude guess for sigma
