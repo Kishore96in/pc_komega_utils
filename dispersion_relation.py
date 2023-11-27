@@ -301,6 +301,7 @@ def fit_mode(
 	om_tilde_max,
 	poly_order,
 	n_lorentz,
+	om_guess = None,
 	):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
@@ -313,6 +314,7 @@ def fit_mode(
 		om_tilde_max: float. Consider the part of the data below this frequency
 		poly_order: int. Order of polynomial to use to fit the continuum.
 		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
+		om_guess: list of float. Guesses for the omega_tilde at which modes are present. Length need not be the same as n_lorentz.
 	
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
@@ -324,9 +326,14 @@ def fit_mode(
 	#initial guess for the parameters.
 	guess_poly = np.zeros(model.poly_order + 1)
 	guess_lor = np.zeros((model.n_lorentz,3))
+	
 	if model.n_lorentz > 0:
 		guess_lor[0,0] = np.max(data_near_target)
 	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz+2)[1:-1]
+	if om_guess is not None:
+		for i in range(min(model.n_lorentz, len(om_guess))):
+			guess_lor[i,1] = om_guess[i]
+	
 	guess_lor[:,2] = (om_tilde_max - om_tilde_min)/2
 	guess = model.pack_params(guess_poly, guess_lor)
 	
