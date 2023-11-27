@@ -427,7 +427,15 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 	
 	P_list = []
 	for z in z_list:
-		fit = fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order=poly_order)
+		fit = fit_mode_auto(
+			dr=dr,
+			k_tilde=k_tilde,
+			z=z,
+			om_tilde_min=om_tilde_min,
+			om_tilde_max=om_tilde_max,
+			poly_order=poly_order,
+			om_guess=[omega_0],
+			)
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
 		omt_near_target, _ = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
