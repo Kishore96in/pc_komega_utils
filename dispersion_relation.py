@@ -386,12 +386,16 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 		
 		omt_near_target, _ = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 		
-		domega = np.abs(omega_0 - params_lorentz[:,1]) #how far each detected mode is from omega_0
-		imode = np.argmin(domega)
-		print(f"{z = :.2f}, dist_from mode = {domega[imode]:.2e}, omega spacing = {omt_near_target[1] - omt_near_target[0]:.2e}") #debug
+		if len(params_lorentz) > 0:
+			domega = np.abs(omega_0 - params_lorentz[:,1]) #how far each detected mode is from omega_0
+			imode = np.argmin(domega)
+			print(f"{z = :.2f}, dist_from mode = {domega[imode]:.2e}, omega spacing = {omt_near_target[1] - omt_near_target[0]:.2e}") #debug
+			
+			mode = fit.lorentzian(omt_near_target, *params_lorentz[imode])
+			mode_mass = np.trapz(mode, omt_near_target)
+		else:
+			mode_mass = 0
 		
-		mode = fit.lorentzian(omt_near_target, *params_lorentz[imode])
-		mode_mass = np.trapz(mode, omt_near_target)
 		P_list.append(mode_mass)
 	
 	return np.array(P_list)
