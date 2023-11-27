@@ -274,8 +274,7 @@ class make_model():
 		assert np.shape(params_lorentz) == (self.n_lorentz, 3 )
 		return tuple([*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)])
 	
-	def lorentzian(self, om, A, om_0, log_gam):
-		gam = np.exp(log_gam)
+	def lorentzian(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
 	def poly(self, om, *params_poly):
@@ -320,7 +319,7 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	if model.n_lorentz > 0:
 		guess_lor[0,0] = np.max(data_near_target)
 	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz) #populate sane guesses for omega_0
-	guess_lor[:,2] = np.log(om_tilde_max - om_tilde_min) - 1.1
+	guess_lor[:,2] = (om_tilde_max - om_tilde_min)/2
 	guess = model.pack_params(guess_poly, guess_lor)
 	
 	#Bounds for the parameters
@@ -328,11 +327,13 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	lbound_lor = np.full((model.n_lorentz,3), -np.inf)
 	lbound_lor[:,0] = 0
 	lbound_lor[:,1] = om_tilde_min
+	lbound_lor[:,2] = 0
 	lbound = model.pack_params(lbound_poly, lbound_lor)
 	
 	ubound_poly = np.full(model.poly_order+1, np.inf)
 	ubound_lor = np.full((model.n_lorentz,3), np.inf)
 	ubound_lor[:,1] = om_tilde_max
+	ubound_lor[:,2] = om_tilde_max - om_tilde_min
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	#A crude guess for sigma
