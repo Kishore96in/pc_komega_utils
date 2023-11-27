@@ -308,7 +308,6 @@ def fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order, n_lorentz):
 	"""
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
-	#TODO: test later with more than the required number of Lorentzians.
 	model = make_model(poly_order, n_lorentz)
 	
 	#initial guess for the parameters.
