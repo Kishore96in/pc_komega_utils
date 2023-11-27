@@ -372,7 +372,7 @@ def fit_mode_auto(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order):
 	
 	raise RuntimeError(f"Improvement in fit has not converged even with {n_lorentz = }")
 
-def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_max):
+def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_max, poly_order=1):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
 	"""
@@ -381,7 +381,7 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 	
 	P_list = []
 	for z in z_list:
-		fit = fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order=1, n_lorentz=1)
+		fit = fit_mode(dr, k_tilde, z, om_tilde_min, om_tilde_max, poly_order=poly_order, n_lorentz=1)
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
 		omt_near_target, _ = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
