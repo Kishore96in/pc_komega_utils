@@ -4,6 +4,7 @@ Assumes x and t are equispaced.
 """
 
 import os
+import warnings
 import pencil as pc
 import numpy as np
 import scipy.fft
@@ -354,6 +355,12 @@ def fit_mode(
 	#A crude guess for sigma
 	sigma = stdev_central(data_near_target, 0.05)
 	
+	if sigma == 0:
+		"""
+		This can only happen if np.all(data_near_target == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
+		"""
+		sigma = 1
+	
 	model.popt, model.pcov = scipy.optimize.curve_fit(
 		model,
 		omt_near_target,
@@ -396,6 +403,12 @@ def fit_mode_auto(
 	
 	sigma = stdev_central(data_near_target, 0.05)
 	
+	if sigma == 0:
+		"""
+		This can only happen if np.all(data_near_target == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
+		"""
+		sigma = 1
+	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
 	chi2r = lambda fit: np.sum(((data_near_target - fit(omt_near_target, *fit.popt) )/sigma)**2)/(len(data_near_target) - fit.nparams)
 	
@@ -412,10 +425,19 @@ def fit_mode_auto(
 			om_guess=om_guess,
 			)
 		
-		if (fit_old is not None) and chi2r(fit)/chi2r(fit_old) > threshold:
+		c = chi2r(fit)
+		if (fit_old is not None) and c/c_old > threshold:
 			return fit_old
+		elif c == 0:
+			"""
+			Usually seems to happen only in regions where the velocity is zero.
+			"""
+			if not np.all(data_near_target == 0):
+				warnings.warn("χ² was 0 even though the data are nonzero.", RuntimeWarning)
+			return fit
 		
 		fit_old = fit
+		c_old = c
 	
 	raise RuntimeError(f"Improvement in fit has not converged even with {n_lorentz = }")
 
