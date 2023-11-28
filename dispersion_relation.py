@@ -461,7 +461,7 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 			)
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
-		omt_near_target, _ = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+		omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 		
 		if len(params_lorentz) > 0:
 			domega = omt_near_target[1] - omt_near_target[0]
@@ -479,12 +479,14 @@ def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_
 					mode = fit.lorentzian(omt_near_target, *params_lorentz[i])
 					mode_mass += np.trapz(mode, omt_near_target)
 			
-		else:
+		elif np.any(data_near_target != 0):
 			"""
-			NOTE
-			Setting these directly to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
+			u_z is nonzero, but no Lorentzian was fitted.
+			Setting these to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
 			"""
 			mode_mass = np.nan
+		else:
+			mode_mass = 0
 		
 		P_list.append(mode_mass)
 	
