@@ -125,6 +125,9 @@ class disp_rel_from_yaver():
 		self.D = urms/self.omega_0
 	
 	def prep_data_for_plot(self, z):
+		"""
+		Return k_tilde, omega_tilde, and the normalized Fourier-transformed vertical velocity at a given height z.
+		"""
 		omega_0 = self.omega_0
 		L_0 = self.L_0
 		D = self.D
@@ -147,6 +150,9 @@ class disp_rel_from_yaver():
 		return kx*L_0, omega/omega_0, data
 	
 	def plot_komega(self, z):
+		"""
+		Plot the k-=omega diagram at a given height z.
+		"""
 		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
 		
 		fig,ax = plt.subplots()
