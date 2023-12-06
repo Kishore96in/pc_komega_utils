@@ -447,24 +447,49 @@ def fit_mode_auto(
 	
 	raise RuntimeError(f"Improvement in fit has not converged even with {n_lorentz = }")
 
-def get_mode_eigenfunction(dr, omega_0, k_tilde, z_list, om_tilde_min, om_tilde_max, poly_order=1):
+def get_mode_eigenfunction(
+	dr,
+	omega_0,
+	k_tilde,
+	z_list,
+	om_tilde_min,
+	om_tilde_max,
+	poly_order = 1,
+	force_n_lorentz = None,
+	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
+	
+	Arguments:
+		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
 	
 	P_list = []
 	for z in z_list:
-		fit = fit_mode_auto(
-			dr=dr,
-			k_tilde=k_tilde,
-			z=z,
-			om_tilde_min=om_tilde_min,
-			om_tilde_max=om_tilde_max,
-			poly_order=poly_order,
-			om_guess=[omega_0],
-			)
+		if force_n_lorentz is None:
+			fit = fit_mode_auto(
+				dr=dr,
+				k_tilde=k_tilde,
+				z=z,
+				om_tilde_min=om_tilde_min,
+				om_tilde_max=om_tilde_max,
+				poly_order=poly_order,
+				om_guess=[omega_0],
+				)
+		else:
+			fit = fit_mode(
+				dr=dr,
+				k_tilde=k_tilde,
+				z=z,
+				om_tilde_min=om_tilde_min,
+				om_tilde_max=om_tilde_max,
+				poly_order=poly_order,
+				om_guess=[omega_0],
+				n_lorentz=force_n_lorentz,
+				)
+		
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
 		omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
