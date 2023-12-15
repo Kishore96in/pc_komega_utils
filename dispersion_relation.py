@@ -456,6 +456,7 @@ def get_mode_eigenfunction(
 	om_tilde_max,
 	poly_order = 1,
 	force_n_lorentz = None,
+	omega_tol = None,
 	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
@@ -469,9 +470,13 @@ def get_mode_eigenfunction(
 		om_tilde_max: float. Upper limit of the band of omega_tilde in which to fit the data.
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
+		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
+	
+	if omega_tol is None:
+		omega_tol = np.inf
 	
 	P_list = []
 	for z in z_list:
@@ -504,18 +509,16 @@ def get_mode_eigenfunction(
 		if len(params_lorentz) > 0:
 			domega = omt_near_target[1] - omt_near_target[0]
 			
-			d_from_om0 = np.abs(omega_0 - params_lorentz[:,1]) #how far each detected mode is from omega_0
-			imode = np.argmin(d_from_om0)
-			
+			imode = np.argmin(np.abs(omega_0 - params_lorentz[:,1]))
 			omega_c = params_lorentz[imode,1]
-			d_from_omc = np.abs(omega_c - params_lorentz[:,1])
 			
 			mode_mass = 0
 			#TODO: check with Nishant if summing the peaks as below is the right thing to do.
-			for i in range(fit.n_lorentz):
-				if np.abs(params_lorentz[i,1] - omega_c) < domega:
-					mode = fit.lorentzian(omt_near_target, *params_lorentz[i])
-					mode_mass += np.trapz(mode, omt_near_target)
+			if np.abs(omega_c - omega_0) < omega_tol:
+				for i in range(fit.n_lorentz):
+					if np.abs(params_lorentz[i,1] - omega_c) < domega:
+						mode = fit.lorentzian(omt_near_target, *params_lorentz[i])
+						mode_mass += np.trapz(mode, omt_near_target)
 			
 		elif np.any(data_near_target != 0):
 			"""
