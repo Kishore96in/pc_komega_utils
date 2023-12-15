@@ -239,6 +239,22 @@ class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 		
 		self.D = 1
 
+class disp_rel_from_yaver_L0_HP(disp_rel_from_yaver):
+	"""
+	Here, L_0 is set as the pressure scale height
+	"""
+	def get_scales(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		gamma = self.param.gamma
+		
+		self.L_0 = cs_d**2/(g*gamma)
+		self.omega_0 = g/cs_d
+		
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		self.D = urms/self.omega_0
+
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
