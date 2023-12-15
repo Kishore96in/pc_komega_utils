@@ -37,6 +37,8 @@ class contourplot_container(plot_container):
 		self.savedir = savedir
 
 class disp_rel_from_yaver():
+	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+	
 	def __init__(self,
 		simdir=".", #Location of the simulation to be read
 		t_min=300, #For all calculations, only use data saved after this time
@@ -47,8 +49,10 @@ class disp_rel_from_yaver():
 		omega_tilde_max = 10, #plot limit
 		fig_savedir = ".", #Where to save the figures
 		field_name = 'uzmxz', #which field to use to plot the dispersion relation
-		cbar_label = r"$\tilde{{\omega}} \hat{{u}} / D^2$", #label to use for the colorbar
+		cbar_label = None, #label to use for the colorbar
 		):
+		if cbar_label is None:
+			cbar_label = self.cbar_label_default
 		
 		sim = pc.sim.get(simdir, quiet=True)
 		
@@ -225,6 +229,8 @@ class disp_rel_from_yaver():
 		return omt_near_target, data_near_target
 
 class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
+	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}}$"
+	
 	def get_scales(self):
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
