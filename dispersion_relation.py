@@ -461,6 +461,13 @@ def get_mode_eigenfunction(
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
 	
 	Arguments:
+		dr: disp_rel_from_yaver instance.
+		omega_0: float
+		k_tilde: float.
+		z_list: list of float. Values of z at which to get the eigenfunction.
+		om_tilde_min: float. Lower limit of the band of omega_tilde in which to fit the data.
+		om_tilde_max: float. Upper limit of the band of omega_tilde in which to fit the data.
+		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
