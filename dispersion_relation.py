@@ -376,6 +376,7 @@ def fit_mode(
 		sigma = np.full_like(data_near_target, sigma),
 		bounds = (lbound,ubound),
 		maxfev=int(1e4),
+		absolute_sigma = True,
 		)
 	
 	return model
