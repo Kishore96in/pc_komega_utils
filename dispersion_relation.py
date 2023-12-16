@@ -331,6 +331,7 @@ def fit_mode(
 	poly_order,
 	n_lorentz,
 	om_guess = None,
+	gamma_max = None,
 	):
 	"""
 	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
@@ -344,10 +345,14 @@ def fit_mode(
 		poly_order: int. Order of polynomial to use to fit the continuum.
 		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
 		om_guess: list of float. Guesses for the omega_tilde at which modes are present. Length need not be the same as n_lorentz.
+		gamma_max: float. Upper limit on the width of the Lorentzians. By default, om_tilde_max = om_tilde_min.
 	
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
 	"""
+	if gamma_max is None:
+		gamma_max = om_tilde_max - om_tilde_min
+	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
 	model = make_model(poly_order, n_lorentz)
@@ -364,7 +369,7 @@ def fit_mode(
 		for i in range(min(model.n_lorentz, len(om_guess))):
 			guess_lor[i,1] = om_guess[i]
 	
-	guess_lor[:,2] = (om_tilde_max - om_tilde_min)/2
+	guess_lor[:,2] = gamma_max/2
 	guess = model.pack_params(guess_poly, guess_lor)
 	
 	#Bounds for the parameters
@@ -378,7 +383,7 @@ def fit_mode(
 	ubound_poly = np.full(model.poly_order+1, np.inf)
 	ubound_lor = np.full((model.n_lorentz,3), np.inf)
 	ubound_lor[:,1] = om_tilde_max
-	ubound_lor[:,2] = om_tilde_max - om_tilde_min
+	ubound_lor[:,2] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	#A crude guess for sigma
@@ -413,6 +418,7 @@ def fit_mode_auto(
 	n_lorentz_max = 5,
 	threshold = 0.5,
 	om_guess = None,
+	gamma_max = None,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
@@ -427,6 +433,7 @@ def fit_mode_auto(
 		n_lorentz_max: int. Maximum number of Lorentzians that can be used in the fit.
 		threshold: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 		om_guess: list of float. Passed to fit_mode.
+		gamma_max: float. Passed to fit_mode.
 	"""
 	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
@@ -453,6 +460,7 @@ def fit_mode_auto(
 			poly_order=poly_order,
 			n_lorentz=n_lorentz,
 			om_guess=om_guess,
+			gamma_max=gamma_max,
 			)
 		
 		c = chi2r(fit)
@@ -481,6 +489,7 @@ def get_mode_eigenfunction(
 	poly_order = 1,
 	force_n_lorentz = None,
 	omega_tol = None,
+	gamma_max = None,
 	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
@@ -495,6 +504,7 @@ def get_mode_eigenfunction(
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
+		gamma_max: float. See fit_mode.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
@@ -513,6 +523,7 @@ def get_mode_eigenfunction(
 				om_tilde_max=om_tilde_max,
 				poly_order=poly_order,
 				om_guess=[omega_0],
+				gamma_max=gamma_max,
 				)
 		else:
 			fit = fit_mode(
@@ -523,6 +534,7 @@ def get_mode_eigenfunction(
 				om_tilde_max=om_tilde_max,
 				poly_order=poly_order,
 				om_guess=[omega_0],
+				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
 				)
 		
