@@ -13,6 +13,8 @@ import matplotlib as mpl
 import scipy.signal
 import scipy.optimize
 
+from dataclasses import dataclass
+
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
 		self.fig = fig
