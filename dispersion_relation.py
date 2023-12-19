@@ -251,7 +251,7 @@ class disp_rel_from_yaver():
 		else:
 			raise ValueError(f"Unable to handle {type(omega) = }")
 	
-	def get_slice(**kwargs):
+	def get_slice(self, **kwargs):
 		"""
 		Slice data in terms of physical values
 		
