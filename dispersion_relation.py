@@ -49,6 +49,11 @@ class disp_rel(metaclass=abc.ABCMeta):
 	
 	@property
 	@abc.abstractmethod
+	def field_name_default(self):
+		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
 	def data_axes():
 		raise NotImplementedError
 	
@@ -73,11 +78,13 @@ class disp_rel(metaclass=abc.ABCMeta):
 		omega_tilde_min = 0, #plot limit
 		omega_tilde_max = 10, #plot limit
 		fig_savedir = ".", #Where to save the figures
-		field_name = 'uzmxz', #which field to use to plot the dispersion relation
+		field_name = None, #which field to use to plot the dispersion relation
 		cbar_label = None, #label to use for the colorbar
 		):
 		if cbar_label is None:
 			cbar_label = self.cbar_label_default
+		if field_name is None:
+			field_name = self.field_name_default
 		
 		sim = pc.sim.get(simdir, quiet=True)
 		
@@ -180,6 +187,10 @@ class disp_rel_from_yaver(disp_rel):
 	@property
 	def cbar_label_default(self):
 		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+	
+	@property
+	def field_name_default(self):
+		return "uzmxz"
 	
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
@@ -354,6 +365,10 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'ky_tilde':2, 'z':3}
+	
+	@property
+	def field_name_default(self):
+		return "uz"
 	
 	@property
 	def ky_tilde(self):
