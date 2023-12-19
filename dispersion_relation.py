@@ -140,20 +140,13 @@ class disp_rel_from_yaver():
 		"""
 		Return k_tilde, omega_tilde, and the normalized Fourier-transformed vertical velocity at a given height z.
 		"""
+		data, [omega_tilde, kx_tilde, _] = self.get_slice(
+			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
+			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
+			z = z,
+			)
 		
-		#Find out which segments of the arrays are needed for the plot.
-		ikx_max = np.argmin(np.abs(self.k_tilde_max - self.kx_tilde))
-		ikx_min = np.argmin(np.abs(self.k_tilde_min - self.kx_tilde))
-		iomega_max = np.argmin(np.abs(self.omega_tilde_max - self.omega_tilde))
-		iomega_min = np.argmin(np.abs(self.omega_tilde_min - self.omega_tilde))
-		
-		kx_tilde = self.kx_tilde[ikx_min:ikx_max]
-		omega_tilde = self.omega_tilde[iomega_min:iomega_max]
-		uz_fft = self.data[iomega_min:iomega_max,ikx_min:ikx_max]
-		
-		iz_surf = np.argmin(np.abs(z - self.grid.z))
-		
-		data = np.abs(omega_tilde[:,None]*uz_fft[:,:,iz_surf]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(omega_tilde[:,None]*data[:,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		return kx_tilde, omega_tilde, data
