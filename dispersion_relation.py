@@ -158,7 +158,7 @@ class disp_rel_from_yaver():
 	
 	def plot_komega(self, z):
 		"""
-		Plot the k-=omega diagram at a given height z.
+		Plot the k-omega diagram at a given height z.
 		"""
 		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
 		
