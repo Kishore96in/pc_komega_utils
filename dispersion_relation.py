@@ -41,6 +41,10 @@ class contourplot_container(plot_container):
 class disp_rel_from_yaver():
 	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}} / D^2$"
 	
+	@property
+	def data_axes(self):
+		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
+	
 	def __init__(self,
 		simdir=".", #Location of the simulation to be read
 		t_min=300, #For all calculations, only use data saved after this time
@@ -227,6 +231,51 @@ class disp_rel_from_yaver():
 		
 		return omt_near_target, data_near_target
 	
+	@staticmethod
+	def _generate_slicer(omega, omega_list):
+		"""
+		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
+		
+		Slicing with the return of this function will not reduce the number of axes in the array.
+		"""
+		omega_list = np.array(omega_list)
+		if omega is None:
+			return slice(None)
+		elif iterable(omega) and len(omega) == 2:
+			i_min = np.argmin(np.abs(omega[0] - omega_list))
+			i_max = np.argmin(np.abs(omega[1] - omega_list))
+			return slice(i_min, i_max)
+		elif isinstance (omega, numbers.Number):
+			i = np.argmin(np.abs(omega - omega_list))
+			return [i]
+		else:
+			raise ValueError(f"Unable to handle {type(omega) = }")
+	
+	def get_slice(**kwargs):
+		"""
+		Slice data in terms of physical values
+		
+		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
+		"""
+		data = self.data
+		
+		coords = [None for i in range(data.ndim)]
+		for name, i in self.data_axes.items():
+			coord_list = getattr(self, name)
+			if name in kwargs.keys():
+				coord_val = kwargs[name]
+			else:
+				coord_val = None
+			sl = self._generate_slicer(coord_val, coord_list)
+			
+			data = np.moveaxis(data, i, 0)
+			data = data[sl]
+			data = np.moveaxis(data, 0, i)
+			
+			coords[i] = coord_list
+		
+		return data, coords
+	
 	@property
 	def omega_tilde(self):
 		return self.omega*self.omega_0
@@ -269,6 +318,10 @@ class fake_grid:
 	z: np.ndarray
 
 class disp_rel_from_dvar(disp_rel_from_yaver):
+	@property
+	def data_axes(self):
+		return {'omega_tilde':0, 'kx_tilde':1, 'ky_tilde':2, 'z':3}
+	
 	@property
 	def ky_tilde(self):
 		return self.ky*self.L_0
@@ -315,55 +368,6 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
 		self.z = z
-		
-	@staticmethod
-	def _generate_slicer(omega, omega_list):
-		"""
-		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
-		
-		Slicing with the return of this function will not reduce the number of axes in the array.
-		"""
-		omega_list = np.array(omega_list)
-		if omega is None:
-			return slice(None)
-		elif iterable(omega) and len(omega) == 2:
-			i_min = np.argmin(np.abs(omega[0] - omega_list))
-			i_max = np.argmin(np.abs(omega[1] - omega_list))
-			return slice(i_min, i_max)
-		elif isinstance (omega, numbers.Number):
-			i = np.argmin(np.abs(omega - omega_list))
-			return [i]
-		else:
-			raise ValueError(f"Unable to handle {type(omega) = }")
-	
-	def get_slice(omega_tilde=None, kx_tilde=None, ky_tilde=None, z=None):
-		"""
-		Slice data in terms of physical values
-		
-		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter.
-		"""
-		om_list = self.omega/self.omega_0
-		kx_list = self.kx*self.L_0
-		ky_list = self.ky*self.L_0
-		z_list = self.z
-		
-		om_slice = self._generate_slicer(omega_tilde, om_list)
-		kx_slice = self._generate_slicer(kx_tilde, kx_list)
-		ky_slice = self._generate_slicer(ky_tilde, ky_list)
-		z_slice = self._generate_slicer(z, z_list)
-		
-		om_list = om_list[om_slice]
-		kx_list = kx_list[kx_slice]
-		ky_list = ky_list[ky_slice]
-		z_list = z_list[z_slice]
-		data = self.data[
-			om_slice,
-			kx_slice,
-			ky_slice,
-			z_slice,
-			]
-		
-		return data, [om_list, kx_list, ky_list, z_list]
 
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
