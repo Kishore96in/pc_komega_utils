@@ -120,6 +120,7 @@ class disp_rel_from_yaver():
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
+		self.z = z
 	
 	def get_scales(self):
 		"""
