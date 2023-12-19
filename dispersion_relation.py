@@ -42,6 +42,10 @@ class contourplot_container(plot_container):
 		self.savedir = savedir
 
 class disp_rel(metaclass=abc.ABCMeta):
+	@property
+	@abc.abstractmethod
+	def cbar_label_default(self):
+		raise NotImplementedError
 	
 	@property
 	@abc.abstractmethod
@@ -169,11 +173,13 @@ class disp_rel(metaclass=abc.ABCMeta):
 		return data, coords
 
 class disp_rel_from_yaver(disp_rel):
-	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}} / D^2$"
-	
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
+		
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
 	
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
@@ -310,7 +316,9 @@ class disp_rel_from_yaver(disp_rel):
 		return self.grid.z
 
 class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
-	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}}$"
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \hat{{u}}$"
 	
 	def get_scales(self):
 		cs_d = np.sqrt(self.param.cs2cool)
