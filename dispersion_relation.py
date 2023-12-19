@@ -255,6 +255,35 @@ class disp_rel_from_yaver_L0_HP(disp_rel_from_yaver):
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
 
+@dataclass
+class fake_grid():
+	x
+	y
+	z
+
+class disp_rel_from_dvar(disp_rel_from_yaver):
+	def read(self):
+		sim = pc.sim.get(self.simdir, quiet=True)
+		
+		self.ts = pc.read.ts(sim=sim, quiet=True)
+		if self.t_max is None:
+			t_max = self.ts.t[-1]
+		else:
+			t_max = self.t_max
+		
+		vard = []
+		t_vard = []
+		for varname in sim.get_varlist(down=True):
+			var = pc.read.var(trimall=True, var_file=varname, datadir=self.datadir)
+			
+			if self.t_min < var.t < t_max:
+				vard.append(getattr(var, self.field_name))
+				t_vard.append(var.t)
+		
+		self.vard = np.array(vard)
+		self.t_vard = np.array(t_vard)
+		self.grid_d = fake_grid(np.shape(vard[-3::-1]))
+	
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
