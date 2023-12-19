@@ -179,7 +179,41 @@ class disp_rel(metaclass=abc.ABCMeta):
 		
 		return data, coords
 
-class disp_rel_from_yaver(disp_rel):
+class scalesMixin_SBC15():
+	"""
+	Use the length and frequency scales defined by Singh et al, 2015.
+	"""
+	def get_scales(self):
+		"""
+		Calculate quantities used to normalize k, omega, and uz.
+		NOTE: currently I am not using a depth-dependent normalization, since we would like to compare amplitudes of modes at different depths.
+		"""
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		self.L_0 = cs_d**2/g
+		self.omega_0 = g/cs_d
+		
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		self.D = urms/self.omega_0
+
+class scalesMixin_L0HP():
+	"""
+	Here, L_0 is set as the pressure scale height
+	"""
+	def get_scales(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		gamma = self.param.gamma
+		
+		self.L_0 = cs_d**2/(g*gamma)
+		self.omega_0 = g/cs_d
+		
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		self.D = urms/self.omega_0
+
+class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
@@ -231,20 +265,6 @@ class disp_rel_from_yaver(disp_rel):
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
-	
-	def get_scales(self):
-		"""
-		Calculate quantities used to normalize k, omega, and uz.
-		NOTE: currently I am not using a depth-dependent normalization, since we would like to compare amplitudes of modes at different depths.
-		"""
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		self.L_0 = cs_d**2/g
-		self.omega_0 = g/cs_d
-		
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		self.D = urms/self.omega_0
 	
 	def prep_data_for_plot(self, z):
 		"""
@@ -339,21 +359,8 @@ class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 		
 		self.D = 1
 
-class disp_rel_from_yaver_L0_HP(disp_rel_from_yaver):
-	"""
-	Here, L_0 is set as the pressure scale height
-	"""
-	def get_scales(self):
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		gamma = self.param.gamma
-		
-		self.L_0 = cs_d**2/(g*gamma)
-		self.omega_0 = g/cs_d
-		
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		self.D = urms/self.omega_0
+class disp_rel_from_yaver_L0_HP(scalesMixin_L0HP, disp_rel_from_yaver):
+	pass
 
 @dataclass
 class fake_grid:
