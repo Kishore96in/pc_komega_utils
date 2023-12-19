@@ -110,8 +110,8 @@ class disp_rel_from_yaver():
 		
 		uz_fft = scipy.fft.fft2(uz, norm='forward', axes=[0,2])
 		uz_fft = fftshift(uz_fft, axes=[0,2])
-		self.uz_fft = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
-		n_omega, n_kx, _ = np.shape(self.uz_fft)
+		self.data = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
+		n_omega, n_kx, _ = np.shape(self.data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
@@ -146,7 +146,7 @@ class disp_rel_from_yaver():
 		
 		kx = self.kx[ikx_min:ikx_max]
 		omega = self.omega[iomega_min:iomega_max]
-		uz_fft = self.uz_fft[iomega_min:iomega_max,ikx_min:ikx_max]
+		uz_fft = self.data[iomega_min:iomega_max,ikx_min:ikx_max]
 		
 		iz_surf = np.argmin(np.abs(z - self.grid.z))
 		
@@ -211,7 +211,7 @@ class disp_rel_from_yaver():
 		
 		iz = np.argmin(np.abs(z - self.grid.z))
 		ik = np.argmin(np.abs(k_tilde - self.kx*self.L_0))
-		data = self.omega*self.uz_fft[:,ik,iz]/(self.omega_0*self.D**2)
+		data = self.omega*self.data[:,ik,iz]/(self.omega_0*self.D**2)
 		
 		if absval:
 			data = np.abs(data)
@@ -312,7 +312,7 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		uz_fft = scipy.fft.fft2(uz, norm='forward', axes=[0,2,3])
 		uz_fft = fftshift(uz_fft, axes=[0,2,3])
 		self.data = np.transpose(uz_fft, axes=[0,3,2,1])
-		n_omega, n_kx, n_ky, _ = np.shape(self.uz_fft)
+		n_omega, n_kx, n_ky, _ = np.shape(self.data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
