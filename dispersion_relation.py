@@ -305,6 +305,53 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
 		self.z = z
 		
+	@staticmethod
+	def _generate_slicer(omega, omega_list):
+		"""
+		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
+		"""
+		omega_list = np.array(omega_list)
+		if omega is None:
+			return slice(None)
+		elif iterable(omega) and len(omega) == 2:
+			i_min = np.argmin(np.abs(omega[0] - omega_list))
+			i_max = np.argmin(np.abs(omega[1] - omega_list))
+			return slice(i_min, i_max)
+		elif isinstance (omega, numbers.Number):
+			i = np.argmin(np.abs(omega - omega_list))
+			return i
+		else:
+			raise ValueError(f"Unable to handle {type(omega) = }")
+	
+	def get_slice(omega_tilde=None, kx_tilde=None, ky_tilde=None, z=None):
+		"""
+		Slice data in terms of physical values
+		
+		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter.
+		"""
+		om_list = self.omega/self.omega_0
+		kx_list = self.kx*self.L_0
+		ky_list = self.ky*self.L_0
+		z_list = self.z
+		
+		om_slice = self._generate_slicer(omega_tilde, om_list)
+		kx_slice = self._generate_slicer(kx_tilde, kx_list)
+		ky_slice = self._generate_slicer(ky_tilde, ky_list)
+		z_slice = self._generate_slicer(z, z_list)
+		
+		om_list = om_list[om_slice]
+		kx_list = kx_list[kx_slice]
+		ky_list = ky_list[ky_slice]
+		z_list = z_list[z_slice]
+		data = self.data[
+			om_slice,
+			kx_slice,
+			ky_slice,
+			z_slice,
+			]
+		
+		return data, [om_list, kx_list, ky_list, z_list]
+
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
