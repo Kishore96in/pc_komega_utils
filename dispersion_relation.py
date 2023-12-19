@@ -153,7 +153,7 @@ class disp_rel_from_yaver():
 		
 		iz_surf = np.argmin(np.abs(z - self.grid.z))
 		
-		data = np.abs(omega[:,None]*uz_fft[:,:,iz_surf]/(self.omega_0*self.D**2)) #NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(omega_tilde[:,None]*uz_fft[:,:,iz_surf]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		return kx_tilde, omega_tilde, data
