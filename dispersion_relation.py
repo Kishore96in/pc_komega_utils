@@ -227,6 +227,14 @@ class disp_rel_from_yaver():
 		omt_near_target = om_tilde[i_min:i_max]
 		
 		return omt_near_target, data_near_target
+	
+	@property
+	def omega_tilde(self):
+		return self.omega*self.omega_0
+	
+	@property
+	def kx_tilde(self):
+		return self.kx*self.L_0
 
 class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}}$"
@@ -262,6 +270,10 @@ class fake_grid():
 	z
 
 class disp_rel_from_dvar(disp_rel_from_yaver):
+	@property
+	def ky_tilde(self):
+		return self.ky*self.L_0
+	
 	def read(self):
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
