@@ -280,7 +280,7 @@ class disp_rel_from_yaver():
 	
 	@property
 	def omega_tilde(self):
-		return self.omega*self.omega_0
+		return self.omega/self.omega_0
 	
 	@property
 	def kx_tilde(self):
