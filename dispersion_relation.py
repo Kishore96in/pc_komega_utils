@@ -156,16 +156,11 @@ class disp_rel_from_yaver():
 		
 		return kx_tilde, omega_tilde, data
 	
-	def plot_komega(self, z):
-		"""
-		Plot the k-omega diagram at a given height z.
-		"""
-		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
-		
+	def contourplotter(self, x, y, data):
 		fig,ax = plt.subplots()
 		im = ax.contourf(
-			k_tilde,
-			omega_tilde,
+			x,
+			y,
 			data,
 			levels = np.logspace(
 				np.log10(np.nanmin(data)),
@@ -181,14 +176,23 @@ class disp_rel_from_yaver():
 			format = mpl.ticker.LogFormatterSciNotation(),
 			ticks = mpl.ticker.LogLocator(),
 			)
-		ax.set_title(f"z = {z:.2f}")
-		ax.set_xlabel(r"$\widetilde{{k}}_x$")
-		ax.set_ylabel(r"$\widetilde{{\omega}}$")
-		c.set_label(r"$\hat{{u}} \widetilde{{\omega}} / D^2$")
-		
-		fig.tight_layout()
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
+	
+	def plot_komega(self, z):
+		"""
+		Plot the k-omega diagram at a given height z.
+		"""
+		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
+		p = self.contourplotter(k_tilde, omega_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
+		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
+		p.cbar.set_label(r"$\hat{{u}} \widetilde{{\omega}} / D^2$")
+		
+		p.fig.tight_layout()
+		return p
 	
 	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None, absval=True):
 		"""
