@@ -321,6 +321,8 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 	def _generate_slicer(omega, omega_list):
 		"""
 		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
+		
+		Slicing with the return of this function will not reduce the number of axes in the array.
 		"""
 		omega_list = np.array(omega_list)
 		if omega is None:
@@ -331,7 +333,7 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 			return slice(i_min, i_max)
 		elif isinstance (omega, numbers.Number):
 			i = np.argmin(np.abs(omega - omega_list))
-			return i
+			return [i]
 		else:
 			raise ValueError(f"Unable to handle {type(omega) = }")
 	
