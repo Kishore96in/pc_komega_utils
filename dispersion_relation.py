@@ -350,6 +350,13 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		self.vard = np.array(vard)
 		self.t_vard = np.array(t_vard)
 		self.grid_d = fake_grid(np.shape(vard[-3::-1]))
+		
+		self.av_xy = pc.read.aver(
+			datadir=self.datadir,
+			simdir=self.simdir,
+			plane_list=['xy'],
+			time_range=[self.t_min, t_max],
+			)
 	
 	def do_ft(self):
 		fftshift = scipy.fft.fftshift
