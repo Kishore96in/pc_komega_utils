@@ -448,6 +448,78 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
+	
+	def plot_komega(self, z):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, omega_tilde) at a given height z and ky_tilde=0.
+		"""
+		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
+			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
+			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
+			ky_tilde = 0,
+			z = z,
+			)
+		
+		data = np.abs(omega_tilde[:,None]*data[:,:,0,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(kx_tilde, omega_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
+		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
+	
+	def plot_kyomega(self, z):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (ky_tilde, omega_tilde) at a given height z and kx_tilde=0.
+		"""
+		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
+			kx_tilde = 0,
+			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
+			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
+			z = z,
+			)
+		
+		data = np.abs(omega_tilde[:,None]*data[:,0,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(ky_tilde, omega_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
+		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
+	
+	def plot_ring(self, z, omega_tilde):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, ky_tilde) at a given height z and angular frequency omega_tilde.
+		"""
+		data, [[om_tilde], kx_tilde, ky_tilde, _] = self.get_slice(
+			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
+			omega_tilde = omega_tilde,
+			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
+			z = z,
+			)
+		
+		data = np.abs(om_tilde*data[0,:,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(kx_tilde, ky_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
+		p.ax.set_ylabel(r"$\widetilde{{k}}_x$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
 
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
