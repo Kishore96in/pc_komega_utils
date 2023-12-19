@@ -14,6 +14,7 @@ import scipy.signal
 import scipy.optimize
 import numbers
 import collections
+import abc
 
 from dataclasses import dataclass
 
@@ -40,12 +41,24 @@ class contourplot_container(plot_container):
 		self.cbar = colorbar
 		self.savedir = savedir
 
-class disp_rel_from_yaver():
-	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+class disp_rel(metaclass=abc.ABCMeta):
 	
 	@property
-	def data_axes(self):
-		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
+	@abc.abstractmethod
+	def data_axes():
+		raise NotImplementedError
+	
+	@abc.abstractmethod
+	def read():
+		raise NotImplementedError
+	
+	@abc.abstractmethod
+	def do_ft():
+		raise NotImplementedError
+	
+	@abc.abstractmethod
+	def get_scales():
+		raise NotImplementedError
 	
 	def __init__(self,
 		simdir=".", #Location of the simulation to be read
@@ -86,6 +99,81 @@ class disp_rel_from_yaver():
 		for k in self.data_axes.keys():
 			if not hasattr(self, k):
 				raise AttributeError(f"Key {k} in data_axes is not an attribute.")
+	
+	def contourplotter(self, x, y, data):
+		fig,ax = plt.subplots()
+		im = ax.contourf(
+			x,
+			y,
+			data,
+			levels = np.logspace(
+				np.log10(np.nanmin(data)),
+				np.log10(np.nanmax(data)),
+				1001
+				),
+			norm = mpl.colors.LogNorm(),
+			)
+		
+		c = plt.colorbar(
+			im,
+			ax = ax,
+			format = mpl.ticker.LogFormatterSciNotation(),
+			ticks = mpl.ticker.LogLocator(),
+			)
+		
+		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
+	
+	@staticmethod
+	def _generate_slicer(omega, omega_list):
+		"""
+		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
+		
+		Slicing with the return of this function will not reduce the number of axes in the array.
+		"""
+		omega_list = np.array(omega_list)
+		if omega is None:
+			return slice(None)
+		elif isinstance(omega, collections.abc.Iterable) and len(omega) == 2:
+			i_min = np.argmin(np.abs(omega[0] - omega_list))
+			i_max = np.argmin(np.abs(omega[1] - omega_list))
+			return slice(i_min, i_max)
+		elif isinstance (omega, numbers.Number):
+			i = np.argmin(np.abs(omega - omega_list))
+			return [i]
+		else:
+			raise ValueError(f"Unable to handle {type(omega) = }")
+	
+	def get_slice(self, **kwargs):
+		"""
+		Slice data in terms of physical values
+		
+		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
+		"""
+		data = self.data
+		
+		coords = [None for i in range(data.ndim)]
+		for name, i in self.data_axes.items():
+			coord_list = getattr(self, name)
+			if name in kwargs.keys():
+				coord_val = kwargs[name]
+			else:
+				coord_val = None
+			sl = self._generate_slicer(coord_val, coord_list)
+			
+			data = np.moveaxis(data, i, 0)
+			data = data[sl]
+			data = np.moveaxis(data, 0, i)
+			
+			coords[i] = coord_list[sl]
+		
+		return data, coords
+
+class disp_rel_from_yaver(disp_rel):
+	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+	
+	@property
+	def data_axes(self):
+		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
 	
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
@@ -156,29 +244,6 @@ class disp_rel_from_yaver():
 		
 		return kx_tilde, omega_tilde, data
 	
-	def contourplotter(self, x, y, data):
-		fig,ax = plt.subplots()
-		im = ax.contourf(
-			x,
-			y,
-			data,
-			levels = np.logspace(
-				np.log10(np.nanmin(data)),
-				np.log10(np.nanmax(data)),
-				1001
-				),
-			norm = mpl.colors.LogNorm(),
-			)
-		
-		c = plt.colorbar(
-			im,
-			ax = ax,
-			format = mpl.ticker.LogFormatterSciNotation(),
-			ticks = mpl.ticker.LogLocator(),
-			)
-		
-		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
-	
 	def plot_komega(self, z):
 		"""
 		Plot the k-omega diagram at a given height z.
@@ -231,51 +296,6 @@ class disp_rel_from_yaver():
 			data_near_target = np.abs(data_near_target)
 		
 		return omt_near_target, data_near_target
-	
-	@staticmethod
-	def _generate_slicer(omega, omega_list):
-		"""
-		Choose the slice of omega_list corresponding to the given omega. Returns an object which can be used to index an array. Argument omega can be either None (select the entire range), a float, or a tuple or two floats.
-		
-		Slicing with the return of this function will not reduce the number of axes in the array.
-		"""
-		omega_list = np.array(omega_list)
-		if omega is None:
-			return slice(None)
-		elif isinstance(omega, collections.abc.Iterable) and len(omega) == 2:
-			i_min = np.argmin(np.abs(omega[0] - omega_list))
-			i_max = np.argmin(np.abs(omega[1] - omega_list))
-			return slice(i_min, i_max)
-		elif isinstance (omega, numbers.Number):
-			i = np.argmin(np.abs(omega - omega_list))
-			return [i]
-		else:
-			raise ValueError(f"Unable to handle {type(omega) = }")
-	
-	def get_slice(self, **kwargs):
-		"""
-		Slice data in terms of physical values
-		
-		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
-		"""
-		data = self.data
-		
-		coords = [None for i in range(data.ndim)]
-		for name, i in self.data_axes.items():
-			coord_list = getattr(self, name)
-			if name in kwargs.keys():
-				coord_val = kwargs[name]
-			else:
-				coord_val = None
-			sl = self._generate_slicer(coord_val, coord_list)
-			
-			data = np.moveaxis(data, i, 0)
-			data = data[sl]
-			data = np.moveaxis(data, 0, i)
-			
-			coords[i] = coord_list[sl]
-		
-		return data, coords
 	
 	@property
 	def omega_tilde(self):
