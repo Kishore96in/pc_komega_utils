@@ -81,6 +81,11 @@ class disp_rel_from_yaver():
 		self.read()
 		self.do_ft()
 		self.get_scales()
+		
+		#Sanity checks
+		for k in self.data_axes.keys():
+			if not hasattr(self, k):
+				raise AttributeError(f"Key {k} in data_axes is not an attribute.")
 	
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
