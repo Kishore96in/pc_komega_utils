@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import scipy.signal
 import scipy.optimize
+import numbers
 
 from dataclasses import dataclass
 from collections import abc
