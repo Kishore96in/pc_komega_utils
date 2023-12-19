@@ -266,10 +266,10 @@ class disp_rel_from_yaver_L0_HP(disp_rel_from_yaver):
 		self.D = urms/self.omega_0
 
 @dataclass
-class fake_grid():
-	x
-	y
-	z
+class fake_grid:
+	x: np.ndarray
+	y: np.ndarray
+	z: np.ndarray
 
 class disp_rel_from_dvar(disp_rel_from_yaver):
 	@property
