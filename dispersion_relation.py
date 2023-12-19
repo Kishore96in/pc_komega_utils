@@ -205,24 +205,21 @@ class disp_rel_from_yaver():
 		if omega_tilde_max is None:
 			omega_tilde_max = self.omega_tilde_max
 		
-		iz = np.argmin(np.abs(z - self.grid.z))
-		ik = np.argmin(np.abs(k_tilde - self.kx_tilde))
-		data = self.omega*self.data[:,ik,iz]/(self.omega_0*self.D**2)
+		if omega_tilde_min < np.min(self.omega_tilde):
+			raise ValueError(f"omega_tilde_min ({omega_tilde_min:.2e}) needs to be greater than the minimum value of omega_tilde ({np.min(self.omega_tilde):.2e}).")
+		if omega_tilde_max > np.max(self.omega_tilde):
+			raise ValueError(f"omega_tilde_max ({omega_tilde_max:.2e}) needs to be less than the maximum value of omega_tilde ({np.max(self.omega_tilde):.2e}).")
+		
+		data_near_target, [omt_near_target, _, _] = self.get_slice(
+			omega_tilde=(omega_tilde_min, omega_tilde_max),
+			kx_tilde = k_tilde,
+			z = z
+			)
+		
+		data_near_target = omt_near_target*data_near_target[:,0,0]/self.D**2
 		
 		if absval:
-			data = np.abs(data)
-		
-		om_tilde = self.omega_tilde
-		
-		if omega_tilde_min < np.min(om_tilde):
-			raise ValueError(f"omega_tilde_min ({omega_tilde_min:.2e}) needs to be greater than the minimum value of omega_tilde ({np.min(om_tilde):.2e}).")
-		if omega_tilde_max > np.max(om_tilde):
-			raise ValueError(f"omega_tilde_max ({omega_tilde_max:.2e}) needs to be less than the maximum value of omega_tilde ({np.max(om_tilde):.2e}).")
-		
-		i_min = np.argmin(np.abs(om_tilde - omega_tilde_min))
-		i_max = np.argmin(np.abs(om_tilde - omega_tilde_max))
-		data_near_target = data[i_min:i_max]
-		omt_near_target = om_tilde[i_min:i_max]
+			data_near_target = np.abs(data_near_target)
 		
 		return omt_near_target, data_near_target
 	
