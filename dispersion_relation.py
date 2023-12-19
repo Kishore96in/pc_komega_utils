@@ -121,7 +121,6 @@ class disp_rel_from_yaver():
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
-		self.z = z
 	
 	def get_scales(self):
 		"""
@@ -286,6 +285,10 @@ class disp_rel_from_yaver():
 	@property
 	def kx_tilde(self):
 		return self.kx*self.L_0
+	
+	@property
+	def z(self):
+		return self.grid.z
 
 class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 	cbar_label_default = r"$\tilde{{\omega}} \hat{{u}}$"
@@ -329,6 +332,10 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 	def ky_tilde(self):
 		return self.ky*self.L_0
 	
+	@property
+	def z(self):
+		return self.grid_d.z
+	
 	def read(self):
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
@@ -370,7 +377,6 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
-		self.z = z
 
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
