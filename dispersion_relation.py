@@ -368,14 +368,29 @@ class fake_grid:
 	y: np.ndarray
 	z: np.ndarray
 
-class disp_rel_from_dvar(disp_rel_from_yaver):
+class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
+	"""
+	Read downsampled snapshots and plot dispersion relations from them.
+	"""
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'ky_tilde':2, 'z':3}
+		
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
 	
 	@property
 	def field_name_default(self):
 		return "uz"
+	
+	@property
+	def omega_tilde(self):
+		return self.omega/self.omega_0
+	
+	@property
+	def kx_tilde(self):
+		return self.kx*self.L_0
 	
 	@property
 	def ky_tilde(self):
