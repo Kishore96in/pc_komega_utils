@@ -134,26 +134,23 @@ class disp_rel_from_yaver():
 		"""
 		Return k_tilde, omega_tilde, and the normalized Fourier-transformed vertical velocity at a given height z.
 		"""
-		omega_0 = self.omega_0
-		L_0 = self.L_0
-		D = self.D
 		
 		#Find out which segments of the arrays are needed for the plot.
-		ikx_max = np.argmin(np.abs(self.k_tilde_max - self.kx*L_0))
-		ikx_min = np.argmin(np.abs(self.k_tilde_min - self.kx*L_0))
-		iomega_max = np.argmin(np.abs(self.omega_tilde_max - self.omega/omega_0))
-		iomega_min = np.argmin(np.abs(self.omega_tilde_min - self.omega/omega_0))
+		ikx_max = np.argmin(np.abs(self.k_tilde_max - self.kx_tilde))
+		ikx_min = np.argmin(np.abs(self.k_tilde_min - self.kx_tilde))
+		iomega_max = np.argmin(np.abs(self.omega_tilde_max - self.omega_tilde))
+		iomega_min = np.argmin(np.abs(self.omega_tilde_min - self.omega_tilde))
 		
-		kx = self.kx[ikx_min:ikx_max]
-		omega = self.omega[iomega_min:iomega_max]
+		kx_tilde = self.kx_tilde[ikx_min:ikx_max]
+		omega_tilde = self.omega_tilde[iomega_min:iomega_max]
 		uz_fft = self.data[iomega_min:iomega_max,ikx_min:ikx_max]
 		
 		iz_surf = np.argmin(np.abs(z - self.grid.z))
 		
-		data = np.abs(omega[:,None]*uz_fft[:,:,iz_surf]/(omega_0*D**2)) #NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(omega[:,None]*uz_fft[:,:,iz_surf]/(self.omega_0*self.D**2)) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
-		return kx*L_0, omega/omega_0, data
+		return kx_tilde, omega_tilde, data
 	
 	def plot_komega(self, z):
 		"""
@@ -210,13 +207,13 @@ class disp_rel_from_yaver():
 			omega_tilde_max = self.omega_tilde_max
 		
 		iz = np.argmin(np.abs(z - self.grid.z))
-		ik = np.argmin(np.abs(k_tilde - self.kx*self.L_0))
+		ik = np.argmin(np.abs(k_tilde - self.kx_tilde))
 		data = self.omega*self.data[:,ik,iz]/(self.omega_0*self.D**2)
 		
 		if absval:
 			data = np.abs(data)
 		
-		om_tilde = self.omega/self.omega_0
+		om_tilde = self.omega_tilde
 		
 		if omega_tilde_min < np.min(om_tilde):
 			raise ValueError(f"omega_tilde_min ({omega_tilde_min:.2e}) needs to be greater than the minimum value of omega_tilde ({np.min(om_tilde):.2e}).")
