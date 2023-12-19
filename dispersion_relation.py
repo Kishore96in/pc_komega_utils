@@ -192,7 +192,7 @@ class disp_rel_from_yaver():
 	
 	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None, absval=True):
 		"""
-		Get the values of omega_tilde and P(omega_tilde) at specified k_tilde and z.in the range omega_tilde_min < omega_tilde < omega_tilde_max
+		Get the values of omega_tilde and P(omega_tilde) at specified k_tilde and z in the range omega_tilde_min < omega_tilde < omega_tilde_max.
 		
 		Arguments:
 			k_tilde: float
