@@ -13,9 +13,9 @@ import matplotlib as mpl
 import scipy.signal
 import scipy.optimize
 import numbers
+import collections
 
 from dataclasses import dataclass
-from collections import abc
 
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
@@ -238,7 +238,7 @@ class disp_rel_from_yaver():
 		omega_list = np.array(omega_list)
 		if omega is None:
 			return slice(None)
-		elif isinstance(omega, abc.Iterable) and len(omega) == 2:
+		elif isinstance(omega, collections.abc.Iterable) and len(omega) == 2:
 			i_min = np.argmin(np.abs(omega[0] - omega_list))
 			i_max = np.argmin(np.abs(omega[1] - omega_list))
 			return slice(i_min, i_max)
