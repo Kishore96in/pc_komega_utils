@@ -1,6 +1,6 @@
 """
 This script assumes it is being run from the simulation directory.
-Assumes x and t are equispaced.
+Assumes x, y, and t are equispaced.
 """
 
 import os
