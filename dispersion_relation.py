@@ -271,7 +271,7 @@ class disp_rel_from_yaver(disp_rel):
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
-		p.cbar.set_label(r"$\hat{{u}} \widetilde{{\omega}} / D^2$")
+		p.cbar.set_label(self.cbar_label)
 		
 		p.fig.tight_layout()
 		return p
