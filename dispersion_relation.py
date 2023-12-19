@@ -284,6 +284,27 @@ class disp_rel_from_dvar(disp_rel_from_yaver):
 		self.t_vard = np.array(t_vard)
 		self.grid_d = fake_grid(np.shape(vard[-3::-1]))
 	
+	def do_ft(self):
+		fftshift = scipy.fft.fftshift
+		fftfreq = scipy.fft.fftfreq
+		x = self.grid_d.x
+		y = self.grid_d.y
+		z = self.grid_d.z
+		t = self.t_vard
+		uz = self.vard
+		
+		assert np.shape(uz) == (len(t), len(z), len(y), len(x))
+		
+		uz_fft = scipy.fft.fft2(uz, norm='forward', axes=[0,2,3])
+		uz_fft = fftshift(uz_fft, axes=[0,2,3])
+		self.data = np.transpose(uz_fft, axes=[0,3,2,1])
+		n_omega, n_kx, n_ky, _ = np.shape(self.uz_fft)
+		
+		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
+		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
+		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
+		self.z = z
+		
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
