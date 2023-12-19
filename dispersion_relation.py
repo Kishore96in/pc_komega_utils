@@ -274,7 +274,7 @@ class disp_rel_from_yaver():
 			data = data[sl]
 			data = np.moveaxis(data, 0, i)
 			
-			coords[i] = coord_list
+			coords[i] = coord_list[sl]
 		
 		return data, coords
 	
