@@ -412,12 +412,30 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		
 		vard = []
 		t_vard = []
-		for varname in sim.get_varlist(down=True):
-			var = pc.read.var(trimall=True, var_file=varname, sim=sim)
-			
-			if self.t_min < var.t < t_max:
+		
+		if sim.param['io_strategy'] == "HDF5":
+			proc_folder = "allprocs"
+			extension = ".h5"
+		elif sim.param['io_strategy'] == "dist":
+			proc_folder = "proc0"
+			extension = ""
+		else:
+			raise NotImplemented(f"Unsupported io_strategy {sim.param['io_strategy']}")
+		
+		#Get list of downsampled snapshots with corresponding times.
+		snap_list = np.loadtxt(os.path.join(sim.datadir, proc_folder, "varN_down.list"), dtype=np.dtype([('name', str, 20), ('time', float)]))
+		snap_list = np.unique(snap_list, axis=0)
+		snap_list = np.sort(snap_list, axis=0, order='time')
+		
+		for varname, t in snap_list:
+			if self.t_min < t < t_max:
+				print(f"Reading {varname}", end='\r') #debug
+				var = pc.read.var(trimall=True, var_file=f"{varname}{extension}", sim=sim)
 				vard.append(getattr(var, self.field_name))
 				t_vard.append(var.t)
+				
+				if not np.isclose(t, var.t):
+					raise RuntimeError(f"Snapshot time disagrees with the time in varN_down.list. {varname = }, {t = }")
 		
 		self.vard = np.array(vard)
 		self.t_vard = np.array(t_vard)
