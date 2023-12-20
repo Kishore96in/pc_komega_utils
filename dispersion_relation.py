@@ -429,7 +429,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		
 		for varname, t in snap_list:
 			if self.t_min < t < t_max:
-				print(f"Reading {varname}", end='\r') #debug
+				print(f"Reading {varname}", end='\r')
 				var = pc.read.var(trimall=True, var_file=f"{varname}{extension}", sim=sim)
 				vard.append(getattr(var, self.field_name))
 				t_vard.append(var.t)
