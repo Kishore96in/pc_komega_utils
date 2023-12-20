@@ -252,6 +252,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 		fftshift = scipy.fft.fftshift
 		fftfreq = scipy.fft.fftfreq
 		x = self.grid.x
+		Lx = self.grid.Lx
 		z = self.grid.z
 		t = self.av_y.t
 		uz = getattr(self.av_y.y, self.field_name)
@@ -264,7 +265,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 		n_omega, n_kx, _ = np.shape(self.data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
-		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
+		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
 	
 	def prep_data_for_plot(self, z):
 		"""
@@ -438,6 +439,8 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		x = self.grid_d.x
 		y = self.grid_d.y
 		z = self.grid_d.z
+		Lx = self.grid.Lx
+		Ly = self.grid.Ly
 		t = self.t_vard
 		uz = self.vard
 		
@@ -449,8 +452,8 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		n_omega, n_kx, n_ky, _ = np.shape(self.data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
-		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = (max(x)-min(x))/n_kx ))
-		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = (max(y)-min(y))/n_ky ))
+		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
+		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = Ly/n_ky ))
 	
 	def plot_komega(self, z):
 		"""
