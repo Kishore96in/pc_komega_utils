@@ -416,7 +416,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		vard = []
 		t_vard = []
 		for varname in sim.get_varlist(down=True):
-			var = pc.read.var(trimall=True, var_file=varname, datadir=self.datadir)
+			var = pc.read.var(trimall=True, var_file=varname, sim=sim)
 			
 			if self.t_min < var.t < t_max:
 				vard.append(getattr(var, self.field_name))
