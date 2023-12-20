@@ -368,9 +368,6 @@ class fake_grid:
 	x: np.ndarray
 	y: np.ndarray
 	z: np.ndarray
-	Lx: float
-	Ly: float
-	Lz: float
 
 class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 	"""
@@ -424,7 +421,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		
 		self.vard = np.array(vard)
 		self.t_vard = np.array(t_vard)
-		self.grid_d = fake_grid(x=var.x, y=var.y, z=var.z, Lx=self.grid.Lx, Ly=self.grid.Ly, Lz=self.grid.Lz)
+		self.grid_d = fake_grid(x=var.x, y=var.y, z=var.z)
 		
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
