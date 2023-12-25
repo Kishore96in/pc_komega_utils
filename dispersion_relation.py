@@ -273,11 +273,12 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 		
 		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2])
 		uz_fft = fftshift(uz_fft, axes=[0,2])
-		self.data = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
-		n_omega, n_kx, _ = np.shape(self.data)
+		data = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
+		n_omega, n_kx, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
+		self.data = self.scale_data(data)
 	
 	def prep_data_for_plot(self, z):
 		"""
