@@ -103,8 +103,8 @@ class disp_rel(metaclass=abc.ABCMeta):
 		self.cbar_label = cbar_label
 		
 		self.read()
-		self.do_ft()
 		self.get_scales()
+		self.do_ft()
 		
 		#Sanity checks
 		for k in self.data_axes.keys():
