@@ -283,7 +283,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 			z = z,
 			)
 		
-		data = omega_tilde[:,None]*self.scale_data(data[:,:,0]) #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*data[:,:,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		return kx_tilde, omega_tilde, data
@@ -333,7 +333,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 			z = z
 			)
 		
-		data_near_target = omt_near_target*self.scale_data(data_near_target)[:,0,0]
+		data_near_target = omt_near_target*data_near_target[:,0,0]
 		
 		return omt_near_target, data_near_target
 	
@@ -465,12 +465,13 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		
 		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2,3])
 		uz_fft = fftshift(uz_fft, axes=[0,2,3])
-		self.data = np.transpose(uz_fft, axes=[0,3,2,1])
-		n_omega, n_kx, n_ky, _ = np.shape(self.data)
+		data = np.transpose(uz_fft, axes=[0,3,2,1])
+		n_omega, n_kx, n_ky, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = Ly/n_ky ))
+		self.data = self.scale_data(data)
 	
 	def plot_komega(self, z):
 		"""
@@ -483,7 +484,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = omega_tilde[:,None]*self.scale_data(data)[:,:,0,0] #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*data[:,:,0,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(kx_tilde, omega_tilde, data)
@@ -507,7 +508,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = omega_tilde[:,None]*self.scale_data(data)[:,0,:,0] #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*data[:,0,:,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(ky_tilde, omega_tilde, data)
@@ -531,7 +532,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = om_tilde*self.scale_data(data_[0,:,:,0]) #NOTE: multiplying by omega to take 'running difference'
+		data = om_tilde*data[0,:,:,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(kx_tilde, ky_tilde, data)
