@@ -196,6 +196,9 @@ class scalesMixin_SBC15():
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
+	
+	def scale_data(self, data):
+		return np.abs(data)/self.D**2
 
 class scalesMixin_L0HP():
 	"""
@@ -212,6 +215,9 @@ class scalesMixin_L0HP():
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
+	
+	def scale_data(self, data):
+		return np.abs(data)/self.D**2
 
 class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	@property
@@ -277,7 +283,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 			z = z,
 			)
 		
-		data = np.abs(omega_tilde[:,None]*data[:,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*self.scale_data(data[:,:,0]) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		return kx_tilde, omega_tilde, data
@@ -297,7 +303,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 		p.fig.tight_layout()
 		return p
 	
-	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None, absval=True):
+	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None):
 		"""
 		Get the values of omega_tilde and P(omega_tilde) at specified k_tilde and z in the range omega_tilde_min < omega_tilde < omega_tilde_max.
 		
@@ -306,7 +312,6 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 			z: float
 			omega_tilde_min: float
 			omega_tilde_max: float
-			absval: bool, whether to take the absolute value of the data before returning.
 		
 		Returns:
 			omt_near_target: numpy array of float
@@ -328,10 +333,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 			z = z
 			)
 		
-		data_near_target = omt_near_target*data_near_target[:,0,0]/self.D**2
-		
-		if absval:
-			data_near_target = np.abs(data_near_target)
+		data_near_target = omt_near_target*self.scale_data(data_near_target)[:,0,0]
 		
 		return omt_near_target, data_near_target
 	
@@ -481,7 +483,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = np.abs(omega_tilde[:,None]*data[:,:,0,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*self.scale_data(data)[:,:,0,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(kx_tilde, omega_tilde, data)
@@ -505,7 +507,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = np.abs(omega_tilde[:,None]*data[:,0,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = omega_tilde[:,None]*self.scale_data(data)[:,0,:,0] #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(ky_tilde, omega_tilde, data)
@@ -529,7 +531,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 			z = z,
 			)
 		
-		data = np.abs(om_tilde*data[0,:,:,0]/self.D**2) #NOTE: multiplying by omega to take 'running difference'
+		data = om_tilde*self.scale_data(data_[0,:,:,0]) #NOTE: multiplying by omega to take 'running difference'
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		p = self.contourplotter(kx_tilde, ky_tilde, data)
