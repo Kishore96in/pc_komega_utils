@@ -187,7 +187,7 @@ class scalesMixin_dataRDbyD2():
 	def scale_data(self, data):
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
 		#NOTE: multiplying by omega to take 'running difference'
-		data = self.omega_tilde * np.abs(data)/self.D**2
+		data = np.abs(self.omega_tilde * data)/self.D**2
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
