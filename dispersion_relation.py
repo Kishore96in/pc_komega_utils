@@ -179,6 +179,18 @@ class disp_rel(metaclass=abc.ABCMeta):
 		
 		return data, coords
 
+class scalesMixin_data():
+	def scale_data(self, data):
+		return np.abs(data)/self.D**2
+
+class scalesMixin_dataRD():
+	def scale_data(self, data):
+		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
+		#NOTE: multiplying by omega to take 'running difference'
+		data = self.omega_tilde * np.abs(data)/self.D**2
+		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
+		return data
+
 class scalesMixin_SBC15(scalesMixin_dataRD):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
@@ -212,18 +224,6 @@ class scalesMixin_L0HP():
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
-
-class scalesMixin_data():
-	def scale_data(self, data):
-		return np.abs(data)/self.D**2
-
-class scalesMixin_dataRD():
-	def scale_data(self, data):
-		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
-		#NOTE: multiplying by omega to take 'running difference'
-		data = self.omega_tilde * np.abs(data)/self.D**2
-		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
-		return data
 
 class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	@property
