@@ -289,7 +289,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
 		p = self.contourplotter(k_tilde, omega_tilde, data)
 		
-		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
@@ -486,7 +486,7 @@ class disp_rel_from_dvar(scalesMixin_L0HP, disp_rel):
 		
 		p = self.contourplotter(kx_tilde, omega_tilde, data)
 		
-		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
