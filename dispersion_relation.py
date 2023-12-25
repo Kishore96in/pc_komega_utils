@@ -179,11 +179,11 @@ class disp_rel(metaclass=abc.ABCMeta):
 		
 		return data, coords
 
-class scalesMixin_data():
+class scalesMixin_databyD2():
 	def scale_data(self, data):
 		return np.abs(data)/self.D**2
 
-class scalesMixin_dataRD():
+class scalesMixin_dataRDbyD2():
 	def scale_data(self, data):
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
 		#NOTE: multiplying by omega to take 'running difference'
@@ -191,7 +191,7 @@ class scalesMixin_dataRD():
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-class scalesMixin_SBC15(scalesMixin_dataRD):
+class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
 	"""
@@ -377,7 +377,7 @@ class fake_grid:
 	y: np.ndarray
 	z: np.ndarray
 
-class disp_rel_from_dvar(scalesMixin_dataRD, scalesMixin_L0HP, disp_rel):
+class disp_rel_from_dvar(scalesMixin_dataRDbyD2, scalesMixin_L0HP, disp_rel):
 	"""
 	Read downsampled snapshots and plot dispersion relations from them.
 	"""
