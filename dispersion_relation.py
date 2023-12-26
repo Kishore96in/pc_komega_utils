@@ -181,13 +181,20 @@ class disp_rel(metaclass=abc.ABCMeta):
 
 class scalesMixin_databyD2():
 	def scale_data(self, data):
-		return np.abs(data)/self.D**2
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		D = urms/self.omega_0
+		return np.abs(data)/D**2
 
 class scalesMixin_dataRDbyD2():
 	def scale_data(self, data):
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		D = urms/self.omega_0
+		
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
 		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)/self.D**2
+		data = np.abs(self.omega_tilde * data)/D**2
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
