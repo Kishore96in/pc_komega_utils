@@ -1,7 +1,7 @@
 from .dispersion_relation import *
 from .fit import *
 
-#The following are defined for compatibility with old code
+#The following are defined for compatibility with old scripts
 class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
 	pass
 
