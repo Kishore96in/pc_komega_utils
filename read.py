@@ -577,6 +577,7 @@ class m_cpl_imshow():
 			extent = (min(x), max(x), min(y), max(y)),
 			aspect = 'auto',
 			norm = mpl.colors.LogNorm(),
+			interpolation = 'none',
 			)
 		
 		c = plt.colorbar(
