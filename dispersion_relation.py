@@ -241,7 +241,7 @@ class m_scl_HP():
 		g = np.abs(self.param.gravz)
 		return g/cs_d
 
-class disp_rel_from_yaver(m_scl_SBC15, dr_base):
+class dr_yaver_base(dr_base):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
@@ -372,7 +372,10 @@ class disp_rel_from_yaver(m_scl_SBC15, dr_base):
 	def z(self):
 		return self.grid.z
 
-class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
+class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
+	pass
+
+class disp_rel_nonorm_from_yaver(m_scl_SBC15, dr_yaver_base):
 	@property
 	def cbar_label_default(self):
 		return  r"$\tilde{{\omega}} \hat{{u}}$"
@@ -384,7 +387,7 @@ class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-class disp_rel_from_yaver_L0_HP(m_scl_HP, disp_rel_from_yaver):
+class disp_rel_from_yaver_L0_HP(m_scl_HP, m_dscl_rdbyD2, dr_yaver_base):
 	pass
 
 @dataclass
@@ -393,7 +396,7 @@ class fake_grid:
 	y: np.ndarray
 	z: np.ndarray
 
-class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_base):
+class dr_dvar_base(dr_base):
 	"""
 	Read downsampled snapshots and plot dispersion relations from them.
 	"""
@@ -566,6 +569,9 @@ class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_base):
 		
 		p.fig.tight_layout()
 		return p
+
+class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_dvar_base):
+	pass
 
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
