@@ -1,4 +1,4 @@
-from .dispersion_relation import *
+from .read import *
 from .fit import *
 from .deprecated import *
 

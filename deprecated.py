@@ -1,7 +1,7 @@
 """
 Defined only for compatibility with older scripts. Do not use in new code.
 """
-from .dispersion_relation import (
+from .read import (
 	m_scl_SBC15,
 	m_scl_HP,
 	m_dscl_rdbyD2,
