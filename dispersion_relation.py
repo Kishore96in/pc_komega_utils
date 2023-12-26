@@ -65,8 +65,14 @@ class disp_rel(metaclass=abc.ABCMeta):
 	def do_ft(self):
 		raise NotImplementedError
 	
+	@property
 	@abc.abstractmethod
-	def get_scales(self):
+	def omega_0(self):
+		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
+	def L_0(self):
 		raise NotImplementedError
 	
 	def __init__(self,
