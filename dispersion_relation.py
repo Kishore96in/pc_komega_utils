@@ -54,19 +54,19 @@ class disp_rel(metaclass=abc.ABCMeta):
 	
 	@property
 	@abc.abstractmethod
-	def data_axes():
+	def data_axes(self):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
-	def read():
+	def read(self):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
-	def do_ft():
+	def do_ft(self):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
-	def get_scales():
+	def get_scales(self):
 		raise NotImplementedError
 	
 	def __init__(self,
