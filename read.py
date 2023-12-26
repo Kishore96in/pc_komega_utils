@@ -565,6 +565,29 @@ class dr_dvar_base(dr_base):
 		p.fig.tight_layout()
 		return p
 
+class m_cpl_imshow():
+	"""
+	Mixin that overrides dr_base.contourplotter to do imshow instead.
+	"""
+	def contourplotter(self, x, y, data):
+		fig,ax = plt.subplots()
+		im = ax.imshow(
+			data,
+			origin = 'lower',
+			extent = (min(x), max(x), min(y), max(y)),
+			aspect = 'auto',
+			norm = mpl.colors.LogNorm(),
+			)
+		
+		c = plt.colorbar(
+			im,
+			ax = ax,
+			format = mpl.ticker.LogFormatterSciNotation(),
+			ticks = mpl.ticker.LogLocator(),
+			)
+		
+		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
+
 if __name__ == "__main__":
 	class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
 		pass
