@@ -187,81 +187,6 @@ class dr_base(metaclass=abc.ABCMeta):
 		
 		return data, coords
 
-class m_dscl_dbyD2():
-	@property
-	def cbar_label_default(self):
-		return  r"$\hat{{u}} / D^2$"
-	
-	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		D = urms/self.omega_0
-		return np.abs(data)/D**2
-
-class m_dscl_rdbyurmsmax():
-	@property
-	def cbar_label_default(self):
-		return  r"$\tilde{{\omega}} \tilde{{P}}$"
-	
-	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		
-		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
-		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)/urms
-		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
-		return data
-
-class m_dscl_rdbyD2():
-	@property
-	def cbar_label_default(self):
-		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
-	
-	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		D = urms/self.omega_0
-		
-		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
-		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)/D**2
-		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
-		return data
-
-class m_scl_SBC15(m_dscl_rdbyD2):
-	"""
-	Use the length and frequency scales defined by Singh et al, 2015.
-	"""
-	@property
-	def L_0(self):
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		return cs_d**2/g
-	
-	@property
-	def omega_0(self):
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		return g/cs_d
-
-class m_scl_HP():
-	"""
-	Here, L_0 is set as the pressure scale height
-	"""
-	@property
-	def L_0(self):
-		gamma = self.param.gamma
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		return cs_d**2/(g*gamma)
-	
-	@property
-	def omega_0(self):
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		return g/cs_d
-
 class dr_yaver_base(dr_base):
 	@property
 	def data_axes(self):
@@ -564,6 +489,81 @@ class dr_dvar_base(dr_base):
 		
 		p.fig.tight_layout()
 		return p
+
+class m_dscl_dbyD2():
+	@property
+	def cbar_label_default(self):
+		return  r"$\hat{{u}} / D^2$"
+	
+	def scale_data(self, data):
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		D = urms/self.omega_0
+		return np.abs(data)/D**2
+
+class m_dscl_rdbyurmsmax():
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \tilde{{P}}$"
+	
+	def scale_data(self, data):
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		
+		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
+		#NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(self.omega_tilde * data)/urms
+		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
+		return data
+
+class m_dscl_rdbyD2():
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+	
+	def scale_data(self, data):
+		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
+		D = urms/self.omega_0
+		
+		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
+		#NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(self.omega_tilde * data)/D**2
+		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
+		return data
+
+class m_scl_SBC15(m_dscl_rdbyD2):
+	"""
+	Use the length and frequency scales defined by Singh et al, 2015.
+	"""
+	@property
+	def L_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return cs_d**2/g
+	
+	@property
+	def omega_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return g/cs_d
+
+class m_scl_HP():
+	"""
+	Here, L_0 is set as the pressure scale height
+	"""
+	@property
+	def L_0(self):
+		gamma = self.param.gamma
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return cs_d**2/(g*gamma)
+	
+	@property
+	def omega_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return g/cs_d
 
 class m_cpl_imshow():
 	"""
