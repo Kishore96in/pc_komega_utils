@@ -367,7 +367,7 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	def z(self):
 		return self.grid.z
 
-class disp_rel_nonorm_from_yaver(scalesMixin_SBC15, disp_rel_from_yaver):
+class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 	@property
 	def cbar_label_default(self):
 		return  r"$\tilde{{\omega}} \hat{{u}}$"
