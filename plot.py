@@ -1,6 +1,10 @@
+"""
+Theoretical dispersion relations which I may want to mark on k-omega diagrams.
+"""
+
 import numpy as np
 
-def oplot_dr_f(dr, plot=None, ax=None):
+def f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
 	
