@@ -8,7 +8,7 @@ from .read import (
 	dr_yaver_base,
 	dr_dvar_base,
 	)
-from .plot import f
+from .plot import fmode
 
 class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
 	pass
@@ -31,4 +31,4 @@ class disp_rel_from_yaver_L0_HP(m_scl_HP, m_dscl_rdbyD2, dr_yaver_base):
 class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_dvar_base):
 	pass
 
-oplot_dr_f = f
+oplot_dr_f = fmode
