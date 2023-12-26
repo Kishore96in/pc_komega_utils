@@ -6,8 +6,8 @@ Class naming scheme
 	disp_rel_from_yaver: calculate dispersion relation from y averaged data
 	disp_rel_from_dvar: calculate dispersion relation from downsampled snapshots
 	
-	scalesMixin*: definitions of omega_0 and L_0
-	scalesMixin_data*: definitions of how the data should be normalized
+	m_scl_*: mixin classes defining omega_0 and L_0
+	m_dscl_*: mixin classes defining how the data should be normalized
 """
 
 import os
@@ -189,14 +189,14 @@ class disp_rel(metaclass=abc.ABCMeta):
 		
 		return data, coords
 
-class scalesMixin_databyD2():
+class m_dscl_dbyD2():
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		D = urms/self.omega_0
 		return np.abs(data)/D**2
 
-class scalesMixin_dataRDbyD2():
+class m_dscl_rdbyD2():
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
@@ -208,7 +208,7 @@ class scalesMixin_dataRDbyD2():
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
+class m_scl_SBC15(m_dscl_rdbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
 	"""
@@ -224,7 +224,7 @@ class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
 		g = np.abs(self.param.gravz)
 		return g/cs_d
 
-class scalesMixin_L0HP():
+class m_scl_HP():
 	"""
 	Here, L_0 is set as the pressure scale height
 	"""
@@ -241,7 +241,7 @@ class scalesMixin_L0HP():
 		g = np.abs(self.param.gravz)
 		return g/cs_d
 
-class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
+class disp_rel_from_yaver(m_scl_SBC15, disp_rel):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
@@ -384,7 +384,7 @@ class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-class disp_rel_from_yaver_L0_HP(scalesMixin_L0HP, disp_rel_from_yaver):
+class disp_rel_from_yaver_L0_HP(m_scl_HP, disp_rel_from_yaver):
 	pass
 
 @dataclass
@@ -393,7 +393,7 @@ class fake_grid:
 	y: np.ndarray
 	z: np.ndarray
 
-class disp_rel_from_dvar(scalesMixin_dataRDbyD2, scalesMixin_L0HP, disp_rel):
+class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, disp_rel):
 	"""
 	Read downsampled snapshots and plot dispersion relations from them.
 	"""
