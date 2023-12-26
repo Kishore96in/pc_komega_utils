@@ -69,10 +69,10 @@ def fit_mode(
 	gamma_max = None,
 	):
 	"""
-	Given a disp_rel_from_yaver instance, find the amplitude of a particular mode as a function of depth
+	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
 	
 	Arguments:
-		dr: disp_rel_from_yaver instance
+		dr: dr_yaver_base instance
 		k_tilde: float, wavenumber at which to find the amplitude
 		z: float, z-coordinate at which to read the data
 		om_tilde_min: float. Consider the part of the data above this frequency
@@ -159,7 +159,7 @@ def fit_mode_auto(
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
 	
 	Arguments:
-		dr: disp_rel_from_yaver instance
+		dr: dr_yaver_base instance
 		k_tilde: float
 		z: float
 		om_tilde_min: float
@@ -230,7 +230,7 @@ def get_mode_eigenfunction(
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
 	
 	Arguments:
-		dr: disp_rel_from_yaver instance.
+		dr: dr_yaver_base instance.
 		omega_0: float
 		k_tilde: float.
 		z_list: list of float. Values of z at which to get the eigenfunction.
