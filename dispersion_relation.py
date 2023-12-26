@@ -195,16 +195,21 @@ class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
 	"""
+	def L_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return cs_d**2/g
+	
+	def omega_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return g/cs_d
+	
 	def get_scales(self):
 		"""
 		Calculate quantities used to normalize k, omega, and uz.
 		NOTE: currently I am not using a depth-dependent normalization, since we would like to compare amplitudes of modes at different depths.
 		"""
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		self.L_0 = cs_d**2/g
-		self.omega_0 = g/cs_d
-		
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
@@ -213,14 +218,19 @@ class scalesMixin_L0HP():
 	"""
 	Here, L_0 is set as the pressure scale height
 	"""
-	def get_scales(self):
+	
+	def L_0(self):
+		gamma = self.param.gamma
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
-		gamma = self.param.gamma
-		
-		self.L_0 = cs_d**2/(g*gamma)
-		self.omega_0 = g/cs_d
-		
+		return cs_d**2/(g*gamma)
+	
+	def omega_0(self):
+		cs_d = np.sqrt(self.param.cs2cool)
+		g = np.abs(self.param.gravz)
+		return g/cs_d
+	
+	def get_scales(self):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		self.D = urms/self.omega_0
