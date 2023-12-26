@@ -1,19 +1,12 @@
 """
 Defined only for compatibility with older scripts. Do not use in new code.
 """
-from .read import (
-	m_scl_SBC15,
-	m_scl_HP,
-	m_dscl_rdbyD2,
-	dr_yaver_base,
-	dr_dvar_base,
-	)
-from .plot import fmode
+from . import read, plot, fit
 
-class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
+class disp_rel_from_yaver(read.m_scl_SBC15, read.dr_yaver_base):
 	pass
 
-class disp_rel_nonorm_from_yaver(m_scl_SBC15, dr_yaver_base):
+class disp_rel_nonorm_from_yaver(read.m_scl_SBC15, read.dr_yaver_base):
 	@property
 	def cbar_label_default(self):
 		return  r"$\tilde{{\omega}} \hat{{u}}$"
@@ -25,10 +18,11 @@ class disp_rel_nonorm_from_yaver(m_scl_SBC15, dr_yaver_base):
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-class disp_rel_from_yaver_L0_HP(m_scl_HP, m_dscl_rdbyD2, dr_yaver_base):
+class disp_rel_from_yaver_L0_HP(read.m_scl_HP, read.m_dscl_rdbyD2, read.dr_yaver_base):
 	pass
 
-class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_dvar_base):
+class disp_rel_from_dvar(read.m_dscl_rdbyD2, read.m_scl_HP, read.dr_dvar_base):
 	pass
 
-oplot_dr_f = fmode
+oplot_dr_f = plot.fmode
+smooth = fit.smooth
