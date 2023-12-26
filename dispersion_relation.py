@@ -109,7 +109,6 @@ class disp_rel(metaclass=abc.ABCMeta):
 		self.cbar_label = cbar_label
 		
 		self.read()
-		self.get_scales()
 		self.do_ft()
 		
 		#Sanity checks
@@ -219,15 +218,6 @@ class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
 		return g/cs_d
-	
-	def get_scales(self):
-		"""
-		Calculate quantities used to normalize k, omega, and uz.
-		NOTE: currently I am not using a depth-dependent normalization, since we would like to compare amplitudes of modes at different depths.
-		"""
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		self.D = urms/self.omega_0
 
 class scalesMixin_L0HP():
 	"""
@@ -245,11 +235,6 @@ class scalesMixin_L0HP():
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
 		return g/cs_d
-	
-	def get_scales(self):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
-		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
-		self.D = urms/self.omega_0
 
 class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	@property
@@ -382,18 +367,17 @@ class disp_rel_from_yaver(scalesMixin_SBC15, disp_rel):
 	def z(self):
 		return self.grid.z
 
-class disp_rel_nonorm_from_yaver(disp_rel_from_yaver):
+class disp_rel_nonorm_from_yaver(scalesMixin_SBC15, disp_rel_from_yaver):
 	@property
 	def cbar_label_default(self):
 		return  r"$\tilde{{\omega}} \hat{{u}}$"
 	
-	def get_scales(self):
-		cs_d = np.sqrt(self.param.cs2cool)
-		g = np.abs(self.param.gravz)
-		self.L_0 = cs_d**2/g
-		self.omega_0 = g/cs_d
-		
-		self.D = 1
+	def scale_data(self, data):
+		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
+		#NOTE: multiplying by omega to take 'running difference'
+		data = np.abs(self.omega_tilde * data)
+		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
+		return data
 
 class disp_rel_from_yaver_L0_HP(scalesMixin_L0HP, disp_rel_from_yaver):
 	pass
