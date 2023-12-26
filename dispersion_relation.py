@@ -8,11 +8,6 @@ Class naming scheme
 	
 	scalesMixin*: definitions of omega_0 and L_0
 	scalesMixin_data*: definitions of how the data should be normalized
-
-Functions:
-	fit_mode
-	fit_mode_auto
-	get_mode_eigenfunction
 """
 
 import os
