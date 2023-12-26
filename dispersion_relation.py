@@ -1,6 +1,18 @@
 """
 This script assumes it is being run from the simulation directory.
 Assumes x, y, and t are equispaced.
+
+Class naming scheme
+	disp_rel_from_yaver: calculate dispersion relation from y averaged data
+	disp_rel_from_dvar: calculate dispersion relation from downsampled snapshots
+	
+	scalesMixin*: definitions of omega_0 and L_0
+	scalesMixin_data*: definitions of how the data should be normalized
+
+Functions:
+	fit_mode
+	fit_mode_auto
+	get_mode_eigenfunction
 """
 
 import os
