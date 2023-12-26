@@ -1,3 +1,5 @@
+import numpy as np
+
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
 	Overplot the dispersion relation corresponding to the f mode
