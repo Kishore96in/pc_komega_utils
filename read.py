@@ -3,9 +3,7 @@ This script assumes it is being run from the simulation directory.
 Assumes x, y, and t are equispaced.
 
 Class naming scheme
-	disp_rel_from_yaver: calculate dispersion relation from y averaged data
-	disp_rel_from_dvar: calculate dispersion relation from downsampled snapshots
-	
+	dr_*: read simulation data and plot k-omega diagrams
 	m_scl_*: mixin classes defining omega_0 and L_0
 	m_dscl_*: mixin classes defining how the data should be normalized
 """
