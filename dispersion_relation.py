@@ -46,7 +46,7 @@ class contourplot_container(plot_container):
 		self.cbar = colorbar
 		self.savedir = savedir
 
-class disp_rel(metaclass=abc.ABCMeta):
+class dr_base(metaclass=abc.ABCMeta):
 	@property
 	@abc.abstractmethod
 	def cbar_label_default(self):
@@ -241,7 +241,7 @@ class m_scl_HP():
 		g = np.abs(self.param.gravz)
 		return g/cs_d
 
-class disp_rel_from_yaver(m_scl_SBC15, disp_rel):
+class disp_rel_from_yaver(m_scl_SBC15, dr_base):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
@@ -393,7 +393,7 @@ class fake_grid:
 	y: np.ndarray
 	z: np.ndarray
 
-class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, disp_rel):
+class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_base):
 	"""
 	Read downsampled snapshots and plot dispersion relations from them.
 	"""
