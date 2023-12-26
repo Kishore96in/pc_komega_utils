@@ -372,24 +372,6 @@ class dr_yaver_base(dr_base):
 	def z(self):
 		return self.grid.z
 
-class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
-	pass
-
-class disp_rel_nonorm_from_yaver(m_scl_SBC15, dr_yaver_base):
-	@property
-	def cbar_label_default(self):
-		return  r"$\tilde{{\omega}} \hat{{u}}$"
-	
-	def scale_data(self, data):
-		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
-		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)
-		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
-		return data
-
-class disp_rel_from_yaver_L0_HP(m_scl_HP, m_dscl_rdbyD2, dr_yaver_base):
-	pass
-
 @dataclass
 class fake_grid:
 	x: np.ndarray
@@ -570,8 +552,6 @@ class dr_dvar_base(dr_base):
 		p.fig.tight_layout()
 		return p
 
-class disp_rel_from_dvar(m_dscl_rdbyD2, m_scl_HP, dr_dvar_base):
-	pass
 
 def oplot_dr_f(dr, plot=None, ax=None):
 	"""
@@ -596,6 +576,9 @@ def oplot_dr_f(dr, plot=None, ax=None):
 	return ax.plot(k_tilde, omega_tilde, ls='--', c='k', alpha=0.3)
 
 if __name__ == "__main__":
+	class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
+		pass
+	
 	dr = disp_rel_from_yaver()
 	dr.plot_komega(1)
 	
