@@ -195,11 +195,13 @@ class scalesMixin_SBC15(scalesMixin_dataRDbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
 	"""
+	@property
 	def L_0(self):
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
 		return cs_d**2/g
 	
+	@property
 	def omega_0(self):
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
@@ -218,13 +220,14 @@ class scalesMixin_L0HP():
 	"""
 	Here, L_0 is set as the pressure scale height
 	"""
-	
+	@property
 	def L_0(self):
 		gamma = self.param.gamma
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
 		return cs_d**2/(g*gamma)
 	
+	@property
 	def omega_0(self):
 		cs_d = np.sqrt(self.param.cs2cool)
 		g = np.abs(self.param.gravz)
