@@ -188,6 +188,10 @@ class dr_base(metaclass=abc.ABCMeta):
 		return data, coords
 
 class m_dscl_dbyD2():
+	@property
+	def cbar_label_default(self):
+		return  r"$\hat{{u}} / D^2$"
+	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
@@ -195,6 +199,10 @@ class m_dscl_dbyD2():
 		return np.abs(data)/D**2
 
 class m_dscl_rdbyurmsmax():
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \tilde{{P}}$"
+	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
@@ -206,6 +214,10 @@ class m_dscl_rdbyurmsmax():
 		return data
 
 class m_dscl_rdbyD2():
+	@property
+	def cbar_label_default(self):
+		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
+	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
@@ -254,10 +266,6 @@ class dr_yaver_base(dr_base):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'z':2}
-		
-	@property
-	def cbar_label_default(self):
-		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
 	
 	@property
 	def field_name_default(self):
@@ -394,10 +402,6 @@ class dr_dvar_base(dr_base):
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'ky_tilde':2, 'z':3}
-		
-	@property
-	def cbar_label_default(self):
-		return  r"$\tilde{{\omega}} \hat{{u}} / D^2$"
 	
 	@property
 	def field_name_default(self):
