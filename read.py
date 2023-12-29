@@ -314,23 +314,13 @@ class dr_yaver_base(dr_base):
 	def z(self):
 		return self.grid.z
 
-@dataclass
-class fake_grid:
-	x: np.ndarray
-	y: np.ndarray
-	z: np.ndarray
-
-class dr_dvar_base(dr_base):
+class dr_3d_base(dr_base):
 	"""
-	Read downsampled snapshots and plot dispersion relations from them.
+	Base class for objects which have both kx and ky.
 	"""
 	@property
 	def data_axes(self):
 		return {'omega_tilde':0, 'kx_tilde':1, 'ky_tilde':2, 'z':3}
-	
-	@property
-	def field_name_default(self):
-		return "uz"
 	
 	@property
 	def omega_tilde(self):
@@ -343,6 +333,97 @@ class dr_dvar_base(dr_base):
 	@property
 	def ky_tilde(self):
 		return self.ky*self.L_0
+	
+	@property
+	@abc.abstractmethod
+	def z(self):
+		raise NotImplementedError
+	
+	def plot_komega(self, z):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, omega_tilde) at a given height z and ky_tilde=0.
+		"""
+		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
+			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
+			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
+			ky_tilde = 0,
+			z = z,
+			)
+		
+		data = data[:,:,0,0]
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(kx_tilde, omega_tilde, data)
+		
+		p.ax.set_title(f"$z = {z:.2f}$")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
+		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
+	
+	def plot_kyomega(self, z):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (ky_tilde, omega_tilde) at a given height z and kx_tilde=0.
+		"""
+		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
+			kx_tilde = 0,
+			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
+			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
+			z = z,
+			)
+		
+		data = data[:,0,:,0]
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(ky_tilde, omega_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
+		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
+	
+	def plot_ring(self, z, omega_tilde):
+		"""
+		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, ky_tilde) at a given height z and angular frequency omega_tilde.
+		"""
+		data, [[om_tilde], kx_tilde, ky_tilde, _] = self.get_slice(
+			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
+			omega_tilde = omega_tilde,
+			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
+			z = z,
+			)
+		
+		data = data[0,:,:,0]
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		p = self.contourplotter(kx_tilde, ky_tilde, data)
+		
+		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
+		p.ax.set_ylabel(r"$\widetilde{{k}}_x$")
+		p.cbar.set_label(self.cbar_label)
+		
+		p.fig.tight_layout()
+		return p
+
+@dataclass
+class fake_grid:
+	x: np.ndarray
+	y: np.ndarray
+	z: np.ndarray
+
+class dr_dvar_base(dr_3d_base):
+	"""
+	Read downsampled snapshots and plot dispersion relations from them.
+	"""
+	@property
+	def field_name_default(self):
+		return "uz"
 	
 	@property
 	def z(self):
@@ -417,78 +498,6 @@ class dr_dvar_base(dr_base):
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = Ly/n_ky ))
 		self.data = self.scale_data(data)
-	
-	def plot_komega(self, z):
-		"""
-		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, omega_tilde) at a given height z and ky_tilde=0.
-		"""
-		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
-			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
-			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
-			ky_tilde = 0,
-			z = z,
-			)
-		
-		data = data[:,:,0,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		p = self.contourplotter(kx_tilde, omega_tilde, data)
-		
-		p.ax.set_title(f"$z = {z:.2f}$")
-		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
-		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
-		p.cbar.set_label(self.cbar_label)
-		
-		p.fig.tight_layout()
-		return p
-	
-	def plot_kyomega(self, z):
-		"""
-		Plot the normalized Fourier-transformed vertical velocity vs (ky_tilde, omega_tilde) at a given height z and kx_tilde=0.
-		"""
-		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
-			kx_tilde = 0,
-			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
-			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
-			z = z,
-			)
-		
-		data = data[:,0,:,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		p = self.contourplotter(ky_tilde, omega_tilde, data)
-		
-		p.ax.set_title(f"z = {z:.2f}")
-		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
-		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
-		p.cbar.set_label(self.cbar_label)
-		
-		p.fig.tight_layout()
-		return p
-	
-	def plot_ring(self, z, omega_tilde):
-		"""
-		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, ky_tilde) at a given height z and angular frequency omega_tilde.
-		"""
-		data, [[om_tilde], kx_tilde, ky_tilde, _] = self.get_slice(
-			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
-			omega_tilde = omega_tilde,
-			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
-			z = z,
-			)
-		
-		data = data[0,:,:,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		p = self.contourplotter(kx_tilde, ky_tilde, data)
-		
-		p.ax.set_title(f"z = {z:.2f}")
-		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
-		p.ax.set_ylabel(r"$\widetilde{{k}}_x$")
-		p.cbar.set_label(self.cbar_label)
-		
-		p.fig.tight_layout()
-		return p
 
 class dr_pxy_base(dr_dvar_base):
 	"""
