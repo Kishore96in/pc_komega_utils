@@ -490,6 +490,80 @@ class dr_dvar_base(dr_base):
 		p.fig.tight_layout()
 		return p
 
+class dr_pxy_base(dr_dvar_base):
+	"""
+	Read the output of power_xy and plot dispersion relations from them. Requires lintegrate_z=F, lintegrate_shell=F, and lcomplex=F in power_spectrum_run_pars.
+	"""
+	@property
+	def field_name_default(self):
+		return "uz_xy"
+	
+	@property
+	def z(self):
+		return self.pxy.zpos
+	
+	def read(self):
+		#check if the right values were passed to power_spectrum_run_pars
+		if not self.param.lcomplex:
+			raise ValueError("Need lcomplex=T")
+		if self.param.lintegrate_shell:
+			raise ValueError("Need lintegrate_shell=F")
+		if self.param.lintegrate_z:
+			raise ValueError("Need lintegrate_z=F")
+		
+		sim = pc.sim.get(self.simdir, quiet=True)
+		
+		pxy = pc.read.power(datadir=self.datadir, quiet=True)
+		self.ts = pc.read.ts(sim=sim, quiet=True)
+		
+		if self.t_max is None:
+			t_max = self.ts.t[-1]
+		else:
+			t_max = self.t_max
+		
+		it_min = np.argmin(np.abs(pxy.t - self.t_min))
+		it_max = np.argmin(np.abs(pxy.t - t_max))
+		for k, v in pxy.__dict__.items():
+			if k not in [
+				#keys which don't have a time axis.
+				"kx",
+				"ky",
+				"nzpos",
+				"zpos",
+				"k",
+				"krms",
+				]:
+				setattr(pxy, k, v[it_min:it_max])
+		self.pxy = pxy
+		
+		self.av_xy = pc.read.aver(
+			datadir=self.datadir,
+			simdir=self.simdir,
+			plane_list=['xy'],
+			time_range=[self.t_min, t_max],
+			)
+	
+	def do_ft(self):
+		fftshift = scipy.fft.fftshift
+		fftfreq = scipy.fft.fftfreq
+		kx = self.pxy.kx
+		ky = self.pxy.ky
+		z = self.pxy.zpos
+		t = self.pxy.t
+		uz = getattr(self.pxy, self.field_name)
+		
+		assert np.shape(uz) == (len(t), len(z), len(ky), len(kx))
+		
+		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0])
+		uz_fft = fftshift(uz_fft, axes=[0])
+		data = np.transpose(uz_fft, axes=[0,3,2,1])
+		n_omega, _, _, _ = np.shape(data)
+		
+		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
+		self.kx = kx
+		self.ky = ky
+		self.data = self.scale_data(data)
+
 class m_dscl_dbyD2():
 	@property
 	def cbar_label_default(self):
