@@ -130,16 +130,19 @@ def fit_mode(
 		"""
 		sigma = 1
 	
-	model.popt, model.pcov = scipy.optimize.curve_fit(
-		model,
-		omt_near_target,
-		data_near_target,
-		p0 = guess,
-		sigma = np.full_like(data_near_target, sigma),
-		bounds = (lbound,ubound),
-		maxfev=int(1e4),
-		absolute_sigma = True,
-		)
+	try:
+		model.popt, model.pcov = scipy.optimize.curve_fit(
+			model,
+			omt_near_target,
+			data_near_target,
+			p0 = guess,
+			sigma = np.full_like(data_near_target, sigma),
+			bounds = (lbound,ubound),
+			maxfev=int(1e4),
+			absolute_sigma = True,
+			)
+	except Exception as e:
+		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error:\n\t{e}")
 	
 	return model
 
