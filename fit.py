@@ -138,7 +138,10 @@ def fit_mode(
 			p0 = guess,
 			sigma = np.full_like(data_near_target, sigma),
 			bounds = (lbound,ubound),
+			method='dogbox',
 			maxfev=int(1e4),
+			xtol=None,
+			x_scale='jac',
 			absolute_sigma = True,
 			)
 	except Exception as e:
