@@ -96,9 +96,6 @@ def fit_mode(
 	guess_poly = np.zeros(model.poly_order + 1)
 	guess_lor = np.zeros((model.n_lorentz,3))
 	
-	if model.n_lorentz > 0:
-		guess_lor[0,0] = np.max(np.abs(data_near_target))
-	
 	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz+2)[1:-1]
 	if om_guess is not None:
 		for i in range(min(model.n_lorentz, len(om_guess))):
@@ -106,6 +103,9 @@ def fit_mode(
 	
 	guess_lor[:,2] = gamma_max/2
 	guess = model.pack_params(guess_poly, guess_lor)
+	
+	if model.n_lorentz > 0:
+		guess_lor[0,0] = 10*np.max(np.abs(data_near_target))*guess_lor[0,2]*np.pi
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
