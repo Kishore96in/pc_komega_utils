@@ -122,13 +122,20 @@ def fit_mode(
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	#A crude guess for sigma
-	sigma = stdev_central(data_near_target, 0.05)
+	sigma = np.full_like(
+		data_near_target,
+		stdev_central(data_near_target, 0.05),
+		)
 	
-	if sigma == 0:
+	if np.all(sigma == 0):
 		"""
 		This can only happen if np.all(data_near_target == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
 		"""
-		sigma = 1
+		sigma[:] = 1
+	elif np.any(sigma == 0):
+		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
+		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
+		sigma = np.where(sigma == 0, min_sigma, sigma)
 	
 	try:
 		model.popt, model.pcov = scipy.optimize.curve_fit(
@@ -136,7 +143,7 @@ def fit_mode(
 			omt_near_target,
 			data_near_target,
 			p0 = guess,
-			sigma = np.full_like(data_near_target, sigma),
+			sigma = sigma,
 			bounds = (lbound,ubound),
 			method='dogbox',
 			maxfev=int(1e4),
