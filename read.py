@@ -573,7 +573,7 @@ class m_dscl_dbyD2():
 class m_dscl_rdbyurmsmax():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \tilde{{\omega}} \tilde{{P}} \right|$"
+		return  r"$\left| \widetilde{{\omega}} \widetilde{{P}} \right|$"
 	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
@@ -588,7 +588,7 @@ class m_dscl_rdbyurmsmax():
 class m_dscl_rdbyD2():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \tilde{{\omega}} \hat{{u}} \right| / D^2$"
+		return  r"$\left| \widetilde{{\omega}} \hat{{u}} \right| / D^2$"
 	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
