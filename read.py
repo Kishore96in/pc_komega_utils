@@ -120,6 +120,11 @@ class dr_base(metaclass=abc.ABCMeta):
 				raise AttributeError(f"Key {k} in data_axes is not an attribute.")
 	
 	def contourplotter(self, x, y, data):
+		if np.all(data == 0):
+			raise RuntimeError("The selected slice is all zeros")
+		
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
 		fig,ax = plt.subplots()
 		im = ax.contourf(
 			x,
@@ -238,9 +243,9 @@ class dr_yaver_base(dr_base):
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
 		self.data = self.scale_data(data)
 	
-	def prep_data_for_plot(self, z):
+	def plot_komega(self, z):
 		"""
-		Return k_tilde, omega_tilde, and the normalized Fourier-transformed vertical velocity at a given height z.
+		Plot the k-omega diagram at a given height z.
 		"""
 		data, [omega_tilde, kx_tilde, _] = self.get_slice(
 			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
@@ -248,19 +253,7 @@ class dr_yaver_base(dr_base):
 			z = z,
 			)
 		
-		data = data[:,:,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		return kx_tilde, omega_tilde, data
-	
-	def plot_komega(self, z):
-		"""
-		Plot the k-omega diagram at a given height z.
-		"""
-		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
-		if np.all(np.isnan(data)):
-			raise RuntimeError("The selected slice is all zeros")
-		p = self.contourplotter(k_tilde, omega_tilde, data)
+		p = self.contourplotter(k_tilde, omega_tilde, data[:,:,0])
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -352,13 +345,7 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		data = data[:,:,0,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		if np.all(np.isnan(data)):
-			raise RuntimeError("The selected slice is all zeros")
-		
-		p = self.contourplotter(kx_tilde, omega_tilde, data)
+		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0,0])
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -379,13 +366,7 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		data = data[:,0,:,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		if np.all(np.isnan(data)):
-			raise RuntimeError("The selected slice is all zeros")
-		
-		p = self.contourplotter(ky_tilde, omega_tilde, data)
+		p = self.contourplotter(ky_tilde, omega_tilde, data[:,0,:,0])
 		
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
@@ -406,13 +387,7 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		data = data[0,:,:,0]
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
-		
-		if np.all(np.isnan(data)):
-			raise RuntimeError("The selected slice is all zeros")
-		
-		p = self.contourplotter(kx_tilde, ky_tilde, data)
+		p = self.contourplotter(kx_tilde, ky_tilde, data[0,:,:,0])
 		
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
@@ -664,6 +639,11 @@ class m_cpl_imshow():
 	Mixin that overrides dr_base.contourplotter to do imshow instead.
 	"""
 	def contourplotter(self, x, y, data):
+		if np.all(data == 0):
+			raise RuntimeError("The selected slice is all zeros")
+		
+		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
 		fig,ax = plt.subplots()
 		im = ax.imshow(
 			data,
