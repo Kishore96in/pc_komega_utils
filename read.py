@@ -253,7 +253,7 @@ class dr_yaver_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(k_tilde, omega_tilde, data[:,:,0])
+		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0])
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -359,7 +359,7 @@ class dr_3d_base(dr_base):
 		"""
 		Plot the normalized Fourier-transformed vertical velocity vs (ky_tilde, omega_tilde) at a given height z and kx_tilde=0.
 		"""
-		data, [omega_tilde, kx_tilde, _, _] = self.get_slice(
+		data, [omega_tilde, _, ky_tilde, _] = self.get_slice(
 			kx_tilde = 0,
 			omega_tilde = (self.omega_tilde_min, self.omega_tilde_max),
 			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
