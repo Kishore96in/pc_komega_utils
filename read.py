@@ -258,6 +258,8 @@ class dr_yaver_base(dr_base):
 		Plot the k-omega diagram at a given height z.
 		"""
 		k_tilde, omega_tilde, data = self.prep_data_for_plot(z)
+		if np.all(np.isnan(data)):
+			raise RuntimeError("The selected slice is all zeros")
 		p = self.contourplotter(k_tilde, omega_tilde, data)
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
@@ -353,6 +355,9 @@ class dr_3d_base(dr_base):
 		data = data[:,:,0,0]
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
+		if np.all(np.isnan(data)):
+			raise RuntimeError("The selected slice is all zeros")
+		
 		p = self.contourplotter(kx_tilde, omega_tilde, data)
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
@@ -377,6 +382,9 @@ class dr_3d_base(dr_base):
 		data = data[:,0,:,0]
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
+		if np.all(np.isnan(data)):
+			raise RuntimeError("The selected slice is all zeros")
+		
 		p = self.contourplotter(ky_tilde, omega_tilde, data)
 		
 		p.ax.set_title(f"z = {z:.2f}")
@@ -400,6 +408,9 @@ class dr_3d_base(dr_base):
 		
 		data = data[0,:,:,0]
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		
+		if np.all(np.isnan(data)):
+			raise RuntimeError("The selected slice is all zeros")
 		
 		p = self.contourplotter(kx_tilde, ky_tilde, data)
 		
