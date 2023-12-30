@@ -220,6 +220,7 @@ def get_mode_eigenfunction(
 	force_n_lorentz = None,
 	omega_tol = None,
 	gamma_max = None,
+	mode_mass_method="sum",
 	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
@@ -235,6 +236,7 @@ def get_mode_eigenfunction(
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
 		gamma_max: float. See fit_mode.
+		mode_mass_method: string. How to compute the mode mass. Can be "sum" or "integral".
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
@@ -282,7 +284,12 @@ def get_mode_eigenfunction(
 			
 			if len(selected) > 0:
 				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
-				mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
+				if mode_mass_method == "integral":
+					mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
+				elif mode_mass_method == "sum":
+					mode_masses = np.array([np.sum(mode) for mode in modes])
+				else:
+					raise ValueError(f"Unsupported {mode_mass_method = }")
 				
 				main_mode = np.argmax(mode_masses)
 				width = selected[main_mode,2]
