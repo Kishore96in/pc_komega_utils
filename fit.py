@@ -317,6 +317,15 @@ def smooth(data, n):
 	weight = weight/np.sum(weight)
 	return scipy.signal.convolve(data, weight, mode='same')
 
+def smooth_gauss(data, n):
+	"""
+	data: numpy array
+	n: int, such that width of the smoothing filter (Gaussian) is 2*n+1
+	"""
+	weight = scipy.signal.windows.gaussian(2*n+1, std=n/3)
+	weight = weight/np.sum(weight)
+	return scipy.signal.convolve(data, weight, mode='same')
+
 def stdev_central(arr, frac, adjust=False):
 	"""
 	Estimate standard derivation of an array arr, considering only values between the frac*100 and (1-frac)*100 percentiles
