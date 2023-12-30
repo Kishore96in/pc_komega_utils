@@ -11,6 +11,7 @@ import warnings
 import numpy as np
 import scipy.signal
 import scipy.optimize
+import scipy.stats
 
 class make_model():
 	"""
@@ -316,23 +317,36 @@ def smooth(data, n):
 	weight = weight/np.sum(weight)
 	return scipy.signal.convolve(data, weight, mode='same')
 
-def stdev_central(arr, frac):
+def stdev_central(arr, frac, adjust=False):
 	"""
 	Estimate standard derivation of an array arr, considering only values between the frac*100 and (1-frac)*100 percentiles
 	
 	Arguments:
 		arr: 1D numpy array
 		frac: float
+		adjust: bool. Whether to scale the standard deviation to account for the outliers by assuming the array elements are IID Gaussian.
 	
 	Returns:
-		stdev: same as arr.dtype
+		stdev: scalar of type arr.dtype
 	"""
 	sort = np.sort(arr)
 	n = len(arr)
 	i_min = int(np.round(n*frac))
 	i_max = int(np.round(n*(1-frac)))
 	cut = sort[i_min:i_max]
-	return np.std(cut)
+	if len(cut) < 2:
+		raise ValueError(f"{frac = } is too high; not enough values left to estimate standard deviation.")
+	std = np.std(cut)
+	
+	if adjust:
+		sol = scipy.optimize.minimize(lambda x: (scipy.stats.norm().cdf(x) - frac)**2, x0=0)
+		if not sol.success:
+			raise RuntimeError(f"Could not find truncation location corresponding to given percentile for Gaussian distribution. {sol.message}")
+		a = sol.x[0]
+		scl = scipy.stats.truncnorm(a,-a).std()
+		return std/scl
+	else:
+		return std
 
 def estimate_sigma(data, gamma_max, omega_tilde):
 	sigma = np.full_like(data, np.sqrt(np.average(data**2) - np.average(data)**2))
