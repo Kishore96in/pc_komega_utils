@@ -139,7 +139,7 @@ def fit_mode(
 			absolute_sigma = True,
 			)
 	except Exception as e:
-		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error:\n\t{e}")
+		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e}")
 	
 	return model
 
