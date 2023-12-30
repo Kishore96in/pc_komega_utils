@@ -272,19 +272,28 @@ def get_mode_eigenfunction(
 		omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 		
 		if len(params_lorentz) > 0:
-			domega = omt_near_target[1] - omt_near_target[0]
+			"""
+			Among all Lorentzians which are within omega_tol of omega_0, we choose the Lorentzian with the highest mode mass. Lorentzians which are closer to the center of this mode than its width are considered as part of the same mode.
+			"""
+			selected = params_lorentz[
+				np.abs(params_lorentz[:,1] - omega_0) < omega_tol
+				]
 			
-			imode = np.argmin(np.abs(omega_0 - params_lorentz[:,1]))
-			omega_c = params_lorentz[imode,1]
-			
-			mode_mass = 0
-			#TODO: check with Nishant if summing the peaks as below is the right thing to do.
-			if np.abs(omega_c - omega_0) < omega_tol:
-				for i in range(fit.n_lorentz):
-					if np.abs(params_lorentz[i,1] - omega_c) < domega:
-						mode = fit.lorentzian(omt_near_target, *params_lorentz[i])
-						mode_mass += np.trapz(mode, omt_near_target)
-			
+			if len(selected) > 0:
+				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
+				mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
+				
+				main_mode = np.argmax(mode_masses)
+				width = selected[main_mode,2]
+				omega_c = selected[main_mode,1]
+				
+				mode_mass = np.sum(np.where(
+					np.abs(selected[:,1] - omega_c) < width,
+					mode_masses,
+					0,
+					))
+			else:
+				mode_mass == 0
 		elif np.any(data_near_target != 0):
 			"""
 			u_z is nonzero, but no Lorentzian was fitted.
