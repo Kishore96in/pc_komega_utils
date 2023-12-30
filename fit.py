@@ -121,21 +121,7 @@ def fit_mode(
 	ubound_lor[:,2] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
-	#A crude guess for sigma
-	sigma = np.full_like(
-		data_near_target,
-		stdev_central(data_near_target, 0.05),
-		)
-	
-	if np.all(sigma == 0):
-		"""
-		This can only happen if np.all(data_near_target == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
-		"""
-		sigma[:] = 1
-	elif np.any(sigma == 0):
-		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
-		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
-		sigma = np.where(sigma == 0, min_sigma, sigma)
+	sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	try:
 		model.popt, model.pcov = scipy.optimize.curve_fit(
@@ -186,13 +172,8 @@ def fit_mode_auto(
 	
 	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	
-	sigma = stdev_central(data_near_target, 0.05)
+	sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
-	if sigma == 0:
-		"""
-		This can only happen if np.all(data_near_target == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
-		"""
-		sigma = 1
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
 	chi2r = lambda fit: np.sum(((data_near_target - fit(omt_near_target, *fit.popt) )/sigma)**2)/(len(data_near_target) - fit.nparams)
@@ -343,3 +324,18 @@ def stdev_central(arr, frac):
 	i_max = int(np.round(n*(1-frac)))
 	cut = sort[i_min:i_max]
 	return np.std(cut)
+
+def estimate_sigma(data, gamma_max, omega_tilde):
+	sigma = np.full_like(data, np.sqrt(np.average(data**2) - np.average(data)**2))
+	
+	if np.all(sigma == 0):
+		"""
+		This can only happen if np.all(data == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
+		"""
+		sigma[:] = 1
+	elif np.any(sigma == 0):
+		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
+		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
+		sigma = np.where(sigma == 0, min_sigma, sigma)
+	
+	return sigma
