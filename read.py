@@ -191,6 +191,32 @@ class dr_base(metaclass=abc.ABCMeta):
 			coords[i] = coord_list[sl]
 		
 		return data, coords
+	
+	def slice_time(self, t, arr):
+		"""
+		Given times t and values at those times (arr), return a slice of arr between self.t_min and self.t_max.
+		
+		Arguments:
+			t: 1D numpy array
+			arr: numpy array whose first axis is the same size as t
+		"""
+		if np.shape(arr)[0] != len(t):
+			raise ValueError("Time axis size mismatch.")
+		
+		if self.t_max is None:
+			t_max = self.ts.t[-1]
+		else:
+			t_max = self.t_max
+		
+		if self.t_min < t[0]:
+			warnings.warn(f"t_min is not in provided range of t; {self.t_min = }, {t[0] = }")
+		if t_max > t[-1]:
+			warnings.warn(f"t_max is not in provided range of t; {t_max = }, {t[-1] = }")
+		
+		it_min = np.argmin(np.abs(t - self.t_min))
+		it_max = np.argmin(np.abs(t - t_max))
+		
+		return arr[it_min:it_max]
 
 class dr_yaver_base(dr_base):
 	@property
@@ -204,23 +230,16 @@ class dr_yaver_base(dr_base):
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
 		#TODO: handle hdf5 read errors below (just output a warning on each fail and retry)?
-		if self.t_max is None:
-			t_max = self.ts.t[-1]
-		else:
-			t_max = self.t_max
-		
 		self.av_y = pc.read.aver(
 			datadir=self.datadir,
 			simdir=self.simdir,
 			plane_list=['y'],
 			var_names=[self.field_name],
-			time_range=[self.t_min, t_max],
 			)
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
 			simdir=self.simdir,
 			plane_list=['xy'],
-			time_range=[self.t_min, t_max],
 			)
 		
 	def do_ft(self):
@@ -229,8 +248,8 @@ class dr_yaver_base(dr_base):
 		x = self.grid.x
 		Lx = self.grid.Lx
 		z = self.grid.z
-		t = self.av_y.t
-		uz = getattr(self.av_y.y, self.field_name)
+		t = self.slice_time(self.av_y.t, self.av_y.t)
+		uz = self.slice_time(self.av_y.t, getattr(self.av_y.y, self.field_name))
 		
 		assert np.shape(uz) == (len(t), len(z), len(x))
 		
@@ -470,8 +489,8 @@ class dr_dvar_base(dr_3d_base):
 		z = self.grid_d.z
 		Lx = self.grid.Lx
 		Ly = self.grid.Ly
-		t = self.t_vard
-		uz = self.vard
+		t = self.slice_time(self.t_vard, self.t_vard)
+		uz = self.slice_time(self.t_vard, self.vard)
 		
 		assert np.shape(uz) == (len(t), len(z), len(y), len(x))
 		
@@ -508,34 +527,12 @@ class dr_pxy_base(dr_dvar_base):
 		
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
-		pxy = pc.read.power(datadir=self.datadir, quiet=True)
 		self.ts = pc.read.ts(sim=sim, quiet=True)
-		
-		if self.t_max is None:
-			t_max = self.ts.t[-1]
-		else:
-			t_max = self.t_max
-		
-		it_min = np.argmin(np.abs(pxy.t - self.t_min))
-		it_max = np.argmin(np.abs(pxy.t - t_max))
-		for k, v in pxy.__dict__.items():
-			if k not in [
-				#keys which don't have a time axis.
-				"kx",
-				"ky",
-				"nzpos",
-				"zpos",
-				"k",
-				"krms",
-				]:
-				setattr(pxy, k, v[it_min:it_max])
-		self.pxy = pxy
-		
+		self.pxy = pc.read.power(datadir=self.datadir, quiet=True)
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
 			simdir=self.simdir,
 			plane_list=['xy'],
-			time_range=[self.t_min, t_max],
 			)
 	
 	def do_ft(self):
@@ -544,8 +541,8 @@ class dr_pxy_base(dr_dvar_base):
 		kx = self.pxy.kx
 		ky = self.pxy.ky
 		z = self.pxy.zpos
-		t = self.pxy.t
-		uz = getattr(self.pxy, self.field_name)
+		t = self.slice_time(self.pxy.t, self.pxy.t)
+		uz = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
 		
 		assert np.shape(uz) == (len(t), len(z), len(ky), len(kx))
 		
@@ -565,7 +562,7 @@ class m_dscl_dbyD2():
 		return  r"$\left| \hat{{u}} \right|/ D^2$"
 	
 	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.sqrt(np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.uz2mz), axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		D = urms/self.omega_0
 		return np.abs(data)/D**2
@@ -576,7 +573,7 @@ class m_dscl_rdbyurmsmax():
 		return  r"$\left| \widetilde{{\omega}} \, \widetilde{{P}} \right|$"
 	
 	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.sqrt(np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.uz2mz), axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
@@ -591,7 +588,7 @@ class m_dscl_rdbyD2():
 		return  r"$\left| \widetilde{{\omega}} \, \hat{{u}} \right| / D^2$"
 	
 	def scale_data(self, data):
-		urms = np.sqrt(np.average(self.av_xy.xy.uz2mz, axis=0))
+		urms = np.sqrt(np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.uz2mz), axis=0))
 		urms = np.max(urms) #Choosing the peak urms since I don't want the normalization to be depth-dependent.
 		D = urms/self.omega_0
 		
