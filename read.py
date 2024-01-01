@@ -78,6 +78,22 @@ class dr_base(metaclass=abc.ABCMeta):
 	def L_0(self):
 		raise NotImplementedError
 	
+	@property
+	def t_min(self):
+		return self._t_min
+	
+	@t_min.setter
+	def t_min(self, _):
+		raise AttributeError("Use set_t_range to change t_min")
+	
+	@property
+	def t_max(self):
+		return self._t_max
+	
+	@t_max.setter
+	def t_max(self, _):
+		raise AttributeError("Use set_t_range to change t_max")
+	
 	def __init__(self,
 		simdir=".", #Location of the simulation to be read
 		t_min=300, #For all calculations, only use data saved after this time
@@ -217,8 +233,8 @@ class dr_base(metaclass=abc.ABCMeta):
 		return arr[it_min:it_max]
 	
 	def set_t_range(self, t_min, t_max=None):
-		self.t_min = t_min
-		self.t_max = t_max
+		self._t_min = t_min
+		self._t_max = t_max
 		self.do_ft()
 
 class dr_yaver_base(dr_base):
