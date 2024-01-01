@@ -101,8 +101,6 @@ class dr_base(metaclass=abc.ABCMeta):
 		self.datadir = sim.datadir
 		self.param = pc.read.param(datadir=self.datadir)
 		self.grid = pc.read.grid(datadir=self.datadir, trim=True, quiet=True)
-		self.t_min = t_min
-		self.t_max = t_max
 		self.k_tilde_min = k_tilde_min
 		self.k_tilde_max = k_tilde_max
 		self.omega_tilde_min = omega_tilde_min
@@ -112,7 +110,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		self.cbar_label = cbar_label
 		
 		self.read()
-		self.do_ft()
+		self.set_t_range(t_min, t_max)
 		
 		#Sanity checks
 		for k in self.data_axes.keys():
@@ -217,6 +215,11 @@ class dr_base(metaclass=abc.ABCMeta):
 		it_max = np.argmin(np.abs(t - t_max))
 		
 		return arr[it_min:it_max]
+	
+	def set_t_range(self, t_min, t_max=None):
+		self.t_min = t_min
+		self.t_max = t_max
+		self.do_ft()
 
 class dr_yaver_base(dr_base):
 	@property
