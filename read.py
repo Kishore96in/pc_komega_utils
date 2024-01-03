@@ -116,6 +116,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		self.simdir = simdir
 		self.datadir = sim.datadir
 		self.param = pc.read.param(datadir=self.datadir)
+		self.dim = pc.read.dim(datadir=self.datadir)
 		self.grid = pc.read.grid(datadir=self.datadir, trim=True, quiet=True)
 		self.k_tilde_min = k_tilde_min
 		self.k_tilde_max = k_tilde_max
