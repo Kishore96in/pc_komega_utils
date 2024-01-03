@@ -692,6 +692,104 @@ class m_cpl_imshow():
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 
+class dr_stat(dr_base):
+	"""
+	Given a dr_base instance, divides the time series into subintervals and uses those to estimate the error in the data.
+	
+	Initialization arguments:
+		dr: dr_base instance
+		n_intervals: int. Number of subintervals to divide the time range into.
+	
+	Notable attributes:
+		self.data: mean of the data in the subintervals of the source
+		self.sigma: estimate of the error in self.data
+	"""
+	@property
+	def cbar_label_default(self):
+		return self._dr.cbar_label_default
+	
+	@property
+	def field_name_default(self):
+		return self._dr.field_name_default
+	
+	@property
+	def data_axes(self):
+		return self._dr.data_axes
+	
+	@property
+	def omega_0(self):
+		return self._dr.omega_0
+	
+	@property
+	def L_0(self):
+		return self._dr.L_0
+	
+	def read(self):
+		#Unused but required because we inherit from dr_base.
+		raise NotImplementedError
+	
+	def do_ft(self):
+		dr = self._dr
+		n_intervals = self.n_intervals
+		
+		if (self.t_min != dr.t_min) or (self.t_max != dr.t_max):
+			dr.set_t_range(self.t_min, self.t_max)
+		
+		#Choose t_max that ensures all the subintervals have the same number of time points.
+		nt = len(dr.omega_tilde)
+		dt = (dr.t_max - dr.t_min)/nt
+		nt = n_intervals*np.floor(nt/n_intervals)
+		t_max = dr.t_min + nt*dt
+		
+		t_ranges = np.linspace(dr.t_min, t_max, n_intervals + 1)
+		
+		data_sum = 0
+		data2_sum = 0
+		for t_min, t_max in zip(t_ranges[:-1], t_ranges[1:]):
+			dr.set_t_range(t_min, t_max)
+			data_sum += dr.data
+			data2_sum += dr.data**2
+		
+		data_mean = data_sum/n_intervals
+		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)
+		
+		self.omega = dr.omega
+		self.data = data_mean
+		self.sigma = sigma/np.sqrt(n_intervals)
+		
+		dr.set_t_range(self.t_min, self.t_max)
+	
+	def __init__(self, dr, n_intervals):
+		self._dr = dr
+		self.n_intervals = n_intervals
+		
+		for attr in [
+			"simdir",
+			"datadir",
+			"param",
+			"dim",
+			"grid",
+			"k_tilde_min",
+			"k_tilde_max",
+			"omega_tilde_min",
+			"omega_tilde_max",
+			"fig_savedir",
+			"field_name",
+			"cbar_label",
+			"ts",
+			"av_xy",
+			*dr.data_axes.keys(),
+			#Plotting functions
+			"plot_komega",
+			"plot_kyomega",
+			"plot_ring",
+			"get_data_at_kz"
+			]:
+			if hasattr(dr, attr):
+				setattr(self, attr, getattr(dr, attr))
+		
+		self.set_t_range(dr.t_min, dr.t_max)
+
 if __name__ == "__main__":
 	class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
 		pass
