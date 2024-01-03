@@ -234,6 +234,9 @@ class dr_base(metaclass=abc.ABCMeta):
 		return arr[it_min:it_max]
 	
 	def set_t_range(self, t_min, t_max=None):
+		if t_max is None:
+			t_max = self.ts.t[-1]
+		
 		self._t_min = t_min
 		self._t_max = t_max
 		self.do_ft()
