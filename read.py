@@ -591,7 +591,7 @@ class dr_pxy_base(dr_dvar_base):
 class m_dscl_dbyD2():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \hat{{u}} \right|/ D^2$"
+		return  r"$\left| \hat{{u}} \right|/ \mathcal{{D}}^2$"
 	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.uz2mz), axis=0))
@@ -617,7 +617,7 @@ class m_dscl_rdbyurmsmax():
 class m_dscl_rdbyD2():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \widetilde{{\omega}} \, \hat{{u}} \right| / D^2$"
+		return  r"$\left| \widetilde{{\omega}} \, \hat{{u}} \right| / \mathcal{{D}}^2$"
 	
 	def scale_data(self, data):
 		urms = np.sqrt(np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.uz2mz), axis=0))
