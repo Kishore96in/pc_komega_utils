@@ -548,6 +548,12 @@ class dr_pxy_base(dr_dvar_base):
 		if self.param.lintegrate_z:
 			raise ValueError("Need lintegrate_z=F")
 		
+		#The following two cause problems because the size-one axis is compressed by Power.read.
+		if self.dim.nxgrid == 1:
+			raise ValueError("Need nxgrid > 1")
+		if self.dim.nygrid == 1:
+			raise ValueError("Need nygrid > 1")
+		
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
 		self.ts = pc.read.ts(sim=sim, quiet=True)
