@@ -711,6 +711,8 @@ class dr_stat():
 		dr = self._dr
 		n_intervals = self.n_intervals
 		
+		t_min_orig = dr.t_min
+		t_max_orig = dr.t_max
 		if (self.t_min != dr.t_min) or (self.t_max != dr.t_max):
 			dr.set_t_range(self.t_min, self.t_max)
 		
@@ -741,7 +743,7 @@ class dr_stat():
 		if hasattr(dr, "ky"):
 			self.ky = dr.ky
 		
-		dr.set_t_range(self.t_min, self.t_max)
+		dr.set_t_range(t_min_orig, t_max_orig)
 	
 	def __new__(cls, dr, *args, **kwargs):
 		newcls = type(f"{type(dr).__name__}_stat", (cls, dr.__class__,) , {})
