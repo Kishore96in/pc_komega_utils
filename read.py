@@ -182,13 +182,16 @@ class dr_base(metaclass=abc.ABCMeta):
 		else:
 			raise ValueError(f"Unable to handle {type(omega) = }")
 	
-	def get_slice(self, **kwargs):
+	def get_slice(self, data=None, **kwargs):
 		"""
 		Slice data in terms of physical values
 		
 		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
 		"""
-		data = self.data
+		if data is None:
+			data = self.data
+		elif np.shape(data) != np.shape(self.data):
+			raise ValueError("Array to be sliced must be of the same shape as self.data.")
 		
 		coords = [None for i in range(data.ndim)]
 		for name, i in self.data_axes.items():
