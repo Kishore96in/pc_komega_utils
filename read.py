@@ -707,10 +707,6 @@ class dr_stat():
 		self.data: mean of the data in the subintervals of the source
 		self.sigma: estimate of the error in self.data
 	"""
-	def read(self):
-		#Unused but required because we inherit from dr_base.
-		raise NotImplementedError
-	
 	def do_ft(self):
 		dr = self._dr
 		n_intervals = self.n_intervals
