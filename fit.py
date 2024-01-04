@@ -379,6 +379,3 @@ def estimate_sigma(data, gamma_max, omega_tilde):
 	
 	return sigma
 
-def compress_empty_axes(arr):
-	newshape = tuple([i for i in arr.shape if i != 1])
-	return np.reshape(arr, newshape)

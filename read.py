@@ -182,11 +182,15 @@ class dr_base(metaclass=abc.ABCMeta):
 		else:
 			raise ValueError(f"Unable to handle {type(omega) = }")
 	
-	def get_slice(self, data=None, **kwargs):
+	def get_slice(self, data=None, compress=False, **kwargs):
 		"""
 		Slice data in terms of physical values
 		
 		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
+		
+		Arguments:
+			data: optional, numpy array. Slice this instead of self.data. Needs to be of the same shape as data.
+			compress: option, bool. Whether to remove size-one axes from the sliced array.
 		"""
 		if data is None:
 			data = self.data
@@ -207,6 +211,9 @@ class dr_base(metaclass=abc.ABCMeta):
 			data = np.moveaxis(data, 0, i)
 			
 			coords[i] = coord_list[sl]
+		
+		if compress:
+			data = data.reshape(*[i for i in arr.shape if i != 1])
 		
 		return data, coords
 	
