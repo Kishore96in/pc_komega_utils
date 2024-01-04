@@ -182,12 +182,13 @@ class dr_base(metaclass=abc.ABCMeta):
 		else:
 			raise ValueError(f"Unable to handle {type(omega) = }")
 	
-	def slice_by_value(self, data, **kwargs):
+	def get_slice(self, **kwargs):
 		"""
-		The equivalent of get_slice, but for an arbitrary array (of the same size as self.data)
+		Slice data in terms of physical values
+		
+		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
 		"""
-		if np.shape(data) != np.shape(self.data):
-			raise ValueError("Size of array is not the same as that of data.")
+		data = self.data
 		
 		coords = [None for i in range(data.ndim)]
 		for name, i in self.data_axes.items():
@@ -205,14 +206,6 @@ class dr_base(metaclass=abc.ABCMeta):
 			coords[i] = coord_list[sl]
 		
 		return data, coords
-	
-	def get_slice(self, **kwargs):
-		"""
-		Slice data in terms of physical values
-		
-		Each arg can be either a float (get the data at that particular value of the specified parameter) or a tuple of two floats (get the data in that range of the specified parameter). Each argument needs to be a keyword, corresponding to the keys of data_axes.
-		"""
-		return self.slice_by_value(self.data, **kwargs)
 	
 	def slice_time(self, t, arr):
 		"""
