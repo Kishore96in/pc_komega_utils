@@ -327,7 +327,7 @@ def smooth(data, n):
 def smooth_gauss(data, n):
 	"""
 	data: numpy array
-	n: int, such that width of the smoothing filter (Gaussian) is 2*n+1
+	n: int, such that width of the smoothing filter (Gaussian) is 2*n+1 and its standard deviation is n/3.
 	"""
 	weight = scipy.signal.windows.gaussian(2*n+1, std=n/3)
 	weight = weight/np.sum(weight)
