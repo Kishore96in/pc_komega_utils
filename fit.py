@@ -189,6 +189,9 @@ def fit_mode_auto(
 	
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
+	if len(data_near_target) < fit.nparams:
+		raise RuntimeError("Data series is too short for fit.")
+	
 	chi2r = lambda fit: np.sum(((data_near_target - fit(omt_near_target, *fit.popt) )/sigma)**2)/(len(data_near_target) - fit.nparams)
 	
 	fit_old = None
