@@ -748,7 +748,7 @@ class dr_stat():
 		dr.set_t_range(self.t_min, self.t_max)
 	
 	def __new__(cls, dr, *args, **kwargs):
-		newcls = type(cls.__name__, (cls, dr.__class__,) , {})
+		newcls = type(f"{type(dr).__name__}_stat", (cls, dr.__class__,) , {})
 		obj = object.__new__(newcls)
 		obj.__init__(dr, 3)
 		return obj
