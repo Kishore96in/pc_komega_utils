@@ -89,7 +89,13 @@ def fit_mode(
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
-	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+	data_near_target, [omt_near_target, *_] = dr.get_slice(
+		omega_tilde=(om_tilde_min, om_tilde_max),
+		kx_tilde = k_tilde,
+		ky_tilde = 0,
+		z = z,
+		compress = True,
+		)
 	
 	model = make_model(poly_order, n_lorentz)
 	
@@ -171,7 +177,13 @@ def fit_mode_auto(
 		gamma_max: float. Passed to fit_mode.
 	"""
 	
-	omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+	data_near_target, [omt_near_target, *_] = dr.get_slice(
+		omega_tilde=(om_tilde_min, om_tilde_max),
+		kx_tilde = k_tilde,
+		ky_tilde = 0,
+		z = z,
+		compress = True,
+		)
 	
 	sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
@@ -272,7 +284,13 @@ def get_mode_eigenfunction(
 		
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
-		omt_near_target, data_near_target = dr.get_data_at_kz(k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+		data_near_target, [omt_near_target, *_] = dr.get_slice(
+			omega_tilde=(om_tilde_min, om_tilde_max),
+			kx_tilde = k_tilde,
+			ky_tilde = 0,
+			z = z,
+			compress = True,
+			)
 		
 		if len(params_lorentz) > 0:
 			"""
