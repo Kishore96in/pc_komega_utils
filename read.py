@@ -732,7 +732,8 @@ class dr_stat():
 			data2_sum += dr.data**2
 		
 		data_mean = data_sum/n_intervals
-		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)
+		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
+		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*sqrt(n_intervals/(n_intervals-1))
 		
 		self.omega = dr.omega
 		self.data = data_mean
