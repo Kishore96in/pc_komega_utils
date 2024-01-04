@@ -213,7 +213,7 @@ class dr_base(metaclass=abc.ABCMeta):
 			coords[i] = coord_list[sl]
 		
 		if compress:
-			data = data.reshape(*[i for i in arr.shape if i != 1])
+			data = data.reshape(*[i for i in data.shape if i != 1])
 		
 		return data, coords
 	
