@@ -707,26 +707,6 @@ class dr_stat():
 		self.data: mean of the data in the subintervals of the source
 		self.sigma: estimate of the error in self.data
 	"""
-	@property
-	def cbar_label_default(self):
-		return self._dr.cbar_label_default
-	
-	@property
-	def field_name_default(self):
-		return self._dr.field_name_default
-	
-	@property
-	def data_axes(self):
-		return self._dr.data_axes
-	
-	@property
-	def omega_0(self):
-		return self._dr.omega_0
-	
-	@property
-	def L_0(self):
-		return self._dr.L_0
-	
 	def read(self):
 		#Unused but required because we inherit from dr_base.
 		raise NotImplementedError
