@@ -695,7 +695,7 @@ class m_cpl_imshow():
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 
-class dr_stat(dr_base):
+class dr_stat():
 	"""
 	Given a dr_base instance, divides the time series into subintervals and uses those to estimate the error in the data.
 	
@@ -760,7 +760,18 @@ class dr_stat(dr_base):
 		self.data = data_mean
 		self.sigma = sigma/np.sqrt(n_intervals)
 		
+		if hasattr(dr, "kx"):
+			self.kx = dr.kx
+		if hasattr(dr, "ky"):
+			self.ky = dr.ky
+		
 		dr.set_t_range(self.t_min, self.t_max)
+	
+	def __new__(cls, dr, *args, **kwargs):
+		newcls = type(cls.__name__, (cls, dr.__class__,) , {})
+		obj = object.__new__(newcls)
+		obj.__init__(dr, 3)
+		return obj
 	
 	def __init__(self, dr, n_intervals):
 		self._dr = dr
@@ -781,12 +792,6 @@ class dr_stat(dr_base):
 			"cbar_label",
 			"ts",
 			"av_xy",
-			*dr.data_axes.keys(),
-			#Plotting functions
-			"plot_komega",
-			"plot_kyomega",
-			"plot_ring",
-			"get_data_at_kz"
 			]:
 			if hasattr(dr, attr):
 				setattr(self, attr, getattr(dr, attr))
