@@ -724,6 +724,38 @@ class dr_stat():
 		self.data: mean of the data in the subintervals of the source
 		self.sigma: estimate of the error in self.data
 	"""
+	
+	def __new__(cls, dr, *args, **kwargs):
+		newcls = type(f"{type(dr).__name__}_stat", (cls, dr.__class__,) , {})
+		obj = object.__new__(newcls)
+		obj.__init__(dr, *args, **kwargs)
+		return obj
+	
+	def __init__(self, dr, n_intervals):
+		self._dr = dr
+		self.n_intervals = n_intervals
+		
+		for attr in [
+			"simdir",
+			"datadir",
+			"param",
+			"dim",
+			"grid",
+			"k_tilde_min",
+			"k_tilde_max",
+			"omega_tilde_min",
+			"omega_tilde_max",
+			"fig_savedir",
+			"field_name",
+			"cbar_label",
+			"ts",
+			"av_xy",
+			]:
+			if hasattr(dr, attr):
+				setattr(self, attr, getattr(dr, attr))
+		
+		self.set_t_range(dr.t_min, dr.t_max)
+	
 	def do_ft(self):
 		dr = self._dr
 		n_intervals = self.n_intervals
@@ -762,37 +794,6 @@ class dr_stat():
 			self.ky = dr.ky
 		
 		dr.set_t_range(t_min_orig, t_max_orig)
-	
-	def __new__(cls, dr, *args, **kwargs):
-		newcls = type(f"{type(dr).__name__}_stat", (cls, dr.__class__,) , {})
-		obj = object.__new__(newcls)
-		obj.__init__(dr, *args, **kwargs)
-		return obj
-	
-	def __init__(self, dr, n_intervals):
-		self._dr = dr
-		self.n_intervals = n_intervals
-		
-		for attr in [
-			"simdir",
-			"datadir",
-			"param",
-			"dim",
-			"grid",
-			"k_tilde_min",
-			"k_tilde_max",
-			"omega_tilde_min",
-			"omega_tilde_max",
-			"fig_savedir",
-			"field_name",
-			"cbar_label",
-			"ts",
-			"av_xy",
-			]:
-			if hasattr(dr, attr):
-				setattr(self, attr, getattr(dr, attr))
-		
-		self.set_t_range(dr.t_min, dr.t_max)
 
 if __name__ == "__main__":
 	class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
