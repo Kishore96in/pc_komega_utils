@@ -253,6 +253,9 @@ class dr_base(metaclass=abc.ABCMeta):
 		return arr[it_min:it_max]
 	
 	def set_t_range(self, t_min, t_max=None):
+		"""
+		Change the range of t to the given values, and then calculate the Fourier transform of the data in this interval (by calling do_ft).
+		"""
 		if t_max is None:
 			t_max = self.ts.t[-1]
 		
