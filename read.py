@@ -173,8 +173,17 @@ class dr_base(metaclass=abc.ABCMeta):
 		if omega is None:
 			return slice(None)
 		elif isinstance(omega, collections.abc.Iterable) and len(omega) == 2:
+			if omega[1] <= omega[0]:
+				raise ValueError("Right limit of range is not greater than left limit.")
+			
 			i_min = np.argmin(np.abs(omega[0] - omega_list))
 			i_max = np.argmin(np.abs(omega[1] - omega_list))
+			
+			if i_max <= i_min:
+				raise ValueError(f"Given range ({omega[0]}, {omega[1]}) is less than the grid spacing ({omega_list[1] - omega_list[0]}).")
+			if i_min > len(omega_list) - 1:
+				raise ValueError("Requested range is outside the coordinate bounds.")
+			
 			return slice(i_min, i_max)
 		elif isinstance (omega, numbers.Number):
 			i = np.argmin(np.abs(omega - omega_list))
