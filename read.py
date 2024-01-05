@@ -80,7 +80,7 @@ class dr_base(metaclass=abc.ABCMeta):
 	
 	@property
 	def t_min(self):
-		return self._t_min
+		return getattr(self, "_t_min", None)
 	
 	@t_min.setter
 	def t_min(self, _):
@@ -88,7 +88,7 @@ class dr_base(metaclass=abc.ABCMeta):
 	
 	@property
 	def t_max(self):
-		return self._t_max
+		return getattr(self, "_t_max", None)
 	
 	@t_max.setter
 	def t_max(self, _):
@@ -259,12 +259,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		if t_min >= t_max:
 			raise ValueError("t_min needs to be less than t_max")
 		
-		if not (
-			hasattr(self, "_t_min") and
-			hasattr(self, "_t_max") and
-			self.t_min == t_min and
-			self.t_max == t_max
-			):
+		if not (self.t_min == t_min and self.t_max == t_max):
 			self._t_min = t_min
 			self._t_max = t_max
 			self.do_ft()
