@@ -730,7 +730,6 @@ class dr_stat():
 	def __new__(cls, dr, *args, **kwargs):
 		newcls = type(f"{type(dr).__name__}_stat", (cls, dr.__class__,) , {})
 		obj = object.__new__(newcls)
-		obj.__init__(dr, *args, **kwargs)
 		return obj
 	
 	def __init__(self, dr, n_intervals):
