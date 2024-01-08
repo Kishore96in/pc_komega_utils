@@ -1,5 +1,4 @@
 """
-This script assumes it is being run from the simulation directory.
 Assumes x, y, and t are equispaced.
 
 Class naming scheme
