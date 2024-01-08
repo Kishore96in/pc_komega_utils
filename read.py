@@ -700,15 +700,20 @@ class m_cpl_imshow():
 		data = data.transpose()
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
+		dx = x[1] - x[0]
+		dy = y[1] - y[0]
+		
 		fig,ax = plt.subplots()
 		im = ax.imshow(
 			data,
 			origin = 'lower',
-			extent = (min(x), max(x), min(y), max(y)),
+			extent = (min(x)-dx/2, max(x)-dx/2, min(y)-dy/2, max(y)-dy/2),
 			aspect = 'auto',
 			norm = mpl.colors.LogNorm(),
 			interpolation = 'none',
 			)
+		ax.set_xlim(min(x), max(x))
+		ax.set_ylim(min(y), max(y))
 		
 		c = plt.colorbar(
 			im,
