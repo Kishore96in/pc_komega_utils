@@ -360,10 +360,9 @@ class dr_yaver_base(dr_base):
 		data_near_target, [omt_near_target, _, _] = self.get_slice(
 			omega_tilde=(omega_tilde_min, omega_tilde_max),
 			kx_tilde = k_tilde,
-			z = z
+			z = z,
+			compress = True
 			)
-		
-		data_near_target = omt_near_target*data_near_target[:,0,0]
 		
 		return omt_near_target, data_near_target
 	
