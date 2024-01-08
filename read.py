@@ -136,9 +136,10 @@ class dr_base(metaclass=abc.ABCMeta):
 	def contourplotter(self, x, y, data):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
-		if np.shape(data) != (len(y), len(x)):
+		if np.shape(data) != (len(x), len(y)):
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
+		data = data.transpose()
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		fig,ax = plt.subplots()
@@ -414,7 +415,7 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0,0])
+		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0,0].transpose())
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -435,7 +436,7 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(ky_tilde, omega_tilde, data[:,0,:,0])
+		p = self.contourplotter(ky_tilde, omega_tilde, data[:,0,:,0].transpose())
 		
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
@@ -694,9 +695,10 @@ class m_cpl_imshow():
 	def contourplotter(self, x, y, data):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
-		if np.shape(data) != (len(y), len(x)):
+		if np.shape(data) != (len(x), len(y)):
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
+		data = data.transpose()
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
 		fig,ax = plt.subplots()
