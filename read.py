@@ -323,7 +323,7 @@ class dr_yaver_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0])
+		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0].transpose())
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
