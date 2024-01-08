@@ -459,8 +459,8 @@ class dr_3d_base(dr_base):
 		p = self.contourplotter(kx_tilde, ky_tilde, data[0,:,:,0])
 		
 		p.ax.set_title(f"z = {z:.2f}")
-		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
-		p.ax.set_ylabel(r"$\widetilde{{k}}_x$")
+		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
+		p.ax.set_ylabel(r"$\widetilde{{k}}_y$")
 		p.cbar.set_label(self.cbar_label)
 		
 		p.fig.tight_layout()
