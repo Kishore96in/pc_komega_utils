@@ -707,7 +707,7 @@ class m_cpl_imshow():
 		im = ax.imshow(
 			data,
 			origin = 'lower',
-			extent = (min(x)-dx/2, max(x)-dx/2, min(y)-dy/2, max(y)-dy/2),
+			extent = (min(x)-dx/2, max(x)+dx/2, min(y)-dy/2, max(y)+dy/2),
 			aspect = 'auto',
 			norm = mpl.colors.LogNorm(),
 			interpolation = 'none',
