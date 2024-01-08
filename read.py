@@ -136,6 +136,8 @@ class dr_base(metaclass=abc.ABCMeta):
 	def contourplotter(self, x, y, data):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
+		if np.shape(data) != (len(y), len(x)):
+			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
@@ -692,6 +694,8 @@ class m_cpl_imshow():
 	def contourplotter(self, x, y, data):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
+		if np.shape(data) != (len(y), len(x)):
+			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
 		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
 		
