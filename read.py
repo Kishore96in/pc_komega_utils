@@ -856,6 +856,14 @@ class dr_sm(dr_wrap_base):
 			self.ky = dr.ky
 		
 		dr.set_t_range(t_min_orig, t_max_orig)
+	
+	@property
+	def smoothing_width(self):
+		"""
+		Width of the smoothing filter in the same units as omega_tilde.
+		"""
+		d_omega = self.omega_tilde[1] - self.omega_tilde[0]
+		return (2*self.n+1) * d_omega
 
 if __name__ == "__main__":
 	class disp_rel_from_yaver(m_scl_SBC15, dr_yaver_base):
