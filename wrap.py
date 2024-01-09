@@ -2,7 +2,7 @@
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
 """
 
-class dr_wrap_base():
+class wrap_base():
 	"""
 	Given a dr_base instance, makes a wrapper of it that allows to manipulate the data without rereading it.
 	"""
@@ -39,7 +39,7 @@ class dr_wrap_base():
 		
 		self.set_t_range(dr.t_min, dr.t_max)
 	
-class dr_stat(dr_wrap_base):
+class dr_stat(wrap_base):
 	"""
 	Given a dr_base instance, divides the time series into subintervals and uses those to estimate the error in the data.
 	
@@ -98,7 +98,7 @@ class dr_stat(dr_wrap_base):
 		
 		dr.set_t_range(t_min_orig, t_max_orig)
 
-class dr_sm(dr_wrap_base):
+class dr_sm(wrap_base):
 	"""
 	Given a dr_base instance, smooth the data along the frequency axis.
 	
