@@ -20,8 +20,6 @@ import abc
 
 from dataclasses import dataclass
 
-from .utils import smooth_tophat
-
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
 		self.fig = fig

@@ -2,6 +2,8 @@
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
 """
 
+from .utils import smooth_tophat
+
 class wrap_base():
 	"""
 	Given a dr_base instance, makes a wrapper of it that allows to manipulate the data without rereading it.
