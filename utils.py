@@ -46,3 +46,24 @@ class fig_saver():
 
 def get_av(av, name, it1=-500):
 	return np.average(getattr(av.xy, name)[it1:], axis=0)
+
+def smooth_tophat(a, n, axis=0):
+	"""
+	Smooth array a along axis axis with a top hat of width (2*n+1). The first n and last n points of the smoothed array contain the same value as the next point towards the center.
+	
+	a: numpy array
+	n: int, such that width of the smoothing filter (top hat) is 2*n+1
+	axis: int. Which axis of arr to smooth.
+	"""
+	a = np.moveaxis(a, axis, 0)
+	sm = np.zeros_like(a)
+	for i in range(-n, n+1):
+		sm += np.roll(a, i, axis=0)
+	sm = sm/(2*n+1)
+	
+	#Edge correction
+	sm[:n] = sm[n]
+	sm[-n:] = sm[-n-1]
+	
+	sm = np.moveaxis(sm, 0, axis)
+	return sm

@@ -20,6 +20,8 @@ import abc
 
 from dataclasses import dataclass
 
+from .utils import smooth_tophat
+
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
 		self.fig = fig
@@ -813,6 +815,40 @@ class dr_stat(dr_wrap_base):
 		self.omega = dr.omega
 		self.data = data_mean
 		self.sigma = sigma/np.sqrt(n_intervals)
+		
+		if hasattr(dr, "kx"):
+			self.kx = dr.kx
+		if hasattr(dr, "ky"):
+			self.ky = dr.ky
+		
+		dr.set_t_range(t_min_orig, t_max_orig)
+
+class dr_sm(dr_wrap_base):
+	"""
+	Given a dr_base instance, smooth the data along the frequency axis.
+	
+	Initialization arguments:
+		dr: dr_base instance
+		n: int. half width of the smoothing filter, as a multiple of the spacing between different values of omega.
+	"""
+	suffix = "sm"
+	
+	def __init__(self, dr, n):
+		self._dr = dr
+		self.n = n
+		
+		self.__post_init__()
+	
+	def do_ft(self):
+		dr = self._dr
+		
+		t_min_orig = dr.t_min
+		t_max_orig = dr.t_max
+		if (self.t_min != dr.t_min) or (self.t_max != dr.t_max):
+			dr.set_t_range(self.t_min, self.t_max)
+		
+		self.omega = dr.omega
+		self.data = smooth_tophat(dr.data, self.n, axis=dr.data_axes['omega_tilde'])
 		
 		if hasattr(dr, "kx"):
 			self.kx = dr.kx
