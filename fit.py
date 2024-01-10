@@ -406,7 +406,7 @@ def stdev_central(arr, frac, adjust=False):
 		return std
 
 def estimate_sigma(data, gamma_max, omega_tilde):
-	sigma = np.full_like(data, np.sqrt(np.average(data**2) - np.average(data)**2))
+	sigma = np.full_like(data, stdev_central(data, 0.05, adjust=True))
 	
 	if np.all(sigma == 0):
 		"""
