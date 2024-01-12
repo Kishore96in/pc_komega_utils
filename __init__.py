@@ -1,4 +1,4 @@
-from . import read, plot, fit, default
+from . import read, plot, fit, default, wrap
 
 from ._deprecated import *
 
