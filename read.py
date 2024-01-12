@@ -191,7 +191,7 @@ class dr_base(metaclass=abc.ABCMeta):
 			i = np.argmin(np.abs(omega - omega_list))
 			return [i]
 		else:
-			raise ValueError(f"Unable to handle {type(omega) = }")
+			raise ValueError(f"Unable to handle {type(omega)}")
 	
 	def get_slice(self, data=None, compress=False, **kwargs):
 		"""
