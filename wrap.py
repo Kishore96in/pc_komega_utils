@@ -2,6 +2,8 @@
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
 """
 
+import numpy as np
+
 from .utils import smooth_tophat
 
 class wrap_base():
