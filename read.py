@@ -215,7 +215,10 @@ class dr_base(metaclass=abc.ABCMeta):
 				coord_val = kwargs[name]
 			else:
 				coord_val = None
-			sl = self._generate_slicer(coord_val, coord_list)
+			try:
+				sl = self._generate_slicer(coord_val, coord_list)
+			except Exception as e:
+				raise RuntimeError(f"{type(e)} while slicing {name}: {e}")
 			
 			data = np.moveaxis(data, i, 0)
 			data = data[sl]
