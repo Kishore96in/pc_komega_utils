@@ -140,7 +140,7 @@ class dr_base(metaclass=abc.ABCMeta):
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
 		data = data.transpose()
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		data[data==0] = np.nan #so that log scaling works
 		
 		fig,ax = plt.subplots()
 		im = ax.contourf(
@@ -701,7 +701,7 @@ class m_cpl_imshow():
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
 		data = data.transpose()
-		data = np.where(data == 0, np.nan, data) #replace 0 with nan so that log scaling works.
+		data[data==0] = np.nan #so that log scaling works
 		
 		dx = x[1] - x[0]
 		dy = y[1] - y[0]
