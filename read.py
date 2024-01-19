@@ -639,7 +639,7 @@ class m_dscl_rdbyurmsmax():
 		
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
 		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)/urms
+		data = np.abs((self.omega_tilde/urms) * data)
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
@@ -655,7 +655,7 @@ class m_dscl_rdbyD2():
 		
 		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
 		#NOTE: multiplying by omega to take 'running difference'
-		data = np.abs(self.omega_tilde * data)/D**2
+		data = np.abs((self.omega_tilde/D**2) * data)
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
