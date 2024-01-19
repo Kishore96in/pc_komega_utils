@@ -104,6 +104,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		fig_savedir = ".", #Where to save the figures
 		field_name = None, #which field to use to plot the dispersion relation
 		cbar_label = None, #label to use for the colorbar
+		n_workers = 1, #Number of processes to use for FFT.
 		):
 		if cbar_label is None:
 			cbar_label = self.cbar_label_default
@@ -124,6 +125,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		self.fig_savedir = fig_savedir
 		self.field_name = field_name
 		self.cbar_label = cbar_label
+		self.n_workers = n_workers
 		
 		self.read()
 		self.set_t_range(t_min, t_max)
@@ -307,7 +309,7 @@ class dr_yaver_base(dr_base):
 		
 		assert np.shape(uz) == (len(t), len(z), len(x))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2])
+		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2], workers=self.n_workers)
 		uz_fft = fftshift(uz_fft, axes=[0,2])
 		data = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
 		n_omega, n_kx, _ = np.shape(data)
@@ -547,7 +549,7 @@ class dr_dvar_base(dr_3d_base):
 		
 		assert np.shape(uz) == (len(t), len(z), len(y), len(x))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2,3])
+		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2,3], workers=self.n_workers)
 		uz_fft = fftshift(uz_fft, axes=[0,2,3])
 		data = np.transpose(uz_fft, axes=[0,3,2,1])
 		n_omega, n_kx, n_ky, _ = np.shape(data)
@@ -605,7 +607,7 @@ class dr_pxy_base(dr_dvar_base):
 		
 		assert np.shape(uz) == (len(t), len(z), len(ky), len(kx))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0])
+		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0], workers=self.n_workers)
 		uz_fft = fftshift(uz_fft, axes=[0])
 		data = np.transpose(uz_fft, axes=[0,3,2,1])
 		n_omega, _, _, _ = np.shape(data)
