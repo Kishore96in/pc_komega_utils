@@ -285,7 +285,6 @@ class dr_yaver_base(dr_base):
 	
 	def read(self):
 		self.ts = pc.read.ts(datadir=self.datadir, quiet=True)
-		#TODO: handle hdf5 read errors below (just output a warning on each fail and retry)?
 		self.av_y = pc.read.aver(
 			datadir=self.datadir,
 			simdir=self.simdir,
