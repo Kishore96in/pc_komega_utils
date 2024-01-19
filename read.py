@@ -658,6 +658,28 @@ class m_dscl_rdbyD2():
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
+
+class m_dscl_rdbycz0():
+	@property
+	def cbar_label_default(self):
+		return  r"$\left| \widetilde{{\omega}} \, \widetilde{{P}} \right|$"
+	
+	def scale_data(self, data):
+		gamma = self.param.gamma
+		cp = self.param.cp
+		TTmz = np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.TTmz), axis=0)
+		c2mz = (gamma-1)*cp*TTmz
+		
+		#Get the sound speed at z=0
+		iz0 = np.argmin(np.abs(self.z - 0))
+		c = np.sqrt(c2mz[iz0])
+		
+		data = np.moveaxis(data, self.data_axes['omega_tilde'], -1) # for broadcasting
+		#NOTE: multiplying by omega to take 'running difference'
+		data = np.abs((self.omega_tilde/c) * data)
+		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
+		return data
+
 class m_scl_SBC15(m_dscl_rdbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
