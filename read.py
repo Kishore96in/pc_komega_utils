@@ -165,6 +165,9 @@ class dr_base(metaclass=abc.ABCMeta):
 			ticks = mpl.ticker.LogLocator(),
 			)
 		
+		c.minorlocator = mpl.ticker.LogLocator(subs='auto')
+		c.minorformatter = mpl.ticker.LogFormatter(minor_thresholds=(2, 0.4))
+		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 	
 	@staticmethod
