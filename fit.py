@@ -327,7 +327,7 @@ def get_mode_eigenfunction(
 				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
 				if mode_mass_method == "integral":
 					mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
-				elif mode_mass_method == "sum":
+				elif mode_mass_method in ["sum", "sum_full"]:
 					mode_masses = np.array([np.sum(mode) for mode in modes])
 				else:
 					raise ValueError(f"Unsupported {mode_mass_method = }")
@@ -351,6 +351,13 @@ def get_mode_eigenfunction(
 			mode_mass = np.nan
 		else:
 			mode_mass = 0
+		
+		if mode_mass_method == "sum_full":
+			"""
+			Nishant suggested that this may be required to get a good-looking fit for the eigenfunction.
+			"""
+			residuals = data_near_target - fit(omt_near_target, *fit.popt)
+			mode_mass += np.sum(residuals)
 		
 		P_list.append(mode_mass)
 	
