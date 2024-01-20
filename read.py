@@ -744,8 +744,6 @@ class m_cpl_imshow():
 		c = plt.colorbar(
 			im,
 			ax = ax,
-			format = mpl.ticker.LogFormatterSciNotation(),
-			ticks = mpl.ticker.LogLocator(),
 			)
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
