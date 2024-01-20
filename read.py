@@ -149,6 +149,7 @@ class dr_base(metaclass=abc.ABCMeta):
 			x,
 			y,
 			data,
+			#specifying levels as an integer (number of levels) does not seem to be supported when using log scaling
 			levels = np.logspace(
 				np.log10(np.nanmin(data)),
 				np.log10(np.nanmax(data)),
