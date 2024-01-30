@@ -134,7 +134,7 @@ def fit_mode(
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	if hasattr(dr, "sigma"):
-		sigma = get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+		sigma = _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	else:
 		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
@@ -198,7 +198,7 @@ def fit_mode_auto(
 		)
 	
 	if hasattr(dr, "sigma"):
-		sigma = get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+		sigma = _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
 	else:
 		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
@@ -433,7 +433,7 @@ def estimate_sigma(data, gamma_max, omega_tilde):
 	
 	return sigma
 
-def get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
+def _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
 	sigma, _ = dr.get_slice(
 		data = dr.sigma,
 		omega_tilde=(omega_tilde_min, omega_tilde_max),
