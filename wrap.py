@@ -69,8 +69,7 @@ class dr_stat(wrap_base):
 		
 		t_min_orig = dr.t_min
 		t_max_orig = dr.t_max
-		if (self.t_min != dr.t_min) or (self.t_max != dr.t_max):
-			dr.set_t_range(self.t_min, self.t_max)
+		dr.set_t_range(self.t_min, self.t_max)
 		
 		#Choose t_max that ensures all the subintervals have the same number of time points.
 		nt = len(dr.omega_tilde)
@@ -123,8 +122,7 @@ class dr_sm(wrap_base):
 		
 		t_min_orig = dr.t_min
 		t_max_orig = dr.t_max
-		if (self.t_min != dr.t_min) or (self.t_max != dr.t_max):
-			dr.set_t_range(self.t_min, self.t_max)
+		dr.set_t_range(self.t_min, self.t_max)
 		
 		self.omega = dr.omega
 		self.data = smooth_tophat(dr.data, self.n, axis=dr.data_axes['omega_tilde'])
