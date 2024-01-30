@@ -161,12 +161,11 @@ class dr_base(metaclass=abc.ABCMeta):
 		c = plt.colorbar(
 			im,
 			ax = ax,
-			format = mpl.ticker.LogFormatterSciNotation(),
 			ticks = mpl.ticker.LogLocator(),
 			)
 		
 		c.minorlocator = mpl.ticker.LogLocator(subs='auto')
-		c.minorformatter = mpl.ticker.LogFormatter(minor_thresholds=(2, 0.4))
+		c.minorformatter = mpl.ticker.LogFormatterSciNotation(minor_thresholds=(2, 0.4))
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 	
@@ -749,6 +748,8 @@ class m_cpl_imshow():
 			im,
 			ax = ax,
 			)
+		
+		c.minorformatter.minor_thresholds = (2,0.4)
 		
 		return contourplot_container(fig, ax, im, c, savedir=self.fig_savedir)
 
