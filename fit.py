@@ -113,7 +113,6 @@ def fit_mode(
 		for i in range(min(model.n_lorentz, len(om_guess))):
 			guess_lor[i,1] = om_guess[i]
 	
-	guess_lor[:,2] = gamma_max
 	guess = model.pack_params(guess_poly, guess_lor)
 	
 	if model.n_lorentz > 0:
@@ -146,10 +145,10 @@ def fit_mode(
 			p0 = guess,
 			sigma = sigma,
 			bounds = (lbound,ubound),
-			method='dogbox',
+			method='trf',
 			maxfev=int(1e4),
-			xtol=None,
 			x_scale='jac',
+			jac='3-point',
 			absolute_sigma = True,
 			)
 	except Exception as e:
