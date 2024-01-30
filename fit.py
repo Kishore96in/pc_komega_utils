@@ -133,7 +133,10 @@ def fit_mode(
 	ubound_lor[:,2] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
-	sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
+	if hasattr(dr, "sigma"):
+		sigma = get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+	else:
+		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	try:
 		model.popt, model.pcov = scipy.optimize.curve_fit(
@@ -194,7 +197,10 @@ def fit_mode_auto(
 		compress = True,
 		)
 	
-	sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
+	if hasattr(dr, "sigma"):
+		sigma = get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
+	else:
+		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
@@ -427,3 +433,25 @@ def estimate_sigma(data, gamma_max, omega_tilde):
 	
 	return sigma
 
+def get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
+	sigma, _ = dr.get_slice(
+		data = dr.sigma,
+		omega_tilde=(omega_tilde_min, omega_tilde_max),
+		kx_tilde = k_tilde,
+		ky_tilde = 0,
+		z = z,
+		compress = True,
+		)
+	
+	if np.all(sigma == 0):
+		"""
+		This can only happen if np.all(data == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
+		
+		"""
+		sigma[:] = 1
+	elif np.any(sigma == 0):
+		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
+		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
+		sigma = np.where(sigma == 0, min_sigma, sigma)
+	
+	return sigma
