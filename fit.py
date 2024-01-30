@@ -113,10 +113,8 @@ def fit_mode(
 		for i in range(min(model.n_lorentz, len(om_guess))):
 			guess_lor[i,1] = om_guess[i]
 	
-	guess = model.pack_params(guess_poly, guess_lor)
 	
-	if model.n_lorentz > 0:
-		guess_lor[0,0] = 10*np.max(np.abs(data_near_target))*guess_lor[0,2]*np.pi
+	guess = model.pack_params(guess_poly, guess_lor)
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
