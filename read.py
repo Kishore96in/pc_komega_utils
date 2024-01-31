@@ -252,9 +252,10 @@ class dr_base(metaclass=abc.ABCMeta):
 		else:
 			t_max = self.t_max
 		
-		if self.t_min < t[0]:
+		dt = t[1] - t[0]
+		if self.t_min < t[0] - 0.5*dt:
 			warnings.warn(f"t_min is not in provided range of t; {self.t_min = }, {t[0] = }")
-		if t_max > t[-1]:
+		if t_max > t[-1] + 0.5*dt:
 			warnings.warn(f"t_max is not in provided range of t; {t_max = }, {t[-1] = }")
 		
 		it_min = np.argmin(np.abs(t - self.t_min))
