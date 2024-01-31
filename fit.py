@@ -346,7 +346,7 @@ def get_mode_eigenfunction(
 					0,
 					))
 			else:
-				mode_mass == 0
+				mode_mass = 0
 		elif np.any(data_near_target != 0):
 			"""
 			u_z is nonzero, but no Lorentzian was fitted.
