@@ -247,19 +247,14 @@ class dr_base(metaclass=abc.ABCMeta):
 		if np.shape(arr)[0] != len(t):
 			raise ValueError("Time axis size mismatch.")
 		
-		if self.t_max is None:
-			t_max = self.ts.t[-1]
-		else:
-			t_max = self.t_max
-		
 		dt = t[1] - t[0]
 		if self.t_min < t[0] - 0.5*dt:
 			warnings.warn(f"t_min is not in provided range of t; {self.t_min = }, {t[0] = }")
-		if t_max > t[-1] + 0.5*dt:
-			warnings.warn(f"t_max is not in provided range of t; {t_max = }, {t[-1] = }")
+		if self.t_max > t[-1] + 0.5*dt:
+			warnings.warn(f"t_max is not in provided range of t; {self.t_max = }, {t[-1] = }")
 		
 		it_min = np.argmin(np.abs(t - self.t_min))
-		it_max = np.argmin(np.abs(t - t_max))
+		it_max = np.argmin(np.abs(t - self.t_max))
 		
 		return arr[it_min:it_max]
 	
