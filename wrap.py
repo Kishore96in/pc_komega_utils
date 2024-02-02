@@ -141,3 +141,48 @@ class dr_sm(wrap_base):
 		"""
 		d_omega = self.omega_tilde[1] - self.omega_tilde[0]
 		return (2*self.n+1) * d_omega
+
+class dr_stat_smsig(dr_stat):
+	"""
+	Like dr_stat, but with the error estimates smoothed wrt. omega.
+	"""
+	suffix = "stat_smsig"
+	
+	def do_ft(self):
+		dr = self._dr
+		n_intervals = self.n_intervals
+		
+		t_min_orig = dr.t_min
+		t_max_orig = dr.t_max
+		dr.set_t_range(self.t_min, self.t_max)
+		
+		#Choose t_max that ensures all the subintervals have the same number of time points.
+		nt = len(dr.omega_tilde)
+		dt = (dr.t_max - dr.t_min)/nt
+		nt = n_intervals*np.floor(nt/n_intervals)
+		t_max = dr.t_min + nt*dt
+		
+		t_ranges = np.linspace(dr.t_min, t_max, n_intervals + 1)
+		
+		data_sum = 0
+		data2_sum = 0
+		for t_min, t_max in zip(t_ranges[:-1], t_ranges[1:]):
+			dr.set_t_range(t_min, t_max)
+			data_sum += dr.data
+			data2_sum += dr.data**2
+		
+		data_mean = data_sum/n_intervals
+		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
+		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
+		sigma = smooth_tophat(sigma, 1, axis=self.data_axes['omega_tilde'])
+		
+		self.omega = dr.omega
+		self.data = data_mean
+		self.sigma = sigma/np.sqrt(n_intervals)
+		
+		if hasattr(dr, "kx"):
+			self.kx = dr.kx
+		if hasattr(dr, "ky"):
+			self.ky = dr.ky
+		
+		dr.set_t_range(t_min_orig, t_max_orig)
