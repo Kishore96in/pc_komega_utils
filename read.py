@@ -657,7 +657,6 @@ class m_dscl_rdbyD2():
 		data = np.moveaxis(data, -1, self.data_axes['omega_tilde'])
 		return data
 
-
 class m_dscl_rdbycz0():
 	@property
 	def cbar_label_default(self):
