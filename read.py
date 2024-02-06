@@ -144,7 +144,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		data = data.transpose()
 		data[data==0] = np.nan #so that log scaling works
 		
-		fig,ax = plt.subplots()
+		fig,ax = plt.subplots(layout='constrained')
 		im = ax.contourf(
 			x,
 			y,
@@ -333,7 +333,6 @@ class dr_yaver_base(dr_base):
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
 		
-		p.fig.tight_layout()
 		return p
 	
 	def get_data_at_kz(self, k_tilde, z, omega_tilde_min=None, omega_tilde_max=None):
@@ -424,7 +423,6 @@ class dr_3d_base(dr_base):
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
 		
-		p.fig.tight_layout()
 		return p
 	
 	def plot_kyomega(self, z):
@@ -445,7 +443,6 @@ class dr_3d_base(dr_base):
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
 		
-		p.fig.tight_layout()
 		return p
 	
 	def plot_ring(self, z, omega_tilde):
@@ -466,7 +463,6 @@ class dr_3d_base(dr_base):
 		p.ax.set_ylabel(r"$\widetilde{{k}}_y$")
 		p.cbar.set_label(self.cbar_label)
 		
-		p.fig.tight_layout()
 		return p
 
 @dataclass
@@ -744,7 +740,7 @@ class m_cpl_imshow():
 		dx = x[1] - x[0]
 		dy = y[1] - y[0]
 		
-		fig,ax = plt.subplots()
+		fig,ax = plt.subplots(layout='constrained')
 		im = ax.imshow(
 			data,
 			origin = 'lower',
