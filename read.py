@@ -303,13 +303,13 @@ class dr_yaver_base(dr_base):
 		Lx = self.grid.Lx
 		z = self.grid.z
 		t = self.slice_time(self.av_y.t, self.av_y.t)
-		uz = self.slice_time(self.av_y.t, getattr(self.av_y.y, self.field_name))
+		data = self.slice_time(self.av_y.t, getattr(self.av_y.y, self.field_name))
 		
-		assert np.shape(uz) == (len(t), len(z), len(x))
+		assert np.shape(data) == (len(t), len(z), len(x))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2], workers=self.n_workers)
-		uz_fft = fftshift(uz_fft, axes=[0,2])
-		data = np.transpose(uz_fft, axes=[0,2,1]) #Move the z-axis to the end.
+		data = scipy.fft.fftn(data, norm='forward', axes=[0,2], workers=self.n_workers)
+		data = fftshift(data, axes=[0,2])
+		data = np.transpose(data, axes=[0,2,1]) #Move the z-axis to the end.
 		n_omega, n_kx, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
@@ -539,13 +539,13 @@ class dr_dvar_base(dr_3d_base):
 		Lx = self.grid.Lx
 		Ly = self.grid.Ly
 		t = self.slice_time(self.t_vard, self.t_vard)
-		uz = self.slice_time(self.t_vard, self.vard)
+		data = self.slice_time(self.t_vard, self.vard)
 		
-		assert np.shape(uz) == (len(t), len(z), len(y), len(x))
+		assert np.shape(data) == (len(t), len(z), len(y), len(x))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0,2,3], workers=self.n_workers)
-		uz_fft = fftshift(uz_fft, axes=[0,2,3])
-		data = np.transpose(uz_fft, axes=[0,3,2,1])
+		data = scipy.fft.fftn(data, norm='forward', axes=[0,2,3], workers=self.n_workers)
+		data = fftshift(data, axes=[0,2,3])
+		data = np.transpose(data, axes=[0,3,2,1])
 		n_omega, n_kx, n_ky, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
@@ -597,13 +597,13 @@ class dr_pxy_base(dr_dvar_base):
 		ky = self.pxy.ky
 		z = self.pxy.zpos
 		t = self.slice_time(self.pxy.t, self.pxy.t)
-		uz = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
+		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
 		
-		assert np.shape(uz) == (len(t), len(z), len(ky), len(kx))
+		assert np.shape(data) == (len(t), len(z), len(ky), len(kx))
 		
-		uz_fft = scipy.fft.fftn(uz, norm='forward', axes=[0], workers=self.n_workers)
-		uz_fft = fftshift(uz_fft, axes=[0])
-		data = np.transpose(uz_fft, axes=[0,3,2,1])
+		data = scipy.fft.fftn(data, norm='forward', axes=[0], workers=self.n_workers)
+		data = fftshift(data, axes=[0])
+		data = np.transpose(data, axes=[0,3,2,1])
 		n_omega, _, _, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
