@@ -79,14 +79,14 @@ class dr_stat(wrap_base):
 		
 		t_ranges = np.linspace(dr.t_min, t_max, n_intervals + 1)
 		
-		data_sum = 0
+		data_mean = 0
 		data2_sum = 0
 		for t_min, t_max in zip(t_ranges[:-1], t_ranges[1:]):
 			dr.set_t_range(t_min, t_max)
-			data_sum += dr.data
+			data_mean += dr.data
 			data2_sum += dr.data**2
 		
-		data_mean = data_sum/n_intervals
+		data_mean = data_mean/n_intervals
 		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
 		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
 		
@@ -164,14 +164,14 @@ class dr_stat_smsig(dr_stat):
 		
 		t_ranges = np.linspace(dr.t_min, t_max, n_intervals + 1)
 		
-		data_sum = 0
+		data_mean = 0
 		data2_sum = 0
 		for t_min, t_max in zip(t_ranges[:-1], t_ranges[1:]):
 			dr.set_t_range(t_min, t_max)
-			data_sum += dr.data
+			data_mean += dr.data
 			data2_sum += dr.data**2
 		
-		data_mean = data_sum/n_intervals
+		data_mean = data_mean/n_intervals
 		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
 		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
 		sigma = smooth_tophat(sigma, 1, axis=self.data_axes['omega_tilde'])
