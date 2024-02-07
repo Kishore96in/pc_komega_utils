@@ -62,8 +62,9 @@ def smooth_tophat(a, n, axis=0):
 	sm = sm/(2*n+1)
 	
 	#Edge correction
-	sm[:n] = sm[n]
-	sm[-n:] = sm[-n-1]
+	if n!= 0:
+		sm[:n] = sm[n]
+		sm[-n:] = sm[-n-1]
 	
 	sm = np.moveaxis(sm, 0, axis)
 	return sm
