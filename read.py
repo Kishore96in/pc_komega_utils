@@ -113,7 +113,7 @@ class dr_base(metaclass=abc.ABCMeta):
 		
 		sim = pc.sim.get(simdir, quiet=True)
 		
-		self.simdir = simdir
+		self.simdir = sim.path
 		self.datadir = sim.datadir
 		self.param = pc.read.param(datadir=self.datadir)
 		self.dim = pc.read.dim(datadir=self.datadir)
