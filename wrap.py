@@ -14,14 +14,29 @@ class wrap_base():
 	def suffix(self):
 		raise NotImplementedError
 	
+	@property
+	def _args_map(self):
+		"""
+		Allows subclasses to define which attribute names should be used for the positional arguments called during instantiation.
+		"""
+		raise NotImplementedError
+	
 	def __new__(cls, dr, *args, **kwargs):
 		newcls = type(f"{type(dr).__name__}_{cls.suffix}", (cls, dr.__class__,) , {})
 		obj = object.__new__(newcls)
 		return obj
 	
-	def __post_init__(self):
-		dr = self._dr
+	def __init__(self, *args):
+		if len(args) != len(self._args_map):
+			raise ValueError(f"Wrong number of arguments (expected { len(self._args_map)}; got {len(args)})")
+		if self._args_map['_dr'] != 0:
+			#This is assumed in __new__
+			raise ValueError("dr should always be first argument")
 		
+		#We use a list because we want this to be mutable (see __setattr__)
+		self._args = list(args)
+		
+		dr = self._dr
 		for attr in [
 			"simdir",
 			"datadir",
@@ -43,6 +58,25 @@ class wrap_base():
 		
 		self.set_t_range(dr.t_min, dr.t_max)
 	
+	def __getnewargs__(self):
+		"""
+		Make subclass instances pickle-able
+		"""
+		return tuple(self._args)
+	
+	def __getattr__(self, name):
+		if name in self._args_map.keys():
+			return self._args[self._args_map[name]]
+		else:
+			raise AttributeError
+	
+	def __setattr__(self, name, value):
+		if name in self._args_map.keys():
+			self._args[self._args_map[name]] = value
+		else:
+			# https://stackoverflow.com/questions/7042152/how-do-i-properly-override-setattr-and-getattribute-on-new-style-classes/7042247#7042247
+			super().__setattr__(name, value)
+
 class dr_stat(wrap_base):
 	"""
 	Given a dr_base instance, divides the time series into subintervals and uses those to estimate the error in the data.
@@ -56,12 +90,7 @@ class dr_stat(wrap_base):
 		self.sigma: estimate of the error in self.data
 	"""
 	suffix = "stat"
-	
-	def __init__(self, dr, n_intervals):
-		self._dr = dr
-		self.n_intervals = n_intervals
-		
-		self.__post_init__()
+	_args_map = {"_dr": 0, "n_intervals": 1}
 	
 	def do_ft(self):
 		dr = self._dr
@@ -110,12 +139,7 @@ class dr_sm(wrap_base):
 		n: int. half width of the smoothing filter, as a multiple of the spacing between different values of omega.
 	"""
 	suffix = "sm"
-	
-	def __init__(self, dr, n):
-		self._dr = dr
-		self.n = n
-		
-		self.__post_init__()
+	_args_map = {"_dr": 0, "n": 1}
 	
 	def do_ft(self):
 		dr = self._dr
