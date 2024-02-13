@@ -3,18 +3,21 @@ Wrappers for dr_base instances, that perform various postprocessing tricks (e.g.
 """
 
 import numpy as np
+import abc
 
 from .utils import smooth_tophat
 
-class wrap_base():
+class wrap_base(metaclass=abc.ABCMeta):
 	"""
 	Given a dr_base instance, makes a wrapper of it that allows to manipulate the data without rereading it.
 	"""
 	@property
+	@abc.abstractmethod
 	def _suffix(self):
 		raise NotImplementedError
 	
 	@property
+	@abc.abstractmethod
 	def _args_map(self):
 		"""
 		Allows subclasses to define which attribute names should be used for the positional arguments called during instantiation.
