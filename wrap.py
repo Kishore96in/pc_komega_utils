@@ -11,7 +11,7 @@ class wrap_base():
 	Given a dr_base instance, makes a wrapper of it that allows to manipulate the data without rereading it.
 	"""
 	@property
-	def suffix(self):
+	def _suffix(self):
 		raise NotImplementedError
 	
 	@property
@@ -22,7 +22,7 @@ class wrap_base():
 		raise NotImplementedError
 	
 	def __new__(cls, dr, *args, **kwargs):
-		newcls = type(f"{type(dr).__name__}_{cls.suffix}", (cls, dr.__class__,) , {})
+		newcls = type(f"{type(dr).__name__}_{cls._suffix}", (cls, dr.__class__,) , {})
 		obj = object.__new__(newcls)
 		return obj
 	
@@ -89,7 +89,7 @@ class dr_stat(wrap_base):
 		self.data: mean of the data in the subintervals of the source
 		self.sigma: estimate of the error in self.data
 	"""
-	suffix = "stat"
+	_suffix = "stat"
 	_args_map = {"_dr": 0, "n_intervals": 1}
 	
 	def do_ft(self):
@@ -138,7 +138,7 @@ class dr_sm(wrap_base):
 		dr: dr_base instance
 		n: int. half width of the smoothing filter, as a multiple of the spacing between different values of omega.
 	"""
-	suffix = "sm"
+	_suffix = "sm"
 	_args_map = {"_dr": 0, "n": 1}
 	
 	def do_ft(self):
@@ -170,7 +170,7 @@ class dr_stat_smsig(dr_stat):
 	"""
 	Like dr_stat, but with the error estimates smoothed wrt. omega.
 	"""
-	suffix = "stat_smsig"
+	_suffix = "stat_smsig"
 	
 	def do_ft(self):
 		dr = self._dr
