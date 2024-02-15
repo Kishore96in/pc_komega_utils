@@ -256,6 +256,9 @@ class dr_base(metaclass=abc.ABCMeta):
 		it_min = np.argmin(np.abs(t - self.t_min))
 		it_max = np.argmin(np.abs(t - self.t_max))
 		
+		if it_max <= it_min:
+			raise ValueError(f"Provided time interval would result in empty slice; t_min = {self.t_min}, t_max = {self.t_max}, {dt = }")
+		
 		return arr[it_min:it_max]
 	
 	def set_t_range(self, t_min, t_max=None):
