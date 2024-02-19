@@ -367,6 +367,33 @@ def get_mode_eigenfunction(
 	
 	return np.array(P_list)
 
+def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
+	"""
+	Given multiple realizations of the same setup, calculate the mode mass in all of them and return estimates of the mean mode mass and the error in the mean.
+	
+	Arguments
+		dr_list: list of dr_base instances
+		Other arguments are the same as get_mode_eigenfunction (except for dr)
+	"""
+	
+	mass_list = []
+	for dr in dr_list:
+		mass_list.append(get_mode_eigenfunction(
+			dr=dr,
+			*args,
+			**kwargs,
+			))
+	mass_list = np.array(mass_list)
+	
+	mean = np.average(mass_list, axis=0)
+	if len(dr_list) == 1:
+		warnings.warn("Cannot estimate error with only one realization")
+		err = np.nan
+	else:
+		err = np.std(mass_list, axis=0)/len(dr_list)
+	
+	return mean, err
+
 def smooth(data, n):
 	"""
 	data: numpy array
