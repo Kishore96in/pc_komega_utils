@@ -390,7 +390,7 @@ def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
 		warnings.warn("Cannot estimate error with only one realization")
 		err = np.full_like(mean, np.nan)
 	else:
-		err = np.std(mass_list, axis=0)/len(dr_list)
+		err = np.std(mass_list, axis=0)/np.sqrt(len(dr_list))
 	
 	return mean, err
 
