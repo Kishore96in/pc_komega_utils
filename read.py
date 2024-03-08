@@ -556,7 +556,7 @@ class dr_dvar_base(dr_3d_base):
 		self.ky = 2*np.pi*fftshift(fftfreq(n_ky, d = Ly/n_ky ))
 		self.data = self.scale_data(data)
 
-class dr_pxy_base(dr_dvar_base):
+class dr_pxy_base(dr_3d_base):
 	"""
 	Read the output of power_xy and plot dispersion relations from them. Requires lintegrate_z=F, lintegrate_shell=F, and lcomplex=F in power_spectrum_run_pars.
 	"""
