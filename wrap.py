@@ -1,7 +1,7 @@
 """
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
 
-Also contains a convenience class, drs_holder, to handle multiple realizations of the same simulation.
+Also contains a convenience class, dr_multi, to handle multiple realizations of the same simulation.
 """
 
 import numpy as np
@@ -220,7 +220,7 @@ class dr_stat_smsig(dr_stat):
 		
 		dr.set_t_range(t_min_orig, t_max_orig)
 
-class drs_holder():
+class dr_multi():
 	"""
 	Holds dispersion relations calculated from multiple realizations of the same simulation setup. The attribute 'realizations' allows to access the individual realizations.
 	
