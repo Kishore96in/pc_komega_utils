@@ -1,9 +1,15 @@
 """
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
+
+Also contains a convenience class, drs_holder, to handle multiple realizations of the same simulation.
 """
 
 import numpy as np
 import abc
+import warnings
+import ast
+import pencil as pc
+import os
 
 from .utils import smooth_tophat
 
@@ -213,3 +219,71 @@ class dr_stat_smsig(dr_stat):
 			self.ky = dr.ky
 		
 		dr.set_t_range(t_min_orig, t_max_orig)
+
+class drs_holder():
+	"""
+	Holds dispersion relations calculated from multiple realizations of the same simulation setup. The attribute 'realizations' allows to access the individual realizations.
+	
+	Arguments:
+		disp_rel: read.dr_base instance
+		simdirs: list of strings containing the paths to the different realizations
+		kwargs: dict. Keyword arguments to be passed to disp_rel
+		cachedir: string. Path to folder to use to cache results (uses the `joblib` package). Defaults to None (no caching).
+	"""
+	def __init__(
+		self,
+		disp_rel,
+		simdirs,
+		kwargs = None,
+		cachedir = None,
+		):
+		if kwargs is None:
+			kwargs = {}
+		
+		if len(simdirs) < 1:
+			raise ValueError("At least one simulation should be specified")
+		
+		self.simdirs = simdirs
+		self.realizations = []
+		
+		import joblib #Keep this import here so that the rest of the functions are usable without joblib installed.
+		memory = joblib.Memory(cachedir)
+		disp_rel = memory.cache(
+			disp_rel,
+			cache_validation_callback = self._cache_validation_callback
+			)
+		
+		for simdir in self.simdirs:
+			dr = disp_rel(simdir=simdir, **kwargs)
+			
+			#These warnings are here again to cover the case when the realizations were loaded from the cache.
+			if dr.t_min < dr.ts.t[0]:
+				warnings.warn(f"{os.path.basename(dr.simdir)}: t_min ({dr.t_min}) < ts.t[0] ({dr.ts.t[0]})")
+			if dr.t_max > dr.ts.t[-1]:
+				warnings.warn(f"{os.path.basename(dr.simdir)}: t_max ({dr.t_max}) > ts.t[-1] ({dr.ts.t[-1]})")
+			
+			self.realizations.append(dr)
+		
+		for attr in [
+			"param",
+			"dim",
+			"grid",
+			"ts",
+			"av_xy",
+			"kx_tilde",
+			"cbar_label",
+			]:
+			if hasattr(self.realizations[0], attr):
+				setattr(self, attr, getattr(self.realizations[0], attr))
+	
+	def _cache_validation_callback(self, metadata):
+		"""
+		Used for joblib. Returns True if the cache is valid.
+		"""
+		kwargs = metadata['input_args']['**']
+		kwargs = ast.literal_eval(kwargs) #convert string to dict.
+		simdir = kwargs['simdir']
+		sim = pc.sim.get(simdir, quiet=True)
+		data_mtime = os.path.getmtime(sim.datadir)
+		
+		return data_mtime < metadata['time']
