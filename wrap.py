@@ -125,8 +125,11 @@ class dr_stat(wrap_base):
 			data2_sum += dr.data**2
 		
 		data_mean = data_mean/n_intervals
-		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
-		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
+		if n_intervals == 1:
+			sigma = np.full_like(data_mean, np.nan)
+		else:
+			#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
+			sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
 		
 		self.omega = dr.omega
 		self.data = data_mean
@@ -205,8 +208,11 @@ class dr_stat_smsig(dr_stat):
 			data2_sum += dr.data**2
 		
 		data_mean = data_mean/n_intervals
-		#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
-		sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
+		if n_intervals == 1:
+			sigma = np.full_like(data_mean, np.nan)
+		else:
+			#sqrt(n/(n-1)) is to reduce the bias in the estimate for the standard deviation.
+			sigma = np.sqrt(data2_sum/n_intervals - (data_mean)**2)*np.sqrt(n_intervals/(n_intervals-1))
 		sigma = smooth_tophat(sigma, 1, axis=self.data_axes['omega_tilde'])
 		
 		self.omega = dr.omega
