@@ -694,6 +694,19 @@ class m_dscl_dbycz0():
 		
 		return np.abs(data/c)
 
+class m_dscl_dbycz():
+	@property
+	def cbar_label_default(self):
+		return  r"$\left| \widetilde{{P}} \right|$"
+	
+	def scale_data(self, data):
+		gamma = self.param.gamma
+		cp = self.param.cp
+		TTmz = np.average(self.slice_time(self.av_xy.t, self.av_xy.xy.TTmz), axis=0)
+		c2mz = (gamma-1)*cp*TTmz
+		
+		return np.abs(data/c2mz)
+
 class m_scl_SBC15(m_dscl_rdbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
