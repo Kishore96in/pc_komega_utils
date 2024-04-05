@@ -259,6 +259,7 @@ class drs_holder():
 		
 		self._kwargs = kwargs
 		self.simdirs = simdirs
+		self._dr_type_for_newargs = dr_type
 		
 		import joblib #Keep this import here so that the rest of the functions are usable without joblib installed.
 		cachedir = kwargs.pop('cachedir', None)
@@ -335,7 +336,7 @@ class drs_holder():
 		"""
 		Make this class pickle-able
 		"""
-		return ((self._dr_type, self.simdirs), self._kwargs)
+		return ((self._dr_type_for_newargs, self.simdirs), self._kwargs)
 	
 	def __getattr__(self, name):
 		if name in self._kwargs.keys():
