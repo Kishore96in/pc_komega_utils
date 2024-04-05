@@ -207,6 +207,10 @@ class dr_base(metaclass=abc.ABCMeta):
 		Arguments:
 			data: optional, numpy array. Slice this instead of self.data. Needs to be of the same shape as data.
 			compress: option, bool. Whether to remove size-one axes from the sliced array.
+		
+		Returns:
+			data: slice of data
+			coords: list of coordinate arrays corresponding to the requested slice, in axes order.
 		"""
 		if data is None:
 			data = self.data
