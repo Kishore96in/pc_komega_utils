@@ -10,6 +10,7 @@ import warnings
 import ast
 import pencil as pc
 import os
+import functools
 
 from .utils import smooth_tophat
 
@@ -264,9 +265,14 @@ class drs_holder():
 		import joblib #Keep this import here so that the rest of the functions are usable without joblib installed.
 		cachedir = kwargs.pop('cachedir', None)
 		memory = joblib.Memory(cachedir)
-		self._dr_type = memory.cache(
+		cached = memory.cache(
+			self._caller,
+			cache_validation_callback = self._cache_validation_callback,
+			)
+		self._dr_type = functools.partial(
+			cached,
 			dr_type,
-			cache_validation_callback = self._cache_validation_callback
+			dr_type.__mro__,
 			)
 		
 		self.realizations = []
@@ -367,3 +373,10 @@ class drs_holder():
 		data_mtime = os.path.getmtime(sim.datadir)
 		
 		return data_mtime < metadata['time']
+	
+	@staticmethod
+	def _caller(func, mro, *args, **kwargs):
+		"""
+		A hack to make sure that joblib does not conflate dr_type objects with different MRO (joblib seems to be designed around functions, not classes).
+		"""
+		return func(*args, **kwargs)
