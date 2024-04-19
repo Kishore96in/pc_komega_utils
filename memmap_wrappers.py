@@ -5,6 +5,7 @@ Helpers to handle arrays and lists larger than RAM.
 import numpy as np
 import os
 import datetime
+import sys
 
 class mmap_array(np.memmap):
 	def __new__(cls, cache_location=None, **kwargs):
@@ -21,9 +22,10 @@ class mmap_array(np.memmap):
 		
 		tmpfilename = os.path.join(cache_location, f"memmap-{os.getpid()}-{datetime.datetime.now().isoformat()}")
 		
-		with open(tmpfilename, mode='w') as f:
+		with open(tmpfilename, mode='wb') as f:
 			#NOTE: this is to circumvent "ValueError: cannot mmap an empty file" in np.memmap.__new__
-			f.write("a")
+			dtype_size = sys.getsizeof(kwargs['dtype'](0))
+			f.write(dtype_size*b"\0")
 		
 		obj = super().__new__(cls, filename=tmpfilename, **kwargs)
 		obj.tmpfilename = tmpfilename
