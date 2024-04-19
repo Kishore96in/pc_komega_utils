@@ -1,5 +1,6 @@
-from pc_komega_utils.memmap_wrappers import mmap_array
 import os
+
+from pc_komega_utils.memmap_wrappers import mmap_array
 
 def test_create_delete():
 	a = mmap_array("/tmp")
