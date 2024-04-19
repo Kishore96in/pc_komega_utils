@@ -10,15 +10,20 @@ from pc_komega_utils.memmap_wrappers import mmap_array
 
 def memory_limit(max_mem):
 	"""
+	Slightly modified version of the code from
 	https://stackoverflow.com/questions/46327566/how-to-have-pytest-place-memory-limits-on-tests#46330985
+	
+	max_mem is the memory limit in GB.
 	"""
 	def decorator(f):
 		def wrapper(*args, **kwargs):
+			max_mem_bytes = int(max_mem*1024**3)
+			
 			process = psutil.Process(os.getpid())
 			prev_limits = resource.getrlimit(resource.RLIMIT_AS)
 			resource.setrlimit(
 				resource.RLIMIT_AS, (
-					process.memory_info().rss + max_mem, -1
+					process.memory_info().vms + max_mem_bytes, -1
 				)
 			)
 			result = f(*args, **kwargs)
