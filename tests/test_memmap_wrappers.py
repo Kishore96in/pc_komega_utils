@@ -20,14 +20,14 @@ def memory_limit(max_mem):
 			max_mem_bytes = int(max_mem*1024**3)
 			
 			process = psutil.Process(os.getpid())
-			prev_limits = resource.getrlimit(resource.RLIMIT_AS)
+			prev_limits = resource.getrlimit(resource.RLIMIT_DATA)
 			resource.setrlimit(
-				resource.RLIMIT_AS, (
-					process.memory_info().vms + max_mem_bytes, -1
+				resource.RLIMIT_DATA, (
+					process.memory_info().data + max_mem_bytes, -1
 				)
 			)
 			result = f(*args, **kwargs)
-			resource.setrlimit(resource.RLIMIT_AS, prev_limits)
+			resource.setrlimit(resource.RLIMIT_DATA, prev_limits)
 			return result
 		return wrapper
 	return decorator
