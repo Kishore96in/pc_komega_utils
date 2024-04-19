@@ -16,6 +16,9 @@ class mmap_array(np.memmap):
 		elif not os.path.isdir(cache_location):
 			raise ValueError
 		
+		if 'dtype' not in kwargs:
+			kwargs['dtype'] = float
+		
 		tmpfilename = os.path.join(cache_location, f"memmap-{os.getpid()}-{datetime.datetime.now().isoformat()}")
 		with open(tmpfilename, mode='w') as f:
 			#NOTE: this is to circumvent "ValueError: cannot mmap an empty file" in np.memmap.__new__
