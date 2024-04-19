@@ -2,6 +2,7 @@ import os
 import pickle
 import datetime
 import numpy as np
+import gc
 
 from pc_komega_utils.memmap_wrappers import mmap_array
 
@@ -30,6 +31,9 @@ def test_pickle():
 	
 	with open(tmpfile, 'wb') as f:
 		pickle.dump(a, f)
+	
+	del a
+	gc.collect()
 	
 	with open(tmpfile, 'rb') as f:
 		b = pickle.load(f)
