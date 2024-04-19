@@ -18,7 +18,7 @@ class mmap_array(np.memmap):
 			raise ValueError
 		
 		if 'dtype' not in kwargs:
-			kwargs['dtype'] = float
+			kwargs['dtype'] = np.double
 		
 		tmpfilename = os.path.join(cache_location, f"memmap-{os.getpid()}-{datetime.datetime.now().isoformat()}")
 		
