@@ -33,4 +33,5 @@ class mmap_array(np.memmap):
 		return obj
 		
 	def __del__(self):
-		os.remove(self.tmpfilename)
+		if hasattr(self, 'tmpfilename'):
+			os.remove(self.tmpfilename)
