@@ -1,4 +1,7 @@
 import os
+import pickle
+import datetime
+import numpy as np
 
 from pc_komega_utils.memmap_wrappers import mmap_array
 
@@ -16,3 +19,20 @@ def test_create_2():
 	
 	assert a.shape == (3,4,5)
 	assert a.dtype == int
+
+def test_pickle():
+	src = np.reshape(np.arange(6), (2,3))
+	
+	a = mmap_array("/tmp", shape=src.shape)
+	a[:] = src
+	
+	tmpfile = f"/tmp/test_mmap_wrapper-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	
+	with open(tmpfile, 'wb') as f:
+		pickle.dump(a, f)
+	
+	with open(tmpfile, 'rb') as f:
+		b = pickle.load(f)
+	
+	assert b.shape == src.shape
+	assert np.all(b == src)
