@@ -38,5 +38,7 @@ def test_pickle():
 	with open(tmpfile, 'rb') as f:
 		b = pickle.load(f)
 	
+	os.remove(tmpfile)
+	
 	assert b.shape == src.shape
 	assert np.all(b == src)
