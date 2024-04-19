@@ -5,6 +5,7 @@ import numpy as np
 import gc
 import resource
 import psutil
+import pytest
 
 from pc_komega_utils.memmap_wrappers import mmap_array
 
@@ -68,3 +69,18 @@ def test_pickle():
 	
 	assert b.shape == src.shape
 	assert np.all(b == src)
+
+@memory_limit(0.24)
+def test_memory_limit():
+	a = np.arange(3e7)
+
+@pytest.mark.xfail
+@memory_limit(0.24)
+def test_memory_limit_2():
+	a = np.arange(4e7)
+
+@pytest.mark.xfail
+@memory_limit(0.24)
+def test_memory_limit_3():
+	a = np.arange(3e7)
+	b = np.arange(3e7)
