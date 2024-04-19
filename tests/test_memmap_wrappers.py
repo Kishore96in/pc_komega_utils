@@ -74,12 +74,12 @@ def test_pickle():
 def test_memory_limit():
 	a = np.arange(3e7)
 
-@pytest.mark.xfail
+@pytest.mark.xfail #if this fails, memory_limit is working
 @memory_limit(0.24)
 def test_memory_limit_2():
 	a = np.arange(4e7)
 
-@pytest.mark.xfail
+@pytest.mark.xfail #if this fails, memory_limit is working
 @memory_limit(0.24)
 def test_memory_limit_3():
 	a = np.arange(3e7)
