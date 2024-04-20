@@ -20,6 +20,8 @@ import abc
 
 from dataclasses import dataclass
 
+from .power_HDF5 import read_power_cached
+
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
 		self.fig = fig
@@ -617,6 +619,36 @@ class dr_pxy_base(dr_3d_base):
 		self.kx = kx
 		self.ky = ky
 		self.data = self.scale_data(data)
+
+class dr_pxy_cached_base(dr_pxy_base):
+	def read(self):
+		#check if the right values were passed to power_spectrum_run_pars
+		if not self.param.lcomplex:
+			raise ValueError("Need lcomplex=T")
+		if self.param.lintegrate_shell:
+			raise ValueError("Need lintegrate_shell=F")
+		if self.param.lintegrate_z:
+			raise ValueError("Need lintegrate_z=F")
+		
+		#The following two cause problems because the size-one axis is compressed by Power.read.
+		if self.dim.nxgrid == 1:
+			raise ValueError("Need nxgrid > 1")
+		if self.dim.nygrid == 1:
+			raise ValueError("Need nygrid > 1")
+		
+		sim = pc.sim.get(self.simdir, quiet=True)
+		
+		self.ts = pc.read.ts(sim=sim, quiet=True)
+		self.pxy = read_power_cached(
+			datadir = self.datadir,
+			quiet = True,
+			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
+			)
+		self.av_xy = pc.read.aver(
+			datadir=self.datadir,
+			simdir=self.simdir,
+			plane_list=['xy'],
+			)
 
 class m_dscl_dbyD2():
 	@property
