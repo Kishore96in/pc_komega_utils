@@ -24,7 +24,7 @@ class read_power_cached():
 		dset[()] = value
 	
 	def __getattr__(self, name):
-		if name in self.cache.keys():
+		if name != 'cache' and name in self.cache.keys():
 			return self.cache[name]
 		else:
 			raise AttributeError
