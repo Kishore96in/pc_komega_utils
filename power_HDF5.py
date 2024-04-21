@@ -17,7 +17,7 @@ class read_power_cached():
 		self.cache = h5py.File(fname, 'w')
 		
 		p = pc.read.power(*args, **kwargs)
-		for k in p.keys():
+		for k in p.__dict__.keys():
 			self._h5cache(k, getattr(p,k))
 	
 	def _h5cache(self, name, value):
