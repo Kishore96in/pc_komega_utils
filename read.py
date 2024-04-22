@@ -20,7 +20,7 @@ import abc
 
 from dataclasses import dataclass
 
-from .power_HDF5 import read_power
+from .power_cached import read_power
 
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
