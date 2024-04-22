@@ -7,18 +7,27 @@ import h5py
 import os
 
 class read_power_cached():
-	def __init__(self, *args, cachedir=".", **kwargs):
+	def __init__(
+		self,
+		*args,
+		cachedir=".",
+		ignore_cache=False,
+		**kwargs,
+		):
 		if not os.path.exists(cachedir):
 			os.makedirs(cachedir)
 		elif not os.path.isdir(cachedir):
 			raise ValueError(f"Cache directory '{cachedir}' is not a directory")
 		
 		fname = os.path.join(cachedir, "power_cache.h5")
-		self.cache = h5py.File(fname, 'w')
-		
-		p = pc.read.power(*args, **kwargs)
-		for k in p.__dict__.keys():
-			self._h5cache(k, getattr(p,k))
+		if os.path.exists(fname) and not ignore_cache:
+			self.cache = h5py.File(fname, 'r')
+		else:
+			self.cache = h5py.File(fname, 'w')
+			
+			p = pc.read.power(*args, **kwargs)
+			for k in p.__dict__.keys():
+				self._h5cache(k, getattr(p,k))
 	
 	def _h5cache(self, name, value):
 		"""
