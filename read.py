@@ -20,7 +20,7 @@ import abc
 
 from dataclasses import dataclass
 
-from .power_HDF5 import read_power_cached
+from .power_HDF5 import read_power
 
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
@@ -639,7 +639,7 @@ class dr_pxy_cached_base(dr_pxy_base):
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
 		self.ts = pc.read.ts(sim=sim, quiet=True)
-		self.pxy = read_power_cached(
+		self.pxy = read_power(
 			datadir = self.datadir,
 			quiet = True,
 			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
