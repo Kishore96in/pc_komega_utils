@@ -1,0 +1,12 @@
+From run /scratch/ckishore/convective_helio/a6.0.1l_r1/data/ on Pegasus
+
+Parameters:
+	nz=288
+	dspec=0.5
+	ckxrange='-50:50'
+	ckyrange='0'
+	lintegrate_z=F
+	lintegrate_shell=F
+	lcomplex=T
+
+var.h5 is a fake snapshot containing only the grid information.
