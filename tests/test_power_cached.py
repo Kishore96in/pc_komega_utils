@@ -1,5 +1,7 @@
 import os
 import datetime
+import pickle
+import numpy as np
 
 import pc_komega_utils
 from pc_komega_utils.power_cached import read_power
@@ -26,3 +28,23 @@ def test_read():
 	assert len(p.ky) == 1
 	assert len(p.t) == 2
 	assert p.uz_xy.shape == (2, 288, 1, 101)
+
+def test_pickle():
+	datadir = get_datadir()
+	cachedir = get_cachedir()
+	
+	p = read_power(
+		datadir = datadir,
+		cachedir = cachedir,
+		quiet = True,
+		)
+	
+	k = p.keys()
+	uz_xy = p.uz_xy[()]
+	
+	s = pickle.dumps(p)
+	del p
+	
+	p2 = pickle.loads(s)
+	assert p2.keys() == k
+	assert np.all(p2.uz_xy == uz_xy)
