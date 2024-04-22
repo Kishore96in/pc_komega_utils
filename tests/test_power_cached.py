@@ -67,3 +67,28 @@ def test_coexist():
 		cachedir = cachedir,
 		quiet = True,
 		)
+
+def test_math():
+	datadir = get_datadir()
+	cachedir = get_cachedir()
+	
+	p = read_power(
+		datadir = datadir,
+		cachedir = cachedir,
+		quiet = True,
+		)
+	
+	t = p.t[()]
+	
+	assert np.all(2*p.t == 2*t)
+	assert np.all(p.t*4 == t*4)
+	assert np.all(p.t/3 == t/3)
+	assert np.all(p.t - 3 == t - 3)
+	assert np.all(p.t**2 == t**2)
+	
+	assert np.all(-p.t == -t)
+	assert np.all(abs(p.t) == abs(t))
+	assert np.all(abs(-p.t) == abs(-t))
+	
+	assert np.all(p.t == t)
+	assert np.all(p.t > t-1)
