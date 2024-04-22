@@ -9,7 +9,7 @@ def get_datadir():
 	return os.path.join(module_loc, "tests", "data")
 
 def get_cachedir():
-	return f"/tmp/test_mmap_wrapper-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	return f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}"
 
 def test_read():
 	datadir = get_datadir()
