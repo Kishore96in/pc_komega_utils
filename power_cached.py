@@ -54,3 +54,9 @@ class read_power():
 	
 	def keys(self):
 		return set(self._cache.keys())
+	
+	def __getstate__(self):
+		return self._cache.filename
+	
+	def __setstate__(self, cachename):
+		self._cache = h5py.File(cachename, 'r')
