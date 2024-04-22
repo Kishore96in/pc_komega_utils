@@ -23,14 +23,17 @@ class read_power():
 			raise ValueError(f"Cache directory '{cachedir}' is not a directory")
 		
 		fname = os.path.join(cachedir, "power_cache.h5")
-		if os.path.exists(fname) and not ignore_cache:
-			self._cache = h5py.File(fname, 'r')
-		else:
+		
+		if ignore_cache or not os.path.exists(fname):
 			self._cache = h5py.File(fname, 'w')
 			
 			p = pc.read.power(*args, **kwargs)
 			for k in p.__dict__.keys():
 				self._h5cache(k, getattr(p,k))
+			
+			self._cache.close()
+		
+		self._cache = h5py.File(fname, 'r')
 	
 	def _h5cache(self, name, value):
 		"""
