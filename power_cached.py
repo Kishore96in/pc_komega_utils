@@ -24,9 +24,9 @@ class read_power():
 		
 		fname = os.path.join(cachedir, "power_cache.h5")
 		if os.path.exists(fname) and not ignore_cache:
-			self.cache = h5py.File(fname, 'r')
+			self._cache = h5py.File(fname, 'r')
 		else:
-			self.cache = h5py.File(fname, 'w')
+			self._cache = h5py.File(fname, 'w')
 			
 			p = pc.read.power(*args, **kwargs)
 			for k in p.__dict__.keys():
@@ -37,11 +37,11 @@ class read_power():
 		name : str
 		value : numpy array
 		"""
-		dset = self.cache.create_dataset(name, data=value)
+		dset = self._cache.create_dataset(name, data=value)
 	
 	def __getattr__(self, name):
-		if name != 'cache' and name in self.cache.keys():
-			data = self.cache[name]
+		if name != '_cache' and name in self._cache.keys():
+			data = self._cache[name]
 			if data.ndim == 0:
 				return data[()]
 			else:
@@ -50,4 +50,4 @@ class read_power():
 			raise AttributeError
 	
 	def __del__(self):
-		self.cache.close()
+		self._cache.close()
