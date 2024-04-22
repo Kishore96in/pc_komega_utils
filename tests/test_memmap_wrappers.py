@@ -84,3 +84,31 @@ def test_memory_limit_2():
 def test_memory_limit_3():
 	a = np.arange(3e7)
 	b = np.arange(3e7)
+
+@pytest.mark.xfail #currently fails. See the note below.
+@memory_limit(0.4)
+def test_pickle_large():
+	"""
+	NOTE: The failure of this test suggests that the entire array is being loaded into memory during pickle.dump(a, f) (this is corroborated by a comment in https://github.com/numpy/numpy/issues/22213#issuecomment-1238255808 ). This makes mmap_array useless for my purposes.
+	"""
+	
+	src = np.arange(3e7)
+	
+	a = mmap_array("/tmp", shape=src.shape)
+	a[:] = src
+	
+	tmpfile = f"/tmp/test_mmap_wrapper-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	
+	with open(tmpfile, 'wb') as f:
+		pickle.dump(a, f)
+	
+	del a
+	gc.collect()
+	
+	with open(tmpfile, 'rb') as f:
+		b = pickle.load(f)
+	
+	os.remove(tmpfile)
+	
+	assert b.shape == src.shape
+	assert np.all(b == src)
