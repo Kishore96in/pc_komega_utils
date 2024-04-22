@@ -52,5 +52,5 @@ class read_power():
 	def __del__(self):
 		self._cache.close()
 	
-	def keys():
+	def keys(self):
 		return set(self._cache.keys())
