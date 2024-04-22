@@ -48,3 +48,22 @@ def test_pickle():
 	p2 = pickle.loads(s)
 	assert p2.keys() == k
 	assert np.all(p2.uz_xy == uz_xy)
+
+def test_coexist():
+	"""
+	Check that it is possible to open multiple instances at the same time in the same data directory.
+	"""
+	datadir = get_datadir()
+	cachedir = get_cachedir()
+	
+	p = read_power(
+		datadir = datadir,
+		cachedir = cachedir,
+		quiet = True,
+		)
+	
+	p2 = read_power(
+		datadir = datadir,
+		cachedir = cachedir,
+		quiet = True,
+		)
