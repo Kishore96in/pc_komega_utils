@@ -643,6 +643,7 @@ class dr_pxy_cached_base(dr_pxy_base):
 			datadir = self.datadir,
 			quiet = True,
 			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
+			ignore_cache = True,
 			)
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
