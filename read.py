@@ -752,6 +752,14 @@ class m_dscl_d():
 	def scale_data(self, data):
 		return np.abs(data)
 
+class m_dscl_d2():
+	@property
+	def cbar_label_default(self):
+		return  r"$\left| P \right|$"
+	
+	def scale_data(self, data):
+		return np.abs(data)**2
+
 class m_scl_SBC15(m_dscl_rdbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
