@@ -7,6 +7,9 @@ import h5py
 import os
 
 class read_power_cached():
+	"""
+	Stores the output of pc.read.power in a HDF5 file. When an attribute is requested, it is looked up in the HDF5 file. This avoids the need to always keep the Power() object in memory (a problem for large simulations).
+	"""
 	def __init__(
 		self,
 		*args,
