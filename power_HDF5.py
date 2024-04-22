@@ -25,12 +25,15 @@ class read_power_cached():
 		name : str
 		value : numpy array
 		"""
-		dset = self.cache.create_dataset(name, value.shape, dtype=value.dtype)
-		dset[()] = value
+		dset = self.cache.create_dataset(name, data=value)
 	
 	def __getattr__(self, name):
 		if name != 'cache' and name in self.cache.keys():
-			return self.cache[name]
+			data = self.cache[name]
+			if data.ndim == 0:
+				return data[()]
+			else:
+				return data
 		else:
 			raise AttributeError
 	
