@@ -26,12 +26,11 @@ class read_power():
 		fname = os.path.join(cachedir, "power_cache.h5")
 		
 		if ignore_cache or not os.path.exists(fname):
-			self._cache = h5py.File(fname, 'w')
-			
 			p = pc.read.power(*args, **kwargs)
+			
+			self._cache = h5py.File(fname, 'w')
 			for k in p.__dict__.keys():
 				self._h5cache(k, getattr(p,k))
-			
 			self._cache.close()
 		
 		self._cache = h5py.File(fname, 'r')
