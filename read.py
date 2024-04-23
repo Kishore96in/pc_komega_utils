@@ -675,16 +675,14 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		z = self.z
 		t = self.slice_time(self.pxy.t, self.pxy.t)
 		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
-		data = np.transpose(data, axes=[0,3,2,1]) #Needs to happen before filtering so that we use the right axis for z.
 		
-		data = np.moveaxis(data, self.data_axes['z'], 0)
-		data = self._filter_z(data)
-		data = np.moveaxis(data, 0, self.data_axes['z'])
+		data = self._filter_z(data, axis=1)
 		
-		assert np.shape(data) == (len(t), len(kx), len(ky), len(z))
+		assert np.shape(data) == (len(t), len(z), len(ky), len(kx))
 		
 		data = scipy.fft.fftn(data, norm='forward', axes=[0], workers=self.n_workers)
 		data = fftshift(data, axes=[0])
+		data = np.transpose(data, axes=[0,3,2,1])
 		n_omega, _, _, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
@@ -696,19 +694,20 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	def z(self):
 		return self._filter_z(self.pxy.zpos)
 	
-	def _filter_z(self, arr):
+	def _filter_z(self, arr, axis=0):
 		z_full = self.pxy.zpos
 		
-		assert np.shape(arr)[0] == np.shape(z_full)[0], f"{np.shape(arr) = }, {np.shape(z_full) = }"
+		assert np.shape(arr)[axis] == np.shape(z_full)[0], f"{np.shape(arr) = }, {np.shape(z_full) = }"
 		
-		ret = np.full(
-			(len(self._z_to_keep), *arr.shape[1:]),
-			np.nan,
-			dtype=arr.dtype,
-			)
+		newshape = list(arr.shape)
+		newshape[axis] = len(self._z_to_keep)
+		ret = np.full(newshape, np.nan, dtype=arr.dtype)
+		
+		ind_pre = [slice(None)]*axis
+		ind_post = [slice(None)]*(arr.ndim-axis-1)
 		for i, z in enumerate(self._z_to_keep):
 			iz = np.argmin(np.abs(z_full - z))
-			ret[i] = arr[iz]
+			ret[i] = arr[(*ind_pre, iz, *ind_post)]
 		
 		return ret
 
