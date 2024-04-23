@@ -695,7 +695,7 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	
 	def _filter_z(self, arr):
 		z_full = self.pxy.zpos
-		assert np.shape(arr) == np.shape(z_full)
+		assert np.shape(arr) == np.shape(z_full), f"{np.shape(arr) = }, {np.shape(z_full) = }"
 		ret = np.full_like(self._z_to_keep, np.nan)
 		for i, z in enumerate(self._z_to_keep):
 			iz = np.argmin(np.abs(z_full - z))
