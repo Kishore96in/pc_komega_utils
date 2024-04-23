@@ -676,7 +676,10 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		t = self.slice_time(self.pxy.t, self.pxy.t)
 		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
 		data = np.transpose(data, axes=[0,3,2,1]) #Needs to happen before filtering so that we use the right axis for z.
-		data = np.apply_along_axis(self._filter_z, axis=self.data_axes['z'], arr=data)
+		
+		data = np.moveaxis(data, self.data_axes['z'], 0)
+		data = self._filter_z(data)
+		data = np.moveaxis(data, 0, self.data_axes['z'])
 		
 		assert np.shape(data) == (len(t), len(kx), len(ky), len(z))
 		
@@ -695,11 +698,18 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	
 	def _filter_z(self, arr):
 		z_full = self.pxy.zpos
-		assert np.shape(arr) == np.shape(z_full), f"{np.shape(arr) = }, {np.shape(z_full) = }"
-		ret = np.full_like(self._z_to_keep, np.nan, dtype=arr.dtype)
+		
+		assert np.shape(arr)[0] == np.shape(z_full)[0], f"{np.shape(arr) = }, {np.shape(z_full) = }"
+		
+		ret = np.full(
+			(len(self._z_to_keep), *arr.shape[1:]),
+			np.nan,
+			dtype=arr.dtype,
+			)
 		for i, z in enumerate(self._z_to_keep):
 			iz = np.argmin(np.abs(z_full - z))
 			ret[i] = arr[iz]
+		
 		return ret
 
 class m_dscl_dbyD2():
