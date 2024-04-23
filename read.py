@@ -651,6 +651,51 @@ class dr_pxy_cached_base(dr_pxy_base):
 			plane_list=['xy'],
 			)
 
+class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
+	"""
+	Since we are typically only interested in a small set of z values, this class only does the Fourier transform etc for those z values (rather than doing computations for the entire data series).
+	
+	Needs to be passed z (list of the z values to consider) during initialization.
+	"""
+	def __init__(self, *args, **kwargs):
+		self._z_to_keep = kwargs.pop('z')
+		
+		super().__init__(self, *args, **kwargs)
+	
+	def do_ft(self):
+		fftshift = scipy.fft.fftshift
+		fftfreq = scipy.fft.fftfreq
+		kx = self.pxy.kx
+		ky = self.pxy.ky
+		z = self.z
+		t = self.slice_time(self.pxy.t, self.pxy.t)
+		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
+		data = np.apply_along_axis(self._filter_z, axis=self.data_axes['z'], arr=data)
+		
+		assert np.shape(data) == (len(t), len(z), len(ky), len(kx))
+		
+		data = scipy.fft.fftn(data, norm='forward', axes=[0], workers=self.n_workers)
+		data = fftshift(data, axes=[0])
+		data = np.transpose(data, axes=[0,3,2,1])
+		n_omega, _, _, _ = np.shape(data)
+		
+		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
+		self.kx = kx
+		self.ky = ky
+		self.data = self.scale_data(data)
+	
+	@property
+	def z(self):
+		return self._filter_z(self.pxy.zpos)
+	
+	def _filter_z(self, arr):
+		z_full = self.pxy.zpos
+		assert np.shape(arr) == np.shape(z_full)
+		ret = np.full_like(self._z_to_keep, np.nan)
+		for i, z in enumerate(self._z_to_keep):
+			iz = np.argmin(np.abs(z_full - z))
+			ret[i] = arr[iz]
+
 class m_dscl_dbyD2():
 	@property
 	def cbar_label_default(self):
