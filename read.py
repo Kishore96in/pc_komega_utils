@@ -621,6 +621,11 @@ class dr_pxy_base(dr_3d_base):
 		self.data = self.scale_data(data)
 
 class dr_pxy_cached_base(dr_pxy_base):
+	def __init__(self, *args, **kwargs):
+		self._ignore_cache = kwargs.pop('ignore_cache', True)
+		
+		super().__init__(*args, **kwargs)
+	
 	def read(self):
 		#check if the right values were passed to power_spectrum_run_pars
 		if not self.param.lcomplex:
@@ -643,7 +648,7 @@ class dr_pxy_cached_base(dr_pxy_base):
 			datadir = self.datadir,
 			quiet = True,
 			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
-			ignore_cache = True,
+			ignore_cache = self._ignore_cache,
 			)
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
