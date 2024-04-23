@@ -655,6 +655,13 @@ class dr_pxy_cached_base(dr_pxy_base):
 			simdir=self.simdir,
 			plane_list=['xy'],
 			)
+	
+	def do_ft(self):
+		super().do_ft()
+		
+		#Convert the following attributes from h5py_dataset_wrapper to numpy arrays (to allow pickling).
+		self.kx = kx[()]
+		self.ky = ky[()]
 
 class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	"""
