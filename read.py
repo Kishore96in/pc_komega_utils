@@ -710,7 +710,7 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		ind_post = [slice(None)]*(arr.ndim-axis-1)
 		for i, z in enumerate(self._z_to_keep):
 			iz = np.argmin(np.abs(z_full - z))
-			ret[i] = arr[(*ind_pre, iz, *ind_post)]
+			ret[(*ind_pre, i, *ind_post)] = arr[(*ind_pre, iz, *ind_post)]
 		
 		return ret
 
