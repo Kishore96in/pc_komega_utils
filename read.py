@@ -700,6 +700,7 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		for i, z in enumerate(self._z_to_keep):
 			iz = np.argmin(np.abs(z_full - z))
 			ret[i] = arr[iz]
+		return ret
 
 class m_dscl_dbyD2():
 	@property
