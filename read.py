@@ -622,7 +622,7 @@ class dr_pxy_base(dr_3d_base):
 
 class dr_pxy_cached_base(dr_pxy_base):
 	def __init__(self, *args, **kwargs):
-		self._ignore_cache = kwargs.pop('ignore_cache', True)
+		self._ignore_cache = kwargs.pop('ignore_cache', False)
 		
 		super().__init__(*args, **kwargs)
 	
