@@ -677,8 +677,8 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	def do_ft(self):
 		fftshift = scipy.fft.fftshift
 		fftfreq = scipy.fft.fftfreq
-		kx = self.pxy.kx[()] #convert from h5py_dataset_wrapper to array
-		ky = self.pxy.ky[()]
+		kx = self.pxy.kx
+		ky = self.pxy.ky
 		z = self.z
 		t = self.slice_time(self.pxy.t, self.pxy.t)
 		
@@ -696,8 +696,8 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		n_omega, _, _, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
-		self.kx = kx
-		self.ky = ky
+		self.kx = kx[()] #convert from h5py_dataset_wrapper to array
+		self.ky = ky[()]
 		self.data = self.scale_data(data)
 	
 	@property
