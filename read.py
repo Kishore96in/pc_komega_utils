@@ -670,8 +670,8 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	def do_ft(self):
 		fftshift = scipy.fft.fftshift
 		fftfreq = scipy.fft.fftfreq
-		kx = self.pxy.kx
-		ky = self.pxy.ky
+		kx = self.pxy.kx[()] #convert from h5py_dataset_wrapper to array
+		ky = self.pxy.ky[()]
 		z = self.z
 		t = self.slice_time(self.pxy.t, self.pxy.t)
 		
