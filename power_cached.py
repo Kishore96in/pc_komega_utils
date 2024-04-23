@@ -6,6 +6,9 @@ import pencil as pc
 import h5py
 import os
 import numpy as np
+import warnings
+
+class InvalidCacheWarning(RuntimeWarning): pass
 
 class read_power():
 	"""
@@ -23,9 +26,20 @@ class read_power():
 		elif not os.path.isdir(cachedir):
 			raise ValueError(f"Cache directory '{cachedir}' is not a directory")
 		
+		#Find the datadir
+		if len(args) > 0:
+			datadir = args[0]
+		else:
+			datadir = kwargs.get('datadir', "data")
+		
 		fname = os.path.join(cachedir, "power_cache.h5")
 		
-		if ignore_cache or not os.path.exists(fname):
+		if ignore_cache or not (
+			os.path.exists(fname) and
+			os.path.getmtime(datadir) < os.path.getmtime(fname)
+			):
+			warnings.warn(f"Cached power data ({fname}) is nonexistent or invalid; reading anew.", InvalidCacheWarning)
+			
 			p = pc.read.power(*args, **kwargs)
 			
 			self._cache = h5py.File(fname, 'w')
