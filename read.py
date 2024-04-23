@@ -660,7 +660,7 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 	def __init__(self, *args, **kwargs):
 		self._z_to_keep = kwargs.pop('z')
 		
-		super().__init__(self, *args, **kwargs)
+		super().__init__(*args, **kwargs)
 	
 	def do_ft(self):
 		fftshift = scipy.fft.fftshift
