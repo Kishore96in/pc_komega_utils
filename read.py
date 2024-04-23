@@ -678,7 +678,7 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		data = np.transpose(data, axes=[0,3,2,1]) #Needs to happen before filtering so that we use the right axis for z.
 		data = np.apply_along_axis(self._filter_z, axis=self.data_axes['z'], arr=data)
 		
-		assert np.shape(data) == (len(t), len(z), len(ky), len(kx))
+		assert np.shape(data) == (len(t), len(kx), len(ky), len(z))
 		
 		data = scipy.fft.fftn(data, norm='forward', axes=[0], workers=self.n_workers)
 		data = fftshift(data, axes=[0])
