@@ -674,9 +674,12 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 		ky = self.pxy.ky
 		z = self.z
 		t = self.slice_time(self.pxy.t, self.pxy.t)
-		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
 		
-		data = self._filter_z(data, axis=1)
+		data = self._filter_z(
+			getattr(self.pxy, self.field_name),
+			axis=1,
+			)
+		data = self.slice_time(self.pxy.t, data)
 		
 		assert np.shape(data) == (len(t), len(z), len(ky), len(kx))
 		
