@@ -94,6 +94,12 @@ class h5py_dataset_wrapper():
 	def __len__(self):
 		return len(self._dset)
 	
+	def __getstate__(self):
+		"""
+		Just a more useful error message.
+		"""
+		raise TypeError(f"Cannot pickle HDF5 dataset (name: {self._dset.name}).")
+	
 	# List of magic methods: https://python-course.eu/oop/magic-methods.php
 	# Binary operators
 	def __add__(self, other):
