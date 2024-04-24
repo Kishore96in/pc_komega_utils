@@ -483,6 +483,8 @@ class fake_grid:
 class dr_dvar_base(dr_3d_base):
 	"""
 	Read downsampled snapshots and plot dispersion relations from them.
+	
+	TODO: There currently seems to be a bug in Pencil, such that each entry in varN_down.list is written twice.
 	"""
 	@property
 	def field_name_default(self):
