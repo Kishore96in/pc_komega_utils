@@ -113,6 +113,7 @@ def fit_mode(
 		for i in range(min(model.n_lorentz, len(om_guess))):
 			guess_lor[i,1] = om_guess[i]
 	
+	guess_lor[:,2] = gamma_max
 	
 	guess = model.pack_params(guess_poly, guess_lor)
 	
