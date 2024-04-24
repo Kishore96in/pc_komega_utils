@@ -445,7 +445,7 @@ def stdev_central(arr, frac, adjust=False):
 		return std
 
 def estimate_sigma(data, gamma_max, omega_tilde):
-	sigma = np.maximum(np.sqrt(smooth((data - smooth(data, 1))**2, 1)), stdev_central(data, 0.05, adjust=True))
+	sigma = np.full_like(data, stdev_central(data, 0.05, adjust=True))
 	
 	if np.all(sigma == 0):
 		"""
