@@ -21,6 +21,7 @@ import abc
 from dataclasses import dataclass
 
 from .power_cached import read_power
+from .utils import smooth_tophat
 
 class plot_container():
 	def __init__(self, fig, ax, im, savedir="."):
@@ -838,7 +839,7 @@ class m_dscl_d2sm1():
 		return  r"$\left| P \right|$"
 	
 	def scale_data(self, data):
-		return pcko.utils.smooth_tophat(
+		return smooth_tophat(
 			np.abs(data)**2,
 			1,
 			axis=self.data_axes['omega_tilde'],
