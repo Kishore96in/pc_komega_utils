@@ -832,6 +832,18 @@ class m_dscl_d2():
 	def scale_data(self, data):
 		return np.abs(data)**2
 
+class m_dscl_d2sm1():
+	@property
+	def cbar_label_default(self):
+		return  r"$\left| P \right|$"
+	
+	def scale_data(self, data):
+		return pcko.utils.smooth_tophat(
+			np.abs(data)**2,
+			1,
+			axis=self.data_axes['omega_tilde'],
+			)
+
 class m_scl_SBC15(m_dscl_rdbyD2):
 	"""
 	Use the length and frequency scales defined by Singh et al, 2015.
