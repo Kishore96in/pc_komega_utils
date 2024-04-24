@@ -604,7 +604,7 @@ class dr_pxy_base(dr_3d_base):
 		fftfreq = scipy.fft.fftfreq
 		kx = self.pxy.kx
 		ky = self.pxy.ky
-		z = self.pxy.zpos
+		z = self.z
 		t = self.slice_time(self.pxy.t, self.pxy.t)
 		data = self.slice_time(self.pxy.t, getattr(self.pxy, self.field_name))
 		
