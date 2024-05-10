@@ -458,12 +458,21 @@ class dr_3d_base(dr_base):
 	def plot_ring(self, z, omega_tilde):
 		"""
 		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, ky_tilde) at a given height z and angular frequency omega_tilde.
+		
+		To average over a range of omega_tilde, you can just pass omega_tilde as a tuple (omega_tilde_min, omega_tilde_max)
 		"""
-		data, [[om_tilde], kx_tilde, ky_tilde, _] = self.get_slice(
+		data, [_, kx_tilde, ky_tilde, _] = self.get_slice(
 			kx_tilde = (self.k_tilde_min, self.k_tilde_max),
 			omega_tilde = omega_tilde,
 			ky_tilde = (self.k_tilde_min, self.k_tilde_max),
 			z = z,
+			)
+		
+		#If we selected multiple omega_tilde, average over them.
+		data = np.average(
+			data,
+			axis = self.data_axes['omega_tilde'],
+			keepdims = True,
 			)
 		
 		p = self.contourplotter(kx_tilde, ky_tilde, data[0,:,:,0])
