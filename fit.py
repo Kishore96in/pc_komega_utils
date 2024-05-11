@@ -281,6 +281,13 @@ def get_mode_eigenfunction(
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
 	
+	if mode_mass_method not in [
+		"sum",
+		"sum_full",
+		"integral",
+		]:
+		raise ValueError(f"Unsupported mode_mass_method: {mode_mass_method}")
+	
 	if omega_tol is None:
 		omega_tol = np.inf
 	
