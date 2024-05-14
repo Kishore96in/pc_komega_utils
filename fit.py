@@ -58,6 +58,16 @@ class make_model():
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
 
+def _default_getter(dr, k_tilde, z, om_tilde_min, om_tilde_max):
+	data_near_target, [omt_near_target, *_] = dr.get_slice(
+		omega_tilde=(om_tilde_min, om_tilde_max),
+		kx_tilde = k_tilde,
+		ky_tilde = 0,
+		z = z,
+		compress = True,
+		)
+	return data_near_target, omt_near_target
+
 def fit_mode(
 	dr,
 	k_tilde,
@@ -68,11 +78,12 @@ def fit_mode(
 	n_lorentz,
 	om_guess = None,
 	gamma_max = None,
+	getter = _default_getter,
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
 	
-	Arguments:
+	Mandatory arguments:
 		dr: dr_yaver_base instance
 		k_tilde: float, wavenumber at which to find the amplitude
 		z: float, z-coordinate at which to read the data
@@ -80,8 +91,11 @@ def fit_mode(
 		om_tilde_max: float. Consider the part of the data below this frequency
 		poly_order: int. Order of polynomial to use to fit the continuum.
 		n_lorentz: int. Number of Lorentzian profiles to use for fitting.
+	
+	Optional arguments:
 		om_guess: list of float. Guesses for the omega_tilde at which modes are present. Length need not be the same as n_lorentz.
 		gamma_max: float. Upper limit on the width of the Lorentzians. By default, om_tilde_max = om_tilde_min.
+		getter: function. A function with signature `getter(dr, k_tilde, z, om_tilde_min, om_tilde_max) -> data:np.ndarray, omega_tilde:np.ndarray`, such that `data` is the power spectrum at the given k_tilde,z for omega_tilde_min<=omega_tilde<omega_tilde_max.
 	
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
@@ -89,13 +103,7 @@ def fit_mode(
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
-	data_near_target, [omt_near_target, *_] = dr.get_slice(
-		omega_tilde=(om_tilde_min, om_tilde_max),
-		kx_tilde = k_tilde,
-		ky_tilde = 0,
-		z = z,
-		compress = True,
-		)
+	data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
 	
 	model = make_model(poly_order, n_lorentz)
 	
@@ -168,6 +176,7 @@ def fit_mode_auto(
 	threshold_p = None,
 	om_guess = None,
 	gamma_max = None,
+	getter = _default_getter,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
@@ -184,17 +193,12 @@ def fit_mode_auto(
 		threshold_p: float: if the probability of the obtained chi-squared is less than this value, accept the fit.
 		om_guess: list of float. Passed to fit_mode.
 		gamma_max: float. Passed to fit_mode.
+		getter: function. See fit_mode.
 	
 	Actual termination condition is determined by the earliest reached of threshold and threshold_p.
 	"""
 	
-	data_near_target, [omt_near_target, *_] = dr.get_slice(
-		omega_tilde=(om_tilde_min, om_tilde_max),
-		kx_tilde = k_tilde,
-		ky_tilde = 0,
-		z = z,
-		compress = True,
-		)
+	data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
 	
 	if hasattr(dr, "sigma"):
 		sigma = _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
@@ -225,6 +229,7 @@ def fit_mode_auto(
 			n_lorentz=n_lorentz,
 			om_guess=om_guess,
 			gamma_max=gamma_max,
+			getter=getter,
 			)
 		
 		c = chi2r(fit)
@@ -261,6 +266,7 @@ def get_mode_eigenfunction(
 	omega_tol = None,
 	gamma_max = None,
 	mode_mass_method="sum",
+	getter = _default_getter,
 	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
@@ -277,6 +283,7 @@ def get_mode_eigenfunction(
 		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
 		gamma_max: float. See fit_mode.
 		mode_mass_method: string. How to compute the mode mass. Can be "sum" or "integral".
+		getter: function. See fit_mode.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
@@ -303,6 +310,7 @@ def get_mode_eigenfunction(
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
+				getter=getter,
 				)
 		else:
 			fit = fit_mode(
@@ -315,17 +323,12 @@ def get_mode_eigenfunction(
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
+				getter=getter,
 				)
 		
 		_, params_lorentz = fit.unpack_params(fit.popt)
 		
-		data_near_target, [omt_near_target, *_] = dr.get_slice(
-			omega_tilde=(om_tilde_min, om_tilde_max),
-			kx_tilde = k_tilde,
-			ky_tilde = 0,
-			z = z,
-			compress = True,
-			)
+		data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
 		
 		if len(params_lorentz) > 0:
 			"""
