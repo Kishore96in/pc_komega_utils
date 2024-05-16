@@ -78,6 +78,7 @@ def fit_mode(
 	n_lorentz,
 	om_guess = None,
 	gamma_max = None,
+	debug = False,
 	getter = _default_getter,
 	):
 	"""
@@ -145,7 +146,7 @@ def fit_mode(
 		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	try:
-		model.popt, model.pcov = scipy.optimize.curve_fit(
+		model.popt, model.pcov, infodict, mesg, _ = scipy.optimize.curve_fit(
 			model,
 			omt_near_target,
 			data_near_target,
@@ -158,9 +159,13 @@ def fit_mode(
 			x_scale='jac',
 			jac='3-point',
 			absolute_sigma = True,
+			full_output = True,
 			)
 	except Exception as e:
 		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e}")
+	
+	if debug:
+		print(f"\t{mesg = }\n\t{infodict['nfev'] = }")
 	
 	return model
 
@@ -172,10 +177,11 @@ def fit_mode_auto(
 	om_tilde_max,
 	poly_order,
 	n_lorentz_max = 5,
-	threshold = 0.5,
+	threshold = None,
 	threshold_p = None,
 	om_guess = None,
 	gamma_max = None,
+	debug=False,
 	getter = _default_getter,
 	):
 	"""
@@ -197,6 +203,8 @@ def fit_mode_auto(
 	
 	Actual termination condition is determined by the earliest reached of threshold and threshold_p.
 	"""
+	if threshold is None:
+		threshold = 0.8
 	
 	data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
 	
@@ -229,6 +237,7 @@ def fit_mode_auto(
 			n_lorentz=n_lorentz,
 			om_guess=om_guess,
 			gamma_max=gamma_max,
+			debug=debug,
 			getter=getter,
 			)
 		
@@ -265,7 +274,10 @@ def get_mode_eigenfunction(
 	force_n_lorentz = None,
 	omega_tol = None,
 	gamma_max = None,
+	threshold = None,
+	threshold_p = None,
 	mode_mass_method="sum",
+	debug=False,
 	getter = _default_getter,
 	):
 	"""
@@ -282,6 +294,8 @@ def get_mode_eigenfunction(
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
 		gamma_max: float. See fit_mode.
+		threshold: float. See fit_mode_auto.
+		threshold_p: float. See fit_mode_auto.
 		mode_mass_method: string. How to compute the mode mass. Can be "sum" or "integral".
 		getter: function. See fit_mode.
 	"""
@@ -300,6 +314,8 @@ def get_mode_eigenfunction(
 	
 	P_list = []
 	for z in z_list:
+		if debug:
+			print(f"get_mode_eigenfunction: {z = }") #debug
 		if force_n_lorentz is None:
 			fit = fit_mode_auto(
 				dr=dr,
@@ -310,6 +326,9 @@ def get_mode_eigenfunction(
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
+				threshold=threshold,
+				threshold_p=threshold_p,
+				debug=debug,
 				getter=getter,
 				)
 		else:
@@ -323,6 +342,7 @@ def get_mode_eigenfunction(
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
+				debug=debug,
 				getter=getter,
 				)
 		
@@ -351,6 +371,8 @@ def get_mode_eigenfunction(
 				width = selected[main_mode,2]
 				omega_c = selected[main_mode,1]
 				
+				if debug:
+					print(f"get_mode_eigenfunction: {omega_c = :.2e}, {width = :.2e}")
 				mode_mass = np.sum(np.where(
 					np.abs(selected[:,1] - omega_c) < width,
 					mode_masses,
