@@ -242,6 +242,11 @@ def fit_mode_auto(
 			)
 		
 		c = chi2r(fit)
+		if debug > 0:
+			if (fit_old is None):
+				#Just to prevent an undefined variable in the next line.
+				c_old = np.inf
+			print(f"\tfit_mode_auto: {c = :.2e}, {c/c_old = :.2e}, {chi2p(fit) = :.2e}")
 		if (threshold_p is not None) and (chi2p(fit) < threshold_p):
 			if debug > 0:
 				print("Terminated due to threshold_p")
