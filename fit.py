@@ -78,7 +78,7 @@ def fit_mode(
 	n_lorentz,
 	om_guess = None,
 	gamma_max = None,
-	debug = False,
+	debug = 0,
 	getter = _default_getter,
 	):
 	"""
@@ -164,7 +164,7 @@ def fit_mode(
 	except Exception as e:
 		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e}")
 	
-	if debug:
+	if debug > 0:
 		print(f"\t{mesg = }\n\t{infodict['nfev'] = }")
 	
 	return model
@@ -181,7 +181,7 @@ def fit_mode_auto(
 	threshold_p = None,
 	om_guess = None,
 	gamma_max = None,
-	debug=False,
+	debug = 0,
 	getter = _default_getter,
 	):
 	"""
@@ -237,17 +237,17 @@ def fit_mode_auto(
 			n_lorentz=n_lorentz,
 			om_guess=om_guess,
 			gamma_max=gamma_max,
-			debug=debug,
+			debug=debug-1,
 			getter=getter,
 			)
 		
 		c = chi2r(fit)
 		if (threshold_p is not None) and (chi2p(fit) < threshold_p):
-			if debug:
+			if debug > 0:
 				print("Terminated due to threshold_p")
 			return fit
 		elif (fit_old is not None) and c/c_old > threshold:
-			if debug:
+			if debug > 0:
 				print("Terminated due to threshold")
 			return fit_old
 		elif c == 0:
@@ -278,7 +278,7 @@ def get_mode_eigenfunction(
 	threshold = None,
 	threshold_p = None,
 	mode_mass_method="sum",
-	debug=False,
+	debug = 0,
 	getter = _default_getter,
 	):
 	"""
@@ -315,8 +315,8 @@ def get_mode_eigenfunction(
 	
 	P_list = []
 	for z in z_list:
-		if debug:
-			print(f"get_mode_eigenfunction: {z = }") #debug
+		if debug > 0:
+			print(f"get_mode_eigenfunction: {z = }")
 		if force_n_lorentz is None:
 			fit = fit_mode_auto(
 				dr=dr,
@@ -329,7 +329,7 @@ def get_mode_eigenfunction(
 				gamma_max=gamma_max,
 				threshold=threshold,
 				threshold_p=threshold_p,
-				debug=debug,
+				debug=debug-1,
 				getter=getter,
 				)
 		else:
@@ -343,7 +343,7 @@ def get_mode_eigenfunction(
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
-				debug=debug,
+				debug=debug-1,
 				getter=getter,
 				)
 		
@@ -372,7 +372,7 @@ def get_mode_eigenfunction(
 				width = selected[main_mode,2]
 				omega_c = selected[main_mode,1]
 				
-				if debug:
+				if debug > 0:
 					print(f"get_mode_eigenfunction: {omega_c = :.2e}, {width = :.2e}")
 				mode_mass = np.sum(np.where(
 					np.abs(selected[:,1] - omega_c) < width,
