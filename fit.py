@@ -261,7 +261,8 @@ def fit_mode_auto(
 		fit_old = fit
 		c_old = c
 	
-	raise RuntimeError(f"Improvement in fit has not converged even with {n_lorentz = }")
+	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } for {k_tilde = }, {om_guess = }, {z = }")
+	return fit
 
 def get_mode_eigenfunction(
 	dr,
