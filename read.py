@@ -799,7 +799,7 @@ class m_dscl_rdbycz0():
 class m_dscl_dbycz0():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \widetilde{{P}} \right|$"
+		return  r"$\widetilde{{P}}$"
 	
 	def scale_data(self, data):
 		gamma = self.param.gamma
@@ -816,7 +816,7 @@ class m_dscl_dbycz0():
 class m_dscl_dbycz():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| \widetilde{{P}} \right|$"
+		return  r"$\widetilde{{P}}$"
 	
 	def scale_data(self, data):
 		gamma = self.param.gamma
@@ -829,7 +829,7 @@ class m_dscl_dbycz():
 class m_dscl_d():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| P \right|$"
+		return  r"$P$"
 	
 	def scale_data(self, data):
 		return np.abs(data)
@@ -837,7 +837,7 @@ class m_dscl_d():
 class m_dscl_d2():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| P \right|$"
+		return  r"$P$"
 	
 	def scale_data(self, data):
 		return np.abs(data)**2
@@ -845,7 +845,7 @@ class m_dscl_d2():
 class m_dscl_d2sm1():
 	@property
 	def cbar_label_default(self):
-		return  r"$\left| P \right|$"
+		return  r"$P$"
 	
 	def scale_data(self, data):
 		return smooth_tophat(
