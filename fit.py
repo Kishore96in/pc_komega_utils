@@ -307,6 +307,7 @@ def get_mode_eigenfunction(
 				"sum": sum the fitted Lorentzian closest to omega_0 (along with other Lorentzians that are closer to it than its width) over the frequency axis
 				"sum_full": like "sum", but also add the residual part of the data to the mode mass (i.e. the part that is fitted by neither the polynomial nor the Lorentzians)
 				"integral": like "sum", but integrate over the frequency axis rather than summing
+				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
 		getter: function. See fit_mode.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
@@ -316,6 +317,7 @@ def get_mode_eigenfunction(
 		"sum",
 		"sum_full",
 		"integral",
+		"sum_multi",
 		]:
 		raise ValueError(f"Unsupported mode_mass_method: {mode_mass_method}")
 	
@@ -372,7 +374,7 @@ def get_mode_eigenfunction(
 				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
 				if mode_mass_method == "integral":
 					mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
-				elif mode_mass_method in ["sum", "sum_full"]:
+				elif mode_mass_method in ["sum", "sum_full", "sum_multi"]:
 					mode_masses = np.array([np.sum(mode) for mode in modes])
 				else:
 					raise ValueError(f"Unsupported {mode_mass_method = }")
@@ -383,11 +385,15 @@ def get_mode_eigenfunction(
 				
 				if debug > 0:
 					print(f"get_mode_eigenfunction: {omega_c = :.2e}, {width = :.2e}")
-				mode_mass = np.sum(np.where(
-					np.abs(selected[:,1] - omega_c) < width,
-					mode_masses,
-					0,
-					))
+				
+				if mode_mass_method == "sum_multi":
+					mode_mass = np.sum(mode_masses)
+				else:
+					mode_mass = np.sum(np.where(
+						np.abs(selected[:,1] - omega_c) < width,
+						mode_masses,
+						0,
+						))
 			else:
 				mode_mass = 0
 		elif np.any(data_near_target != 0):
