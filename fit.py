@@ -302,7 +302,11 @@ def get_mode_eigenfunction(
 		gamma_max: float. See fit_mode.
 		threshold: float. See fit_mode_auto.
 		threshold_p: float. See fit_mode_auto.
-		mode_mass_method: string. How to compute the mode mass. Can be "sum" or "integral".
+		mode_mass_method: string. How to compute the mode mass.
+			Allowed values:
+				"sum": sum the fitted Lorentzian closest to omega_0 (along with other Lorentzians that are closer to it than its width) over the frequency axis
+				"sum_full": like "sum", but also add the residual part of the data to the mode mass (i.e. the part that is fitted by neither the polynomial nor the Lorentzians)
+				"integral": like "sum", but integrate over the frequency axis rather than summing
 		getter: function. See fit_mode.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
