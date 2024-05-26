@@ -12,7 +12,3 @@ Utilities to plot dispersion relations and fit modes in simulations that use the
 
 # Known issues
 1. Using `dill` to save dr_base instances is sometimes prevented by the following bug: <https://github.com/uqfoundation/dill/issues/332> (fixed in dill 0.3.8)
-
-# Version History
-
-v0.1: initial version
