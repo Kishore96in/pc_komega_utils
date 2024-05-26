@@ -251,18 +251,15 @@ def fit_mode_auto(
 	
 	fit_old = None
 	for n_lorentz in range(n_lorentz_max):
-		fit = fit_mode(
-			dr,
-			k_tilde=k_tilde,
-			z=z,
-			om_tilde_min=om_tilde_min,
-			om_tilde_max=om_tilde_max,
-			poly_order=poly_order,
-			n_lorentz=n_lorentz,
-			om_guess=om_guess,
-			gamma_max=gamma_max,
-			debug=debug-1,
-			getter=getter,
+		fit = _fit_mode(
+			data_near_target = data_near_target,
+			omt_near_target = omt_near_target,
+			poly_order = poly_order,
+			n_lorentz = n_lorentz,
+			sigma = sigma,
+			om_guess = om_guess,
+			gamma_max = gamma_max,
+			debug = debug - 1,
 			)
 		
 		c = chi2r(fit)
