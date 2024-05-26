@@ -71,8 +71,6 @@ def _default_getter(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 def _fit_mode(
 	data_near_target,
 	omt_near_target,
-	om_tilde_min,
-	om_tilde_max,
 	poly_order,
 	n_lorentz,
 	sigma = sigma,
@@ -80,6 +78,9 @@ def _fit_mode(
 	gamma_max = None,
 	debug = 0,
 	):
+	om_tilde_min = min(omt_near_target)
+	om_tilde_max = max(omt_near_target)
+	
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
@@ -182,12 +183,10 @@ def fit_mode(
 		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	return _fit_mode(
-		data_near_target,
-		omt_near_target,
-		om_tilde_min,
-		om_tilde_max,
-		poly_order,
-		n_lorentz,
+		data_near_target = data_near_target,
+		omt_near_target = omt_near_target,
+		poly_order = poly_order,
+		n_lorentz = n_lorentz,
 		sigma = sigma,
 		om_guess = om_guess,
 		gamma_max = gamma_max,
