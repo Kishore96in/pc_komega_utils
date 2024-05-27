@@ -73,7 +73,7 @@ def _fit_mode(
 	omt_near_target,
 	poly_order,
 	n_lorentz,
-	sigma = sigma,
+	sigma = None,
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
