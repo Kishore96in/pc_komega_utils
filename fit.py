@@ -95,6 +95,8 @@ def fit_mode(
 	Optional arguments:
 		om_guess: list of float. Guesses for the omega_tilde at which modes are present. Length need not be the same as n_lorentz.
 		gamma_max: float. Upper limit on the width of the Lorentzians. By default, om_tilde_max = om_tilde_min.
+		sigma: 1D array: absolute error in data_near_target
+		debug: int. Set >0 to print debug output.
 	
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
