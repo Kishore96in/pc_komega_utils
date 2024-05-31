@@ -301,39 +301,37 @@ def get_mode_eigenfunction(
 	for z in z_list:
 		if debug > 0:
 			print(f"get_mode_eigenfunction: {z = }")
+		
+		d = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
+		data_near_target = d['data_near_target']
+		omt_near_target = d['omt_near_target']
+		sigma = d['sigma']
+		
 		if force_n_lorentz is None:
 			fit = fit_mode_auto(
-				dr=dr,
-				k_tilde=k_tilde,
-				z=z,
-				om_tilde_min=om_tilde_min,
-				om_tilde_max=om_tilde_max,
+				data_near_target=data_near_target,
+				omt_near_target=omt_near_target,
+				sigma=sigma,
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
 				threshold=threshold,
 				threshold_p=threshold_p,
 				debug=debug-1,
-				getter=getter,
 				)
 		else:
 			fit = fit_mode(
-				dr=dr,
-				k_tilde=k_tilde,
-				z=z,
-				om_tilde_min=om_tilde_min,
-				om_tilde_max=om_tilde_max,
+				data_near_target=data_near_target,
+				omt_near_target=omt_near_target,
+				sigma=sigma,
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
 				debug=debug-1,
-				getter=getter,
 				)
 		
 		_, params_lorentz = fit.unpack_params(fit.popt)
-		
-		data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
 		
 		if len(params_lorentz) > 0:
 			"""
