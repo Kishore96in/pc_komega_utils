@@ -66,10 +66,11 @@ def _default_getter(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 		z = z,
 		compress = True,
 		)
+	sigma = stdev_central(data_near_target, 0.05, adjust=True)
 	return {
 		'data_near_target': data_near_target,
 		'omt_near_target': omt_near_target,
-		'sigma': None,
+		'sigma': sigma,
 		}
 
 def fit_mode(
