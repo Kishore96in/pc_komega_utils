@@ -207,7 +207,7 @@ def fit_mode_auto(
 	
 	fit_old = None
 	for n_lorentz in range(n_lorentz_max):
-		fit = _fit_mode(
+		fit = fit_mode(
 			data_near_target = data_near_target,
 			omt_near_target = omt_near_target,
 			poly_order = poly_order,
