@@ -192,6 +192,9 @@ def fit_mode_auto(
 	"""
 	if threshold is None:
 		threshold = 0.8
+	if sigma is None:
+		#Wrappers such as get_mode_eigenfunction currently allow sigma=None, so keep this error message.
+		raise ValueError("fit_mode_auto requires an error estimate")
 	
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
