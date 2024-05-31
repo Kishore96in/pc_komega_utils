@@ -67,8 +67,8 @@ def _default_getter(dr, k_tilde, z, om_tilde_min, om_tilde_max):
 		compress = True,
 		)
 	return {
-		'data_near_target' = data_near_target,
-		'omt_near_target' = omt_near_target,
+		'data_near_target': data_near_target,
+		'omt_near_target': omt_near_target,
 		'sigma': None,
 		}
 
