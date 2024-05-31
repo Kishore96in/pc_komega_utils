@@ -159,48 +159,35 @@ def fit_mode(
 	return model
 
 def fit_mode_auto(
-	dr,
-	k_tilde,
-	z,
-	om_tilde_min,
-	om_tilde_max,
+	data_near_target,
+	omt_near_target,
 	poly_order,
 	n_lorentz_max = 5,
 	threshold = None,
 	threshold_p = None,
+	sigma = None,
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
-	getter = _default_getter,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
 	
 	Arguments:
-		dr: dr_yaver_base instance
-		k_tilde: float
-		z: float
-		om_tilde_min: float
-		om_tilde_max: float
+		data_near_target: 1D array. The power spectrum as a function of frequency
+		omt_near_target: 1D array. Frequencies corresponding to the entries of data_near_target
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		n_lorentz_max: int. Maximum number of Lorentzians that can be used in the fit.
 		threshold: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 		threshold_p: float: if the probability of the obtained chi-squared is less than this value, accept the fit.
+		sigma: 1D array. Absolute error estimates for the data.
 		om_guess: list of float. Passed to fit_mode.
 		gamma_max: float. Passed to fit_mode.
-		getter: function. See fit_mode.
 	
 	Actual termination condition is determined by the earliest reached of threshold and threshold_p.
 	"""
 	if threshold is None:
 		threshold = 0.8
-	
-	data_near_target, omt_near_target = getter(dr, k_tilde, z, om_tilde_min, om_tilde_max)
-	
-	if hasattr(dr, "sigma"):
-		sigma = _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min=om_tilde_min, omega_tilde_max=om_tilde_max)
-	else:
-		sigma = estimate_sigma(data_near_target, gamma_max=gamma_max, omega_tilde=omt_near_target)
 	
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
