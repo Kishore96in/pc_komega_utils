@@ -68,3 +68,45 @@ def smooth_tophat(a, n, axis=0):
 	
 	sm = np.moveaxis(sm, 0, axis)
 	return sm
+
+def stdev_central(arr, frac, adjust=False):
+	"""
+	Estimate standard derivation of an array arr, considering only values between the frac*100 and (1-frac)*100 percentiles
+	
+	Arguments:
+		arr: 1D numpy array
+		frac: float
+		adjust: bool. Whether to scale the standard deviation to account for the outliers by assuming the array elements are IID Gaussian.
+	
+	Returns:
+		stdev: scalar of type arr.dtype
+	"""
+	sort = np.sort(arr)
+	n = len(arr)
+	i_min = int(np.round(n*frac))
+	i_max = int(np.round(n*(1-frac)))
+	cut = sort[i_min:i_max]
+	if len(cut) < 2:
+		raise ValueError(f"{frac = } is too high; not enough values left to estimate standard deviation.")
+	std = np.std(cut)
+	
+	if adjust:
+		sol = scipy.optimize.minimize(lambda x: (scipy.stats.norm().cdf(x) - frac)**2, x0=0)
+		if not sol.success:
+			raise RuntimeError(f"Could not find truncation location corresponding to given percentile for Gaussian distribution. {sol.message}")
+		a = sol.x[0]
+		scl = scipy.stats.truncnorm(a,-a).std()
+		return std/scl
+	else:
+		return std
+
+def smooth_gauss(data, n):
+	"""
+	data: numpy array
+	n: int, such that FWHM of the smoothing filter (Gaussian) is 2*n+1.
+	"""
+	sig = (2*n+1)/2.355
+	
+	weight = scipy.signal.windows.gaussian(6*sig, std=sig)
+	weight = weight/np.sum(weight)
+	return scipy.signal.convolve(data, weight, mode='same')

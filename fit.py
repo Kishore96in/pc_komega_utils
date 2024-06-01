@@ -13,6 +13,8 @@ import scipy.signal
 import scipy.optimize
 import scipy.stats
 
+from .utils import stdev_central
+
 class make_model():
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
@@ -423,56 +425,6 @@ def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
 		err = np.std(mass_list, axis=0)/np.sqrt(len(dr_list))
 	
 	return mean, err
-
-def smooth(data, n):
-	"""
-	data: numpy array
-	n: int, such that width of the smoothing filter (top hat) is 2*n+1
-	"""
-	weight = np.ones(2*n+1)
-	weight = weight/np.sum(weight)
-	return scipy.signal.convolve(data, weight, mode='same')
-
-def smooth_gauss(data, n):
-	"""
-	data: numpy array
-	n: int, such that width of the smoothing filter (Gaussian) is 2*n+1 and its standard deviation is n/3.
-	TODO: actually, I suppose it is the the standard deviation of the Gaussian that should be set to 2*n+1
-	"""
-	weight = scipy.signal.windows.gaussian(2*n+1, std=n/3)
-	weight = weight/np.sum(weight)
-	return scipy.signal.convolve(data, weight, mode='same')
-
-def stdev_central(arr, frac, adjust=False):
-	"""
-	Estimate standard derivation of an array arr, considering only values between the frac*100 and (1-frac)*100 percentiles
-	
-	Arguments:
-		arr: 1D numpy array
-		frac: float
-		adjust: bool. Whether to scale the standard deviation to account for the outliers by assuming the array elements are IID Gaussian.
-	
-	Returns:
-		stdev: scalar of type arr.dtype
-	"""
-	sort = np.sort(arr)
-	n = len(arr)
-	i_min = int(np.round(n*frac))
-	i_max = int(np.round(n*(1-frac)))
-	cut = sort[i_min:i_max]
-	if len(cut) < 2:
-		raise ValueError(f"{frac = } is too high; not enough values left to estimate standard deviation.")
-	std = np.std(cut)
-	
-	if adjust:
-		sol = scipy.optimize.minimize(lambda x: (scipy.stats.norm().cdf(x) - frac)**2, x0=0)
-		if not sol.success:
-			raise RuntimeError(f"Could not find truncation location corresponding to given percentile for Gaussian distribution. {sol.message}")
-		a = sol.x[0]
-		scl = scipy.stats.truncnorm(a,-a).std()
-		return std/scl
-	else:
-		return std
 
 def _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
 	sigma, _ = dr.get_slice(
