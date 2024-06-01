@@ -24,6 +24,9 @@ Some legacy functions that were in the main namespace:
 - pcko.oplot_dr_f
 - pcko.smooth
 
+### Added
+- pcko.getters: basic getter implementations which can be used, e.g., with get_mode_eigenfunction.
+
 ## 0.1
 
 Initial version
