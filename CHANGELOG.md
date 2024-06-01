@@ -6,9 +6,14 @@
 
 - fit_mode and fit_mode_auto now directly take arrays of data, omega, and sigma
 
+#### Moved from pcko.fit to pcko.utils
+- stdev_central
+- smooth_gauss (n is now half the FWHM of the Gaussian)
+
 ### Removed
 
 - pcko.fit.estimate_sigma
+- pcko.fit.smooth
 
 Some legacy functions that were in the main namespace:
 
