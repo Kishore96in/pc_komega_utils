@@ -14,6 +14,7 @@ import scipy.optimize
 import scipy.stats
 
 from .utils import stdev_central
+from .getters import getter_kyeq0 as _default_getter
 
 class make_model():
 	"""
@@ -59,21 +60,6 @@ class make_model():
 		for i in range(self.n_lorentz):
 			ret += self.lorentzian(om, *params_lorentz[i])
 		return ret
-
-def _default_getter(dr, k_tilde, z, om_tilde_min, om_tilde_max):
-	data_near_target, [omt_near_target, *_] = dr.get_slice(
-		omega_tilde=(om_tilde_min, om_tilde_max),
-		kx_tilde = k_tilde,
-		ky_tilde = 0,
-		z = z,
-		compress = True,
-		)
-	sigma = stdev_central(data_near_target, 0.05, adjust=True)
-	return {
-		'data_near_target': data_near_target,
-		'omt_near_target': omt_near_target,
-		'sigma': sigma,
-		}
 
 def fit_mode(
 	data_near_target,
