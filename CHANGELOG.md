@@ -8,6 +8,10 @@
 
 ### Removed
 
+- pcko.fit.estimate_sigma
+
+Some legacy functions that were in the main namespace:
+
 - pcko.disp_rel_from_yaver
 - pcko.disp_rel_nonorm_from_yaver
 - pcko.disp_rel_from_yaver_L0_HP
