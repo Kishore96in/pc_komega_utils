@@ -474,21 +474,6 @@ def stdev_central(arr, frac, adjust=False):
 	else:
 		return std
 
-def estimate_sigma(data, gamma_max, omega_tilde):
-	sigma = np.full_like(data, stdev_central(data, 0.05, adjust=True))
-	
-	if np.all(sigma == 0):
-		"""
-		This can only happen if np.all(data == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
-		"""
-		sigma[:] = 1
-	elif np.any(sigma == 0):
-		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
-		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
-		sigma = np.where(sigma == 0, min_sigma, sigma)
-	
-	return sigma
-
 def _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
 	sigma, _ = dr.get_slice(
 		data = dr.sigma,
