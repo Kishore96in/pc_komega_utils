@@ -138,16 +138,20 @@ class dr_base(metaclass=abc.ABCMeta):
 			if not hasattr(self, k):
 				raise AttributeError(f"Key {k} in data_axes is not an attribute.")
 	
-	def contourplotter(self, x, y, data):
+	def contourplotter(self, x, y, data, ax=None):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
 		if np.shape(data) != (len(x), len(y)):
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
 		
+		if ax is None:
+			fig, ax = plt.subplots(layout='constrained')
+		else:
+			fig = ax.get_figure()
+		
 		data = data.transpose()
 		data[data==0] = np.nan #so that log scaling works
 		
-		fig,ax = plt.subplots(layout='constrained')
 		im = ax.contourf(
 			x,
 			y,
@@ -326,7 +330,7 @@ class dr_yaver_base(dr_base):
 		self.kx = 2*np.pi*fftshift(fftfreq(n_kx, d = Lx/n_kx ))
 		self.data = self.scale_data(data)
 	
-	def plot_komega(self, z):
+	def plot_komega(self, z, ax=None):
 		"""
 		Plot the k-omega diagram at a given height z.
 		"""
@@ -336,7 +340,12 @@ class dr_yaver_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0].transpose())
+		p = self.contourplotter(
+			kx_tilde,
+			omega_tilde,
+			data[:,:,0].transpose(),
+			ax = ax,
+			)
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -415,7 +424,7 @@ class dr_3d_base(dr_base):
 	def z(self):
 		raise NotImplementedError
 	
-	def plot_komega(self, z):
+	def plot_komega(self, z, ax=None):
 		"""
 		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, omega_tilde) at a given height z and ky_tilde=0.
 		"""
@@ -426,7 +435,12 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(kx_tilde, omega_tilde, data[:,:,0,0].transpose())
+		p = self.contourplotter(
+			kx_tilde,
+			omega_tilde,
+			data[:,:,0,0].transpose(),
+			ax = ax,
+			)
 		
 		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -435,7 +449,7 @@ class dr_3d_base(dr_base):
 		
 		return p
 	
-	def plot_kyomega(self, z):
+	def plot_kyomega(self, z, ax=None):
 		"""
 		Plot the normalized Fourier-transformed vertical velocity vs (ky_tilde, omega_tilde) at a given height z and kx_tilde=0.
 		"""
@@ -446,7 +460,12 @@ class dr_3d_base(dr_base):
 			z = z,
 			)
 		
-		p = self.contourplotter(ky_tilde, omega_tilde, data[:,0,:,0].transpose())
+		p = self.contourplotter(
+			ky_tilde,
+			omega_tilde,
+			data[:,0,:,0].transpose(),
+			ax = ax,
+			)
 		
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
@@ -455,7 +474,7 @@ class dr_3d_base(dr_base):
 		
 		return p
 	
-	def plot_ring(self, z, omega_tilde):
+	def plot_ring(self, z, omega_tilde, ax=None):
 		"""
 		Plot the normalized Fourier-transformed vertical velocity vs (kx_tilde, ky_tilde) at a given height z and angular frequency omega_tilde.
 		
@@ -475,7 +494,12 @@ class dr_3d_base(dr_base):
 			keepdims = True,
 			)
 		
-		p = self.contourplotter(kx_tilde, ky_tilde, data[0,:,:,0])
+		p = self.contourplotter(
+			kx_tilde,
+			ky_tilde,
+			data[0,:,:,0],
+			ax = ax,
+			)
 		
 		p.ax.set_title(f"z = {z:.2f}")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
@@ -891,11 +915,16 @@ class m_cpl_imshow():
 	"""
 	Mixin that overrides dr_base.contourplotter to do imshow instead.
 	"""
-	def contourplotter(self, x, y, data):
+	def contourplotter(self, x, y, data, ax=None):
 		if np.all(data == 0):
 			raise RuntimeError("The selected slice is all zeros")
 		if np.shape(data) != (len(x), len(y)):
 			raise ValueError(f"data array needs to have shape [len(x), len(y)].")
+		
+		if ax is None:
+			fig, ax = plt.subplots(layout='constrained')
+		else:
+			fig = ax.get_figure()
 		
 		data = data.transpose()
 		data[data==0] = np.nan #so that log scaling works
@@ -903,7 +932,6 @@ class m_cpl_imshow():
 		dx = x[1] - x[0]
 		dy = y[1] - y[0]
 		
-		fig,ax = plt.subplots(layout='constrained')
 		im = ax.imshow(
 			data,
 			origin = 'lower',
