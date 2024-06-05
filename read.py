@@ -467,7 +467,7 @@ class dr_3d_base(dr_base):
 			ax = ax,
 			)
 		
-		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_y$")
 		p.ax.set_ylabel(r"$\widetilde{{\omega}}$")
 		p.cbar.set_label(self.cbar_label)
@@ -501,7 +501,7 @@ class dr_3d_base(dr_base):
 			ax = ax,
 			)
 		
-		p.ax.set_title(f"z = {z:.2f}")
+		p.ax.set_title(f"$z = {z:.2f}$")
 		p.ax.set_xlabel(r"$\widetilde{{k}}_x$")
 		p.ax.set_ylabel(r"$\widetilde{{k}}_y$")
 		p.cbar.set_label(self.cbar_label)
