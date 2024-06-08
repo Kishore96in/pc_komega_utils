@@ -295,7 +295,7 @@ def get_mode_eigenfunction(
 				"sum_full": like "sum", but also add the residual part of the data to the mode mass (i.e. the part that is fitted by neither the polynomial nor the Lorentzians)
 				"integral": like "sum", but integrate over the frequency axis rather than summing
 				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
-		getter: function. See fit_mode.
+		getter: function. Instance of getters.AbstractGetter
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
