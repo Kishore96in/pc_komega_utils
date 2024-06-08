@@ -70,7 +70,7 @@ def fit_mode(
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
-	identifier = None,
+	identifier = "",
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
@@ -97,10 +97,7 @@ def fit_mode(
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
-	if identifier is None:
-		identifier = ""
-	else:
-		if (len(identifier) > 0 and identifier[0] != '('):
+	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
 	model = make_model(poly_order, n_lorentz)
@@ -172,7 +169,7 @@ def fit_mode_auto(
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
-	identifier = None,
+	identifier = "",
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
@@ -197,10 +194,7 @@ def fit_mode_auto(
 		#Wrappers such as get_mode_eigenfunction currently allow sigma=None, so keep this error message.
 		raise ValueError("fit_mode_auto requires an error estimate")
 	
-	if identifier is None:
-		identifier = ""
-	else:
-		if (len(identifier) > 0 and identifier[0] != '('):
+	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
