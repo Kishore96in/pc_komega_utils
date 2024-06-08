@@ -266,12 +266,10 @@ def get_mode_eigenfunction(
 	poly_order = 1,
 	force_n_lorentz = None,
 	omega_tol = None,
-	gamma_max = None,
-	threshold = None,
-	threshold_p = None,
 	mode_mass_method="sum",
 	debug = 0,
 	getter = _default_getter,
+	**kwargs,
 	):
 	"""
 	Use fit_mode to get the z-dependent eigenfunction of the mode whose frequency (omega_tilde) is close to omega_0 at k_tilde.
@@ -286,9 +284,6 @@ def get_mode_eigenfunction(
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		force_n_lorentz: int. Force this many Lorentizans to be used for the fitting (rather than automatically determining based on the data). If this is set to None (default), the number of Lorentzians will be automatically determined.
 		omega_tol: float or None. If (not None) and (the distance between the detected mode and omega_0) is greater than or equal to this value, do not consider that mode for computation of the mode mass.
-		gamma_max: float. See fit_mode.
-		threshold: float. See fit_mode_auto.
-		threshold_p: float. See fit_mode_auto.
 		mode_mass_method: string. How to compute the mode mass.
 			Allowed values:
 				"sum": sum the fitted Lorentzian closest to omega_0 (along with other Lorentzians that are closer to it than its width) over the frequency axis
@@ -296,6 +291,8 @@ def get_mode_eigenfunction(
 				"integral": like "sum", but integrate over the frequency axis rather than summing
 				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
 		getter: function. Instance of getters.AbstractGetter
+	
+	Other kwargs are passed to either fit_mode or fit_mode_auto depending on the value of force_n_lorentz.
 	"""
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
@@ -328,10 +325,8 @@ def get_mode_eigenfunction(
 				sigma=sigma,
 				poly_order=poly_order,
 				om_guess=[omega_0],
-				gamma_max=gamma_max,
-				threshold=threshold,
-				threshold_p=threshold_p,
 				debug=debug-1,
+				**kwargs,
 				)
 		else:
 			fit = fit_mode(
@@ -340,9 +335,9 @@ def get_mode_eigenfunction(
 				sigma=sigma,
 				poly_order=poly_order,
 				om_guess=[omega_0],
-				gamma_max=gamma_max,
 				n_lorentz=force_n_lorentz,
 				debug=debug-1,
+				**kwargs,
 				)
 		
 		_, params_lorentz = fit.unpack_params(fit.popt)
