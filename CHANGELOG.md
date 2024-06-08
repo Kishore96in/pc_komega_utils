@@ -5,6 +5,7 @@
 ### Changed
 
 - fit_mode and fit_mode_auto now directly take arrays of data, omega, and sigma
+- fit_mode_auto: threshold is now renamed to threshold_ratio
 
 #### Moved from pcko.fit to pcko.utils
 - stdev_central
