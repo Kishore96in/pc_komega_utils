@@ -247,6 +247,8 @@ def fit_mode_auto(
 		fit_old = fit
 		c_old = c
 	
+	om_tilde_min = min(omt_near_target)
+	om_tilde_max = max(omt_near_target)
 	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } ({om_tilde_min = }) ({om_tilde_max = }) ({om_guess = }) {identifier}")
 	return fit
 
