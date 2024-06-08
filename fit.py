@@ -164,7 +164,7 @@ def fit_mode_auto(
 	poly_order,
 	sigma,
 	n_lorentz_max = 5,
-	threshold = None,
+	threshold_ratio = None,
 	threshold_p = None,
 	om_guess = None,
 	gamma_max = None,
@@ -179,17 +179,17 @@ def fit_mode_auto(
 		omt_near_target: 1D array. Frequencies corresponding to the entries of data_near_target
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		n_lorentz_max: int. Maximum number of Lorentzians that can be used in the fit.
-		threshold: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
+		threshold_ratio: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 		threshold_p: float: if the probability of the obtained chi-squared is less than this value, accept the fit.
 		sigma: 1D array. Absolute error estimates for the data.
 		om_guess: list of float. Passed to fit_mode.
 		gamma_max: float. Passed to fit_mode.
 		identifier: str. Used by wrapper functions to allow more informative error messages.
 	
-	Actual termination condition is determined by the earliest reached of threshold and threshold_p.
+	Actual termination condition is determined by the earliest reached of threshold_ratio and threshold_p.
 	"""
-	if threshold is None:
-		threshold = 0.8
+	if threshold_ratio is None:
+		threshold_ratio = 0.8
 	if sigma is None:
 		#Wrappers such as get_mode_eigenfunction currently allow sigma=None, so keep this error message.
 		raise ValueError("fit_mode_auto requires an error estimate")
@@ -232,9 +232,9 @@ def fit_mode_auto(
 			if debug > 0:
 				print("Terminated due to threshold_p")
 			return fit
-		elif (fit_old is not None) and c/c_old > threshold:
+		elif (fit_old is not None) and c/c_old > threshold_ratio:
 			if debug > 0:
-				print("Terminated due to threshold")
+				print("Terminated due to threshold_ratio")
 			return fit_old
 		elif c == 0:
 			"""
