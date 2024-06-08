@@ -154,7 +154,7 @@ def fit_mode(
 			full_output = True,
 			)
 	except Exception as e:
-		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e} {identifier}")
+		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, with error: {e} {identifier}")
 	
 	if debug > 0:
 		print(f"\t{mesg = }\n\t{infodict['nfev'] = }")
@@ -253,7 +253,7 @@ def fit_mode_auto(
 		fit_old = fit
 		c_old = c
 	
-	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } for {om_guess = } {identifier}")
+	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } ({om_tilde_min = }) ({om_tilde_max = }) ({om_guess = }) {identifier}")
 	return fit
 
 def get_mode_eigenfunction(
@@ -269,6 +269,7 @@ def get_mode_eigenfunction(
 	mode_mass_method="sum",
 	debug = 0,
 	getter = _default_getter,
+	identifier = "",
 	**kwargs,
 	):
 	"""
@@ -291,6 +292,7 @@ def get_mode_eigenfunction(
 				"integral": like "sum", but integrate over the frequency axis rather than summing
 				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
 		getter: function. Instance of getters.AbstractGetter
+		identifier: str. Use to get more informative error messages in wrapped functions.
 	
 	Other kwargs are passed to either fit_mode or fit_mode_auto depending on the value of force_n_lorentz.
 	"""
@@ -318,6 +320,8 @@ def get_mode_eigenfunction(
 		omt_near_target = d['omt_near_target']
 		sigma = d['sigma']
 		
+		ide = identifier + f"{z = }"
+		
 		if force_n_lorentz is None:
 			fit = fit_mode_auto(
 				data_near_target=data_near_target,
@@ -326,6 +330,7 @@ def get_mode_eigenfunction(
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				debug=debug-1,
+				identifier = ide,
 				**kwargs,
 				)
 		else:
@@ -337,6 +342,7 @@ def get_mode_eigenfunction(
 				om_guess=[omega_0],
 				n_lorentz=force_n_lorentz,
 				debug=debug-1,
+				identifier = ide,
 				**kwargs,
 				)
 		
