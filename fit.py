@@ -100,7 +100,7 @@ def fit_mode(
 	if identifier is None:
 		identifier = ""
 	else:
-		if not (identifier[0] == '(' and indentifier[-1] == ')'):
+		if (len(indentifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
 	model = make_model(poly_order, n_lorentz)
@@ -200,7 +200,7 @@ def fit_mode_auto(
 	if identifier is None:
 		identifier = ""
 	else:
-		if not (identifier[0] == '(' and indentifier[-1] == ')'):
+		if (len(indentifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
