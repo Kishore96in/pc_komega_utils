@@ -70,6 +70,7 @@ def fit_mode(
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
+	identifier = None,
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
@@ -85,6 +86,7 @@ def fit_mode(
 		gamma_max: float. Upper limit on the width of the Lorentzians. By default, om_tilde_max = om_tilde_min.
 		sigma: 1D array: absolute error in data_near_target
 		debug: int. Set >0 to print debug output.
+		identifier: str. Used by wrapper functions to allow more informative error messages.
 	
 	Returns:
 		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
@@ -94,6 +96,12 @@ def fit_mode(
 	
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
+	
+	if identifier is None:
+		identifier = ""
+	else:
+		if not (identifier[0] == '(' and indentifier[-1] == ')'):
+			identifier = f"({identifier})"
 	
 	model = make_model(poly_order, n_lorentz)
 	
@@ -146,7 +154,7 @@ def fit_mode(
 			full_output = True,
 			)
 	except Exception as e:
-		raise RuntimeError(f"Failed for {k_tilde = }, {z = }, {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e}")
+		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, {gamma_max = } with error: {e} {identifier}")
 	
 	if debug > 0:
 		print(f"\t{mesg = }\n\t{infodict['nfev'] = }")
@@ -164,6 +172,7 @@ def fit_mode_auto(
 	om_guess = None,
 	gamma_max = None,
 	debug = 0,
+	identifier = None,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
@@ -178,6 +187,7 @@ def fit_mode_auto(
 		sigma: 1D array. Absolute error estimates for the data.
 		om_guess: list of float. Passed to fit_mode.
 		gamma_max: float. Passed to fit_mode.
+		identifier: str. Used by wrapper functions to allow more informative error messages.
 	
 	Actual termination condition is determined by the earliest reached of threshold and threshold_p.
 	"""
@@ -187,6 +197,11 @@ def fit_mode_auto(
 		#Wrappers such as get_mode_eigenfunction currently allow sigma=None, so keep this error message.
 		raise ValueError("fit_mode_auto requires an error estimate")
 	
+	if identifier is None:
+		identifier = ""
+	else:
+		if not (identifier[0] == '(' and indentifier[-1] == ')'):
+			identifier = f"({identifier})"
 	
 	#Function to calculate the reduced chi-square corresponding to a particular fit.
 	chi2r = lambda fit: np.sum(((data_near_target - fit(omt_near_target, *fit.popt) )/sigma)**2)/(len(data_near_target) - fit.nparams)
@@ -210,6 +225,7 @@ def fit_mode_auto(
 			om_guess = om_guess,
 			gamma_max = gamma_max,
 			debug = debug - 1,
+			identifier = identifier,
 			)
 		
 		c = chi2r(fit)
@@ -237,7 +253,7 @@ def fit_mode_auto(
 		fit_old = fit
 		c_old = c
 	
-	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } for {k_tilde = }, {om_guess = }, {z = }")
+	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } for {om_guess = } {identifier}")
 	return fit
 
 def get_mode_eigenfunction(
