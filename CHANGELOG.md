@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0 (planned)
+## 1.0
 
 ### Changed
 
