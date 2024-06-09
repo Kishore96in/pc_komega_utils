@@ -458,7 +458,7 @@ def get_mode_eigenfunction(
 			selected = params_lorentz[np.abs(params_lorentz[:,i_om] - omega_0) < omega_tol]
 			
 			if len(selected) > 0:
-				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
+				modes = [fit.line(omt_near_target, *params) for params in selected]
 				if mode_mass_method == "integral":
 					mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
 				elif mode_mass_method in ["sum", "sum_full", "sum_multi"]:
