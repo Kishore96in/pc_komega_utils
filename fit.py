@@ -78,6 +78,13 @@ class AbstractModelMaker(abc.ABC):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
+	def line(self, om, *args):
+		"""
+		Model for the profile of an individual mode. The first argument is a 1D array of angular frequencies, and the ones that follow are the parameters of the mode profile.
+		"""
+		raise NotImplementedError
+	
+	@abc.abstractmethod
 	def get_line_freq(self, *args):
 		"""
 		Get the central angular frequency of a line, given the line parameters
