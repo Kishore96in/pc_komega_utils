@@ -164,6 +164,7 @@ def fit_mode_auto(
 	poly_order,
 	sigma,
 	n_lorentz_max = 5,
+	n_lorentz_min = 0,
 	threshold_ratio = None,
 	threshold_p = None,
 	om_guess = None,
@@ -179,6 +180,7 @@ def fit_mode_auto(
 		omt_near_target: 1D array. Frequencies corresponding to the entries of data_near_target
 		poly_order: int. Order of the polynomial to use for fitting the continuum.
 		n_lorentz_max: int. Maximum number of Lorentzians that can be used in the fit.
+		n_lorentz_min: int. Minimum number of Lorentzians that can be used in the fit.
 		threshold_ratio: float. Ratio of reduced chi-squared needed to accept addition of a Lorentzian.
 		threshold_p: float: if the probability of the obtained chi-squared is less than this value, accept the fit.
 		sigma: 1D array. Absolute error estimates for the data.
@@ -209,7 +211,7 @@ def fit_mode_auto(
 		
 	
 	fit_old = None
-	for n_lorentz in range(n_lorentz_max+1):
+	for n_lorentz in range(n_lorentz_min, n_lorentz_max+1):
 		fit = fit_mode(
 			data_near_target = data_near_target,
 			omt_near_target = omt_near_target,
