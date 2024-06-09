@@ -449,14 +449,13 @@ def get_mode_eigenfunction(
 				)
 		
 		_, params_lorentz = fit.unpack_params(fit.popt)
+		i_om = fit._ind_line_freq
 		
 		if len(params_lorentz) > 0:
 			"""
 			Among all Lorentzians which are within omega_tol of omega_0, we choose the Lorentzian with the highest mode mass. Lorentzians which are closer to the center of this mode than its width are considered as part of the same mode.
 			"""
-			
-			omega_c_list = np.array([fit.get_line_freq(*this) for this in params_lorentz])
-			selected = params_lorentz[np.abs(omega_c_list - omega_0) < omega_tol]
+			selected = params_lorentz[np.abs(params_lorentz[:,i_om] - omega_0) < omega_tol]
 			
 			if len(selected) > 0:
 				modes = [fit.lorentzian(omt_near_target, *params) for params in selected]
@@ -477,9 +476,8 @@ def get_mode_eigenfunction(
 				if mode_mass_method == "sum_multi":
 					mode_mass = np.sum(mode_masses)
 				else:
-					omega_c_list_sel = np.array([fit.get_line_freq(*this) for this in selected])
 					mode_mass = np.sum(np.where(
-						np.abs(omega_c_list_sel - omega_c) < width,
+						np.abs(selected[:,i_om] - omega_c) < width,
 						mode_masses,
 						0,
 						))
