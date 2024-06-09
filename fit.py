@@ -206,31 +206,35 @@ def fit_mode(
 	
 	#initial guess for the parameters.
 	guess_poly = np.zeros(model.poly_order + 1)
-	guess_lor = np.zeros((model.n_lorentz,3))
+	guess_lor = np.zeros((model.n_lines,model.n_lineparams))
 	
 	guess_poly[0] = data_near_target[0]
 	
-	guess_lor[:,1] = np.linspace(om_tilde_min, om_tilde_max, model.n_lorentz+2)[1:-1]
-	if om_guess is not None:
-		for i in range(min(model.n_lorentz, len(om_guess))):
-			guess_lor[i,1] = om_guess[i]
+	i_om = model._ind_line_freq
 	
-	guess_lor[:,2] = gamma_max
+	guess_lor[:,i_om] = np.linspace(om_tilde_min, om_tilde_max, model.n_lines+2)[1:-1]
+	if om_guess is not None:
+		for i in range(min(model.n_lines, len(om_guess))):
+			guess_lor[i,i_om] = om_guess[i]
+	
+	for i in model._width_like_params:
+		guess_lor[:,i] = gamma_max
 	
 	guess = model.pack_params(guess_poly, guess_lor)
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
-	lbound_lor = np.full((model.n_lorentz,3), -np.inf)
-	lbound_lor[:,0] = 0
-	lbound_lor[:,1] = om_tilde_min
-	lbound_lor[:,2] = 0
+	lbound_lor = np.full((model.n_lines,model.n_lineparams), -np.inf)
+	for i in model._positive_params:
+		lbound_lor[:,i] = 0
+	lbound_lor[:,i_om] = om_tilde_min
 	lbound = model.pack_params(lbound_poly, lbound_lor)
 	
 	ubound_poly = np.full(model.poly_order+1, np.inf)
-	ubound_lor = np.full((model.n_lorentz,3), np.inf)
-	ubound_lor[:,1] = om_tilde_max
-	ubound_lor[:,2] = gamma_max
+	ubound_lor = np.full((model.n_lines,model.n_lineparams), np.inf)
+	ubound_lor[:,i_om] = om_tilde_max
+	for i in model._width_like_params:
+		ubound_lor[:,i] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	try:
