@@ -426,26 +426,3 @@ def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
 		err = np.std(mass_list, axis=0)/np.sqrt(len(dr_list))
 	
 	return mean, err
-
-def _get_sigma_at_kz(dr, k_tilde, z, omega_tilde_min, omega_tilde_max):
-	sigma, _ = dr.get_slice(
-		data = dr.sigma,
-		omega_tilde=(omega_tilde_min, omega_tilde_max),
-		kx_tilde = k_tilde,
-		ky_tilde = 0,
-		z = z,
-		compress = True,
-		)
-	
-	if np.all(sigma == 0):
-		"""
-		This can only happen if np.all(data == 0), in which case we set sigma=1 to prevent divide-by-zero errors.
-		
-		"""
-		sigma[:] = 1
-	elif np.any(sigma == 0):
-		warnings.warn("Estimated error was zero in some bins. Applying floor to estimated error.")
-		min_sigma = np.min(np.compress(sigma != 0, sigma)) #smallest nonzero value
-		sigma = np.where(sigma == 0, min_sigma, sigma)
-	
-	return sigma
