@@ -108,10 +108,10 @@ class make_model(AbstractModelMaker):
 	def line(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
-	def get_line_freq(self, om, A, om_0, gam):
+	def get_line_freq(self, A, om_0, gam):
 		return om_0
 	
-	def get_line_hwhm(self, om, A, om_0, gam):
+	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
 def fit_mode(
