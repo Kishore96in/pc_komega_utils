@@ -85,17 +85,40 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		raise NotImplementedError
 	
+	@property
 	@abc.abstractmethod
+	def _ind_line_freq(self, *args):
+		"""
+		Index of the central angular frequency of a line in the tuple of line parameters
+		"""
+		raise NotImplementedError
+	
 	def get_line_freq(self, *args):
 		"""
 		Get the central angular frequency of a line, given the line parameters
 		"""
-		raise NotImplementedError
+		return args[self._ind_line_freq]
 	
 	@abc.abstractmethod
 	def get_line_hwhm(self, *args):
 		"""
 		Get the HWHM (half-width at half-maximum) of a line, given the line parameters
+		"""
+		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
+	def _width_like_params(self):
+		"""
+		Returns a list of indices of the line parameters that can be interpreted as widths. This is used by fit_mode to set bounds on the parameters.
+		"""
+		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
+	def _positive_params(self):
+		"""
+		Returns a list of indices of the line parameters that need to be positive. This is used by fit_mode to set bounds on the parameters.
 		"""
 		raise NotImplementedError
 
@@ -105,24 +128,26 @@ class ModelMakerLorentzian(AbstractModelMaker):
 	"""
 	
 	n_lineparams = 3
+	_ind_line_freq = 1
+	_width_like_params = [2]
+	_positive_params = [0,2]
 	
 	def line(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
-	def get_line_freq(self, A, om_0, gam):
-		return om_0
 	
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
 class ModelMakerVoigt(AbstractModelMaker):
 	n_lineparams = 4
+	_ind_line_freq = 1
+	_width_like_params = [2,3]
+	_positive_params = [0,2,3]
 	
 	def line(self, om, A, om_0, gam, sigma):
 		return A*scipy.special.voigt_profile(om-om_0, sigma, gam)
 	
-	def get_line_freq(self, A, om_0, gam, sigma):
-		return om_0
 	
 	def get_line_hwhm(self, A, om_0, gam, sigma):
 		"""
