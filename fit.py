@@ -80,7 +80,7 @@ class AbstractModelMaker(abc.ABC):
 	@abc.abstractmethod
 	def get_line_freq(self, *args):
 		"""
-		Get the central frequency of a line, given the line parameters
+		Get the central angular frequency of a line, given the line parameters
 		"""
 		raise NotImplementedError
 	
