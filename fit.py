@@ -135,7 +135,6 @@ class ModelMakerLorentzian(AbstractModelMaker):
 	def line(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
-	
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
@@ -147,7 +146,6 @@ class ModelMakerVoigt(AbstractModelMaker):
 	
 	def line(self, om, A, om_0, gam, sigma):
 		return A*scipy.special.voigt_profile(om-om_0, sigma, gam)
-	
 	
 	def get_line_hwhm(self, A, om_0, gam, sigma):
 		"""
