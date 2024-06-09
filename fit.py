@@ -12,6 +12,7 @@ import numpy as np
 import scipy.signal
 import scipy.optimize
 import scipy.stats
+import scipy.special
 import abc
 
 from .utils import stdev_central
@@ -113,6 +114,24 @@ class make_model(AbstractModelMaker):
 	
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
+
+class make_model_voigt(AbstractModelMaker):
+	n_lineparams = 4
+	
+	def line(self, om, A, om_0, gam, sigma):
+		return A*scipy.special.voigt_profile(om-om_0, sigma, gam)
+	
+	def get_line_freq(self, A, om_0, gam, sigma):
+		return om_0
+	
+	def get_line_hwhm(self, A, om_0, gam, sigma):
+		"""
+		An approximation formula from https://en.wikipedia.org/wiki/Voigt_profile#The_width_of_the_Voigt_profile (accessed 2:39 PM IST, 09-Jun-2024)
+		"""
+		f_L = 2*gam
+		f_G = 2.3548200450309493*sigma
+		f = 0.5346*f_L + np.sqrt(0.2166*f_L**2 + f_G**2)
+		return f/2
 
 def fit_mode(
 	data_near_target,
