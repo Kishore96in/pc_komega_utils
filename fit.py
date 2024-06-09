@@ -99,7 +99,7 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		raise NotImplementedError
 
-class make_model(AbstractModelMaker):
+class ModelMakerLorentzian(AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
 	"""
@@ -115,7 +115,7 @@ class make_model(AbstractModelMaker):
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
-class make_model_voigt(AbstractModelMaker):
+class ModelMakerVoigt(AbstractModelMaker):
 	n_lineparams = 4
 	
 	def line(self, om, A, om_0, gam, sigma):
@@ -143,7 +143,7 @@ def fit_mode(
 	gamma_max = None,
 	debug = 0,
 	identifier = "",
-	ModelMaker = make_model,
+	ModelMaker = ModelMakerLorentzian,
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
@@ -245,7 +245,7 @@ def fit_mode_auto(
 	gamma_max = None,
 	debug = 0,
 	identifier = "",
-	ModelMaker = make_model,
+	ModelMaker = ModelMakerLorentzian,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
