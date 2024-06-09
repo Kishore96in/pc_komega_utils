@@ -106,7 +106,7 @@ def smooth_gauss(data, n):
 	n: int, such that FWHM of the smoothing filter (Gaussian) is 2*n+1.
 	"""
 	sig = (2*n+1)/2.355
-	
-	weight = scipy.signal.windows.gaussian(6*sig, std=sig)
+	wlen = int(np.round(6*sig))
+	weight = scipy.signal.windows.gaussian(wlen, std=sig)
 	weight = weight/np.sum(weight)
 	return scipy.signal.convolve(data, weight, mode='same')
