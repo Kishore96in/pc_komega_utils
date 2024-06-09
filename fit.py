@@ -12,38 +12,33 @@ import numpy as np
 import scipy.signal
 import scipy.optimize
 import scipy.stats
+import abc
 
 from .utils import stdev_central
 from .getters import getter_kyeq0 as _default_getter
 
-class make_model():
-	"""
-	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
-	"""
+class AbstractModelMaker(abc.ABC):
 	def __init__(self, poly_order, n_lorentz):
 		self.poly_order = poly_order
-		self.n_lorentz = n_lorentz
-		self.nparams = (1 + self.poly_order) + 3*self.n_lorentz
+		self.n_lines = n_lorentz
+		self.nparams = (1 + self.poly_order) + self.n_lineparams*self.n_lines
 	
 	def unpack_params(self, args):
 		assert len(args) == self.nparams
 		params_poly = args[:self.poly_order+1]
-		params_lorentz = np.reshape(args[self.poly_order+1:], (self.n_lorentz, 3))
+		params_lorentz = np.reshape(args[self.poly_order+1:], (self.n_lorentz, self.n_lineparams))
 		return params_poly, params_lorentz
 	
 	def pack_params(self, params_poly, params_lorentz):
 		"""
 		params_poly: numpy array of length poly_order + 1
-		params_lorentz: numpy array of shape (n_lorentz, 3)
+		params_lorentz: numpy array of shape (n_lorentz, n_lineparams)
 		
 		Returns list
 		"""
 		assert len(params_poly) == self.poly_order + 1
-		assert np.shape(params_lorentz) == (self.n_lorentz, 3 )
-		return tuple([*params_poly, *np.reshape(params_lorentz, 3*self.n_lorentz)])
-	
-	def lorentzian(self, om, A, om_0, gam):
-		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
+		assert np.shape(params_lorentz) == (self.n_lorentz, self.n_lineparams)
+		return tuple([*params_poly, *np.reshape(params_lorentz, self.n_lineparams*self.n_lorentz)])
 	
 	def poly(self, om, *params_poly):
 		assert len(params_poly) == self.poly_order + 1
@@ -58,8 +53,59 @@ class make_model():
 		params_poly, params_lorentz = self.unpack_params(args)
 		ret = self.poly(om, *params_poly)
 		for i in range(self.n_lorentz):
-			ret += self.lorentzian(om, *params_lorentz[i])
+			ret += self.line(om, *params_lorentz[i])
 		return ret
+	
+	@property
+	def n_lorentz(self):
+		"""
+		For backwards compatibility
+		"""
+		return self.n_lines
+	
+	def lorentzian(self, *args, **kwargs):
+		"""
+		For backwards compatibility
+		"""
+		return self.line(*args, **kwargs)
+	
+	@property
+	@abc.abstractmethod
+	def n_lineparams(self):
+		"""
+		Number of parameters needed to specify the line profile
+		"""
+		raise NotImplementedError
+	
+	@abc.abstractmethod
+	def get_line_freq(self, *args):
+		"""
+		Get the central frequency of a line, given the line parameters
+		"""
+		raise NotImplementedError
+	
+	@abc.abstractmethod
+	def get_line_hwhm(self, *args):
+		"""
+		Get the HWHM (half-width at half-maximum) of a line, given the line parameters
+		"""
+		raise NotImplementedError
+
+class make_model(AbstractModelMaker):
+	"""
+	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
+	"""
+	
+	n_lineparams = 3
+	
+	def line(self, om, A, om_0, gam):
+		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
+	
+	def get_line_freq(self, om, A, om_0, gam):
+		return om_0
+	
+	def get_line_hwhm(self, om, A, om_0, gam):
+		return gam
 
 def fit_mode(
 	data_near_target,
