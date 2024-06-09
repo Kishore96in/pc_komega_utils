@@ -143,6 +143,7 @@ def fit_mode(
 	gamma_max = None,
 	debug = 0,
 	identifier = "",
+	ModelMaker = make_model,
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
@@ -159,9 +160,10 @@ def fit_mode(
 		sigma: 1D array: absolute error in data_near_target
 		debug: int. Set >0 to print debug output.
 		identifier: str. Used by wrapper functions to allow more informative error messages.
+		ModelMaker: AbstractModelMaker. Describes what function to use to fit the mode profiles.
 	
 	Returns:
-		model: make_model instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
+		model: ModelMaker instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
 	"""
 	om_tilde_min = min(omt_near_target)
 	om_tilde_max = max(omt_near_target)
@@ -172,7 +174,7 @@ def fit_mode(
 	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
-	model = make_model(poly_order, n_lorentz)
+	model = ModelMaker(poly_order, n_lorentz)
 	
 	if len(data_near_target) < model.nparams:
 		raise RuntimeError("Data series is too short for fit.")
@@ -243,6 +245,7 @@ def fit_mode_auto(
 	gamma_max = None,
 	debug = 0,
 	identifier = "",
+	ModelMaker = make_model,
 	):
 	"""
 	Keep on increasing n_lorentz in fit_mode until the fit no longer improves.
@@ -259,6 +262,7 @@ def fit_mode_auto(
 		om_guess: list of float. Passed to fit_mode.
 		gamma_max: float. Passed to fit_mode.
 		identifier: str. Used by wrapper functions to allow more informative error messages.
+		ModelMaker: AbstractModelMaker. Passed to fit_mode.
 	
 	Actual termination condition is determined by the earliest reached of threshold_ratio and threshold_p.
 	"""
@@ -294,6 +298,7 @@ def fit_mode_auto(
 			gamma_max = gamma_max,
 			debug = debug - 1,
 			identifier = identifier,
+			ModelMaker = ModelMaker,
 			)
 		
 		c = chi2r(fit)
