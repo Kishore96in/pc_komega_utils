@@ -27,19 +27,19 @@ class AbstractModelMaker(abc.ABC):
 	def unpack_params(self, args):
 		assert len(args) == self.nparams
 		params_poly = args[:self.poly_order+1]
-		params_lorentz = np.reshape(args[self.poly_order+1:], (self.n_lorentz, self.n_lineparams))
+		params_lorentz = np.reshape(args[self.poly_order+1:], (self.n_lines, self.n_lineparams))
 		return params_poly, params_lorentz
 	
 	def pack_params(self, params_poly, params_lorentz):
 		"""
 		params_poly: numpy array of length poly_order + 1
-		params_lorentz: numpy array of shape (n_lorentz, n_lineparams)
+		params_lorentz: numpy array of shape (n_lines, n_lineparams)
 		
 		Returns list
 		"""
 		assert len(params_poly) == self.poly_order + 1
-		assert np.shape(params_lorentz) == (self.n_lorentz, self.n_lineparams)
-		return tuple([*params_poly, *np.reshape(params_lorentz, self.n_lineparams*self.n_lorentz)])
+		assert np.shape(params_lorentz) == (self.n_lines, self.n_lineparams)
+		return tuple([*params_poly, *np.reshape(params_lorentz, self.n_lineparams*self.n_lines)])
 	
 	def poly(self, om, *params_poly):
 		assert len(params_poly) == self.poly_order + 1
@@ -53,7 +53,7 @@ class AbstractModelMaker(abc.ABC):
 		
 		params_poly, params_lorentz = self.unpack_params(args)
 		ret = self.poly(om, *params_poly)
-		for i in range(self.n_lorentz):
+		for i in range(self.n_lines):
 			ret += self.line(om, *params_lorentz[i])
 		return ret
 	
