@@ -139,6 +139,10 @@ class ModelMakerLorentzian(AbstractModelMaker):
 		return gam
 
 class ModelMakerVoigt(AbstractModelMaker):
+	"""
+	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
+	"""
+	
 	n_lineparams = 4
 	_ind_line_freq = 1
 	_width_like_params = [2,3]
