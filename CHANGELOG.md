@@ -1,5 +1,11 @@
 # Changelog
 
+## Upcoming
+
+### Changed
+
+- fit_mode and its wrappers now take an optional 'model' kwarg (AbstractModelMaker subclass) that allows the user to customize how the mode profile is modelled (e.g., using a Gaussian rather than a Lorentzian)
+
 ## 1.0
 
 ### Changed
