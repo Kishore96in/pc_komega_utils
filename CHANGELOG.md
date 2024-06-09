@@ -15,6 +15,7 @@
 ### Removed
 
 - pcko.fit.estimate_sigma
+- pcko.fit._get_sigma_at_kz
 - pcko.fit.smooth
 
 Some legacy functions that were in the main namespace:
