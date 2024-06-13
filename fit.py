@@ -14,6 +14,7 @@ import scipy.optimize
 import scipy.stats
 import scipy.special
 import abc
+import itertools
 
 from .utils import stdev_central
 from .getters import getter_kyeq0 as _default_getter
@@ -299,6 +300,27 @@ def fit_mode(
 	for i in model._width_like_params:
 		ubound_lor[:,i] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
+	
+	def _residuals(omt, params):
+		"""
+		For use with scipy.optimize.minimize
+		"""
+		res = 0
+		total = 0
+		
+		params_poly, params_lines = model.unpack_params(params)
+		poly = model.poly(omt_near_target, *params_poly)
+		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
+		
+		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
+		for comp in itertools.chain([poly], lines):
+			total += comp
+			res += np.where(comp < 0: -comp, 0)**2
+		
+		#The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares
+		res += 0.5*(model_data - data_near_target)**2
+		
+		return np.sum(res)
 	
 	try:
 		popt, _, infodict, mesg, _ = scipy.optimize.curve_fit(
