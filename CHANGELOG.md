@@ -5,6 +5,7 @@
 ### Changed
 
 - fit_mode and its wrappers now take an optional 'model' kwarg (AbstractModelMaker subclass) that allows the user to customize how the mode profile is modelled (e.g., using a Gaussian rather than a Lorentzian)
+- fit_mode now also imposes the constraint that each component of the fit should be positive.
 
 ## 1.0
 
