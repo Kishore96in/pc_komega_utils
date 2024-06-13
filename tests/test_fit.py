@@ -1,29 +1,29 @@
-import pickle
-import os
 import numpy as np
 import subprocess
 
 from pc_komega_utils.fit import fit_mode, fit_mode_auto
 
-def get_dataset(name):
-	dirname = os.path.dirname(__file__)
-	dataloc = os.path.join(dirname, f"fit_data/{name}/inputs.pickle")
+
+def get_dataset_1():
+	om = np.linspace(0.3,0.7,100)
 	
-	if not os.path.exists(dataloc):
-		p = subprocess.Popen(
-			["python", "make_data.py"],
-			cwd = os.path.join(os.path.dirname(dataloc)),
-			)
-		p.wait()
+	A = 1e-5
+	om_0 = 0.5
+	gam = 0.01
+	sigma = 1e-5
 	
-	with open(
-		dataloc,
-		'rb',
-		) as f:
-		return pickle.load(f)
+	rand = np.random.default_rng(seed=42).normal(loc=1e-4, scale=sigma, size=len(om))
+	
+	data = rand + (A*gam/np.pi)/((om - om_0)**2 + gam**2)
+	
+	return {
+		'data_near_target': data,
+		'omt_near_target': om,
+		'sigma': sigma,
+		}
 
 def test_fit_1():
-	dset = get_dataset("1")
+	dset = get_dataset_1()
 	
 	fit = fit_mode(
 		**dset,
