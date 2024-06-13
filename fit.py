@@ -199,6 +199,10 @@ def fit_mode(
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
+	if sigma is None:
+		#This is equivalent to not using sigma in the residual
+		sigma = 1
+	
 	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
@@ -258,7 +262,7 @@ def fit_mode(
 			res += np.where(comp < 0, -comp, 0)**2
 		
 		#The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares
-		res += 0.5*(total - data_near_target)**2
+		res += 0.5*((total - data_near_target)/sigma)**2
 		
 		return np.sum(res)
 	
