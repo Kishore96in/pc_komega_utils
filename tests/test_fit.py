@@ -82,8 +82,11 @@ def test_fit_2():
 	
 	_, params_lorentz = fit.unpack_params(fit.popt)
 	assert np.shape(params_lorentz) == (2,3)
-	assert np.isclose(0.4, params_lorentz[0,1], atol=2*d_omt)
-	assert np.isclose(0.6, params_lorentz[1,1], atol=2*d_omt)
+	
+	i1 = np.argmin(np.abs(params_lorentz[:,1] - 0.4)) #Find the Lorentzian closest to omega=0.4
+	i2 = int(not i1)
+	assert np.isclose(0.4, params_lorentz[i1,1], atol=2*d_omt)
+	assert np.isclose(0.6, params_lorentz[i2,1], atol=2*d_omt)
 
 def test_fit_auto_2():
 	dset = get_dataset_2()
@@ -100,5 +103,8 @@ def test_fit_auto_2():
 	
 	_, params_lorentz = fit.unpack_params(fit.popt)
 	assert np.shape(params_lorentz) == (2,3)
-	assert np.isclose(0.4, params_lorentz[0,1], atol=2*d_omt)
-	assert np.isclose(0.6, params_lorentz[1,1], atol=2*d_omt)
+	
+	i1 = np.argmin(np.abs(params_lorentz[:,1] - 0.4)) #Find the Lorentzian closest to omega=0.4
+	i2 = int(not i1)
+	assert np.isclose(0.4, params_lorentz[i1,1], atol=2*d_omt)
+	assert np.isclose(0.6, params_lorentz[i2,1], atol=2*d_omt)
