@@ -247,33 +247,50 @@ def fit_mode(
 	
 	def _residual(params):
 		"""
-		For use with scipy.optimize.minimize
+		For use with scipy.optimize.minimize. The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares.
 		"""
-		res = 0
 		total = 0
 		
 		params_poly, params_lines = model.unpack_params(params)
 		poly = model.poly(omt_near_target, *params_poly)
 		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
 		
-		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
 		for comp in itertools.chain([poly], lines):
 			total += comp
-			res += np.where(comp < 0, -comp, 0)**2
 		
-		#The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares
-		res += 0.5*((total - data_near_target)/sigma)**2
+		return np.sum(0.5*((total - data_near_target)/sigma)**2)
+	
+	def _positive_constraint(params):
+		"""
+		For use with scipy.optimize.minimize(method='trust-constr')
+		"""
+		con = np.full(model.n_lines + 1, np.nan)
 		
-		return np.sum(res)
+		params_poly, params_lines = model.unpack_params(params)
+		poly = model.poly(omt_near_target, *params_poly)
+		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
+		
+		for i, comp in enumerate(itertools.chain([poly], lines)):
+			#TODO: another option (in case the below doesn't work out) may be to use np.max(np.where(comp < 0, comp, 0)) and make the constraint an equality constraint (set lb==ub)
+			con[i] = np.min(comp)
+		
+		return con
 	
 	try:
 		res = scipy.optimize.minimize(
 			_residual,
 			x0 = guess,
 			bounds = tuple(zip(lbound, ubound)),
-			jac = '3-point',
+			method = 'trust-constr',
+			jac = '2-point',
+			constraints = scipy.optimize.NonlinearConstraint(
+				_positive_constraint,
+				np.zeros(model.n_lines + 1),
+				np.full(model.n_lines + 1, np.inf),
+				jac='2-point',
+				),
 			options = {
-				'maxiter': 1e4*model.nparams
+				'maxiter': 1e3*model.nparams
 				},
 			)
 		model.popt = res.x
