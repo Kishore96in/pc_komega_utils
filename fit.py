@@ -264,26 +264,25 @@ def fit_mode(
 		return res
 	
 	try:
-		model.popt, model.pcov, infodict, mesg, _ = scipy.optimize.curve_fit(
-			model,
-			omt_near_target,
-			data_near_target,
-			p0 = guess,
-			sigma = sigma,
+		res = scipy.optimize.least_squares(
+			_residuals,
+			x0 = guess,
 			bounds = (lbound,ubound),
 			method='trf',
-			maxfev = 1e4*model.nparams,
+			max_nfev = 1e4*model.nparams,
 			ftol = None,
 			x_scale='jac',
 			jac='3-point',
-			absolute_sigma = True,
-			full_output = True,
 			)
+		
+		model.popt = res.x
+		mesg = res.message
+		nfev = res.nfev
 	except Exception as e:
 		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, with error: {e} {identifier}")
 	
 	if debug > 0:
-		print(f"\t{mesg = }\n\t{infodict['nfev'] = }")
+		print(f"\t{mesg = }\n\t{nfev = }")
 	
 	return model
 
