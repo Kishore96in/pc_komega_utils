@@ -84,3 +84,21 @@ def test_fit_2():
 	assert np.shape(params_lorentz) == (2,3)
 	assert np.isclose(0.4, params_lorentz[0,1], atol=2*d_omt)
 	assert np.isclose(0.6, params_lorentz[1,1], atol=2*d_omt)
+
+def test_fit_auto_2():
+	dset = get_dataset_2()
+	
+	fit = fit_mode_auto(
+		**dset,
+		poly_order = 1,
+		om_guess = [0.4],
+		gamma_max = 0.1,
+		)
+	
+	omt = dset['omt_near_target']
+	d_omt = omt[1] - omt[0]
+	
+	_, params_lorentz = fit.unpack_params(fit.popt)
+	assert np.shape(params_lorentz) == (2,3)
+	assert np.isclose(0.4, params_lorentz[0,1], atol=2*d_omt)
+	assert np.isclose(0.6, params_lorentz[1,1], atol=2*d_omt)
