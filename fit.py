@@ -289,8 +289,8 @@ def fit_mode(
 			jac = '2-point',
 			constraints = scipy.optimize.NonlinearConstraint(
 				_positive_constraint,
-				np.zeros(model.n_lines + 1),
-				np.full(model.n_lines + 1, np.inf),
+				0,
+				np.inf,
 				jac='2-point',
 				),
 			options = {
