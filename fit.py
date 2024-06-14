@@ -256,16 +256,27 @@ def fit_mode(
 		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
 		for comp in itertools.chain([poly], lines):
 			total += comp
-			res += np.where(comp < 0, abs(comp), 0)
+			res += np.where(comp < 0, comp**2, 0)
 		
 		#The usual residual
-		res += abs((total - data_near_target)/sigma)
+		res += ((total - data_near_target)/sigma)**2
 		
 		return res
+	
+	def _loss(z):
+		"""
+		scipy.optimize.least_squares expects this to return an array [rho(z), d rho(z)/dz, d^2 rho(z)/dz^2]
+		"""
+		return np.array([
+			z,
+			np.ones_like(z),
+			np.zeros_like(z),
+			])
 	
 	try:
 		res = scipy.optimize.least_squares(
 			_residuals,
+			loss = _loss,
 			x0 = guess,
 			bounds = (lbound,ubound),
 			method='trf',
