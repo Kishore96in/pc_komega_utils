@@ -203,7 +203,7 @@ def fit_mode(
 		#This is equivalent to not using sigma in the residual
 		sigma = 1
 	if np.min(sigma) < 10*np.finfo(float).eps:
-		#TODO: above, I would ideally use `np.finfo(np.array(sigma).dtype).eps`, but htat would fail if sigma were to have an int-like dtype.
+		#TODO: above, I would ideally use `np.finfo(np.array(sigma).dtype).eps`, but that would fail if sigma were to have an int-like dtype.
 		warnings.warn("fit_mode: ignoring sigma < 10 * machine epsilon")
 		sigma = 1
 	
