@@ -279,10 +279,7 @@ def fit_mode(
 		ubound_lor[:,i] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
-	def _residual(params):
-		"""
-		For use with scipy.optimize.minimize
-		"""
+	def _residuals(params):
 		res = 0
 		total = 0
 		
@@ -293,12 +290,12 @@ def fit_mode(
 		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
 		for comp in itertools.chain([poly], lines):
 			total += comp
-			res += np.where(comp < 0, -comp, 0)**2
+			res += np.where(comp < 0, abs(comp), 0)
 		
-		#The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares
-		res += 0.5*((total - data_near_target)/sigma)**2
+		#The usual residual
+		res += abs((total - data_near_target)/sigma)
 		
-		return np.sum(res)
+		return res
 	
 	try:
 		popt, _, infodict, mesg, _ = scipy.optimize.curve_fit(
