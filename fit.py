@@ -258,7 +258,7 @@ def fit_mode(
 		for comp in itertools.chain([poly], lines):
 			total += comp
 		
-		return np.sum(0.5*((total - data_near_target)/sigma)**2)
+		return 0.5*np.sum(((total - data_near_target)/sigma)**2)
 	
 	def _positive_constraint(params):
 		"""
