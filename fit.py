@@ -298,7 +298,8 @@ def fit_mode(
 				jac='2-point',
 				),
 			options = {
-				'maxiter': 1e3*model.nparams
+				'maxiter': 1e3*model.nparams,
+				'factorization_method': 'SVDFactorization',
 				},
 			)
 		model.popt = res.x
