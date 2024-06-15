@@ -268,16 +268,20 @@ def fit_mode(
 		jac = []
 		for i in range(len(params)):
 			#Step size below minimizes combined truncation and roundoff error for a finite-difference scheme with m-th order error.
-			m = 2
+			m = 3
 			dp = (np.finfo(float).eps)**(1/(m+1))
+			params_p2dp = params.copy()
+			params_p2dp[i] += 2*dp
+			
 			params_pdp = params.copy()
 			params_pdp[i] += dp
 			
 			params_mdp = params.copy()
 			params_mdp[i] -= dp
 			
-			dr = _residuals_lsq(params_pdp) - _residuals_lsq(params_mdp)
-			jac.append(dr/(2*dp))
+			r = _residuals_lsq
+			dr = r(params_p2dp) - 6*r(params_pdp) + 2*r(params_mdp) + 3*r(params)
+			jac.append(dr/(-4*dp))
 		
 		return np.array(jac).transpose()
 	
