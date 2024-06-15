@@ -223,10 +223,6 @@ def fit_mode(
 	if gamma_max is None:
 		gamma_max = om_tilde_max - om_tilde_min
 	
-	if sigma is None:
-		#This is equivalent to not using sigma in the residual
-		sigma = 1
-	
 	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
 	
@@ -238,7 +234,11 @@ def fit_mode(
 	#If the values are very small (e.g. 1e-13), the fits get drastically affected (presumably due to accumulation of rounding errors). Before passing the data to the optimization routine, we thus scale it. The inverse of this scaling will later be applied to the returned optimal parameters.
 	scale = np.max(data_near_target)
 	data_near_target = data_near_target/scale
-	if sigma is not None:
+	
+	if sigma is None:
+		#This is equivalent to not having any sigma in _residual
+		sigma = 1
+	else:
 		sigma = sigma/scale
 	
 	#initial guesses for the parameters.
