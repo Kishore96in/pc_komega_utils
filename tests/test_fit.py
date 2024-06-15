@@ -132,7 +132,7 @@ def get_dataset_3():
 	gam = 0.01
 	
 	
-	data = 3e-10 + om*2e-10 + 1e-10*om**2 + (A*gam/np.pi)/((om - om_0)**2 + gam**2)
+	data = 3e-10 + om*2e-10 + 4e-10*om**2 + (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
 	return {
 		'data_near_target': data,
@@ -160,7 +160,7 @@ def test_fit_3():
 	print(f"{params_poly = }")
 	assert np.isclose(3e-10, params_poly[0], rtol=1e-1, atol=0)
 	assert np.isclose(2e-10, params_poly[1], rtol=1e-1, atol=0)
-	assert np.isclose(1e-10, params_poly[2], rtol=1e-1, atol=0)
+	assert np.isclose(4e-10, params_poly[2], rtol=1e-1, atol=0)
 	
 	assert np.isclose(1e-11, params_lorentz[0,0], rtol=1e-1, atol=0)
 	assert np.isclose(0.5, params_lorentz[0,1], atol=2*d_omt)
