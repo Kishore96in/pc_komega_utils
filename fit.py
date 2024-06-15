@@ -215,12 +215,16 @@ def fit_mode(
 	if len(data_near_target) < model.nparams:
 		raise RuntimeError("Data series is too short for fit.")
 	
-	#initial guess for the parameters.
-	guess_poly = np.zeros(model.poly_order + 1)
+	#initial guesses for the parameters.
+	guess_poly = np.polynomial.polynomial.Polynomial.fit(
+		omt_near_target,
+		data_near_target,
+		model.poly_order,
+		domain = [omt_near_target[0], omt_near_target[-1]],
+		window = [omt_near_target[0], omt_near_target[-1]],
+		).coef
+	
 	guess_lor = np.zeros((model.n_lines,model.n_lineparams))
-	
-	guess_poly[0] = data_near_target[0]
-	
 	i_om = model._ind_line_freq
 	
 	guess_lor[:,i_om] = np.linspace(om_tilde_min, om_tilde_max, model.n_lines+2)[1:-1]
