@@ -137,7 +137,6 @@ def get_dataset_3():
 	return {
 		'data_near_target': data,
 		'omt_near_target': om,
-		'sigma': 1,
 		}
 
 @pytest.mark.xfail(reason="The numbers involved are all very small. This can be checked by multiplying the amplitude and the polynomial coefficients by 1e6, in which case the fit succeeds")
