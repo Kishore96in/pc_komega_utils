@@ -290,7 +290,7 @@ def fit_mode(
 		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
 		for comp in itertools.chain([poly], lines):
 			total += comp
-			res += np.where(comp < 0, comp**2, 0)
+			res += np.where(comp < 0, (comp/sigma)**2, 0)
 		
 		#The usual residual
 		res += ((total - data_near_target)/sigma)**2
