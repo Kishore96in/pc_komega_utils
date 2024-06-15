@@ -14,7 +14,6 @@ import scipy.optimize
 import scipy.stats
 import scipy.special
 import abc
-import itertools
 
 from .utils import stdev_central
 from .getters import getter_kyeq0 as _default_getter
@@ -249,23 +248,33 @@ def fit_mode(
 		ubound_lor[:,i] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
+	def _residuals_lsq(params):
+		"""
+		The usual least-squares residual
+		"""
+		total = model(omt_near_target, *params)
+		return ((total - data_near_target)/sigma)**2
+	
 	def _residuals(params):
-		res = 0
-		total = 0
-		
-		params_poly, params_lines = model.unpack_params(params)
+		params_poly, _ = model.unpack_params(params)
 		poly = model.poly(omt_near_target, *params_poly)
-		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
 		
-		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
-		for comp in itertools.chain([poly], lines):
-			total += comp
-			res += np.where(comp < 0, (comp/sigma)**2, 0)
+		#The following term ensures positivity of the polynomial component. We assume that the line profiles have _positive_params set such that they are always positive.
+		res = np.where(poly < 0, (poly/sigma)**2, 0)
 		
-		#The usual residual
-		res += ((total - data_near_target)/sigma)**2
+		return res + _residuals_lsq(params)
+	
+	def _jacobian(params):
+		jac = []
+		for i, p in enumerate(params):
+			dp = np.sqrt(np.finfo(float).eps) * p
+			params_shift = params.copy()
+			params_shift[i] = p + dp
+			
+			dr = _residuals_lsq(params_shift) - _residuals_lsq(params)
+			jac.append(dr/dp)
 		
-		return res
+		return np.array(jac).transpose()
 	
 	def _loss(z):
 		"""
@@ -287,7 +296,7 @@ def fit_mode(
 			max_nfev = 1e4*model.nparams,
 			ftol = None,
 			x_scale='jac',
-			jac='3-point',
+			jac=_jacobian,
 			)
 		
 		model.popt = res.x
