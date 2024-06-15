@@ -255,7 +255,7 @@ def fit_mode(
 	
 	def _residual(params):
 		"""
-		For use with scipy.optimize.minimize.
+		For use with scipy.optimize.minimize. The usual least-squares residual. 0.5 is just to remain the same as the form used in scipy.optimize.least_squares.
 		"""
 		total = 0
 		
@@ -266,7 +266,7 @@ def fit_mode(
 		for comp in itertools.chain([poly], lines):
 			total += comp
 		
-		return np.sum(np.abs((total - data_near_target)/sigma))
+		return 0.5*np.sum(((total - data_near_target)/sigma)**2)
 	
 	def _positive_constraint(params):
 		"""
