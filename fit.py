@@ -288,7 +288,7 @@ def fit_mode(
 				_positive_constraint,
 				0,
 				0,
-				jac='2-point',
+				jac='3-point',
 				),
 			options = {
 				'maxiter': 1e3*model.nparams,
