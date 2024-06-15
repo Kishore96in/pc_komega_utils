@@ -123,3 +123,46 @@ def test_fit_auto_2():
 	assert np.isclose(1e-5, params_lorentz[i2,0], rtol=1e-1)
 	assert np.isclose(0.6, params_lorentz[i2,1], atol=2*d_omt)
 	assert np.isclose(0.02, params_lorentz[i2,2], rtol=1e-1)
+
+def get_dataset_3():
+	om = np.linspace(0.3,0.7,100)
+	
+	A = 1e-11
+	om_0 = 0.5
+	gam = 0.01
+	
+	
+	data = 3e-10 + om*2e-10 + 1e-11*om**2 + (A*gam/np.pi)/((om - om_0)**2 + gam**2)
+	
+	return {
+		'data_near_target': data,
+		'omt_near_target': om,
+		'sigma': 1,
+		}
+
+def test_fit_3():
+	dset = get_dataset_3()
+	
+	fit = fit_mode(
+		**dset,
+		poly_order = 2,
+		n_lorentz = 1,
+		om_guess = [0.5],
+		gamma_max = 0.1,
+		)
+	
+	omt = dset['omt_near_target']
+	d_omt = omt[1] - omt[0]
+	
+	params_poly, params_lorentz = fit.unpack_params(fit.popt)
+	assert np.shape(params_poly) == (3,)
+	assert np.shape(params_lorentz) == (1,3)
+	
+	print(f"{params_poly = }")
+	assert np.isclose(3e-10, params_poly[0], rtol=1e-1, atol=0)
+	assert np.isclose(2e-10, params_poly[1], rtol=1e-1, atol=0)
+	assert np.isclose(1e-11, params_poly[2], rtol=1e-1, atol=0)
+	
+	assert np.isclose(1e-11, params_lorentz[0,0], rtol=1e-1, atol=0)
+	assert np.isclose(0.5, params_lorentz[0,1], atol=2*d_omt)
+	assert np.isclose(0.01, params_lorentz[0,2], rtol=1e-1)
