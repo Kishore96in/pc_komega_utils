@@ -267,7 +267,8 @@ def fit_mode(
 	def _jacobian(params):
 		jac = []
 		for i, p in enumerate(params):
-			dp = np.sqrt(np.finfo(float).eps) * p
+			#Step size below minimizes combined truncation and roundoff error
+			dp = np.sqrt(np.finfo(float).eps)
 			params_shift = params.copy()
 			params_shift[i] = p + dp
 			
