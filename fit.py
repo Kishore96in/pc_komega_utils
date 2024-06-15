@@ -264,7 +264,38 @@ def fit_mode(
 		
 		return res + _residuals_lsq(params)
 	
-	def _jacobian(params):
+	def _jac_1(params):
+		jac = []
+		for i in range(len(params)):
+			#Step size below minimizes combined truncation and roundoff error for a finite-difference scheme with m-th order error.
+			m = 1
+			dp = (np.finfo(float).eps)**(1/(m+1))
+			params_pdp = params.copy()
+			params_pdp[i] += dp
+			
+			dr = _residuals_lsq(params_pdp) - _residuals_lsq(params)
+			jac.append(dr/dp)
+		
+		return np.array(jac).transpose()
+	
+	def _jac_2(params):
+		jac = []
+		for i in range(len(params)):
+			#Step size below minimizes combined truncation and roundoff error for a finite-difference scheme with m-th order error.
+			m = 2
+			dp = (np.finfo(float).eps)**(1/(m+1))
+			params_pdp = params.copy()
+			params_pdp[i] += dp
+			
+			params_mdp = params.copy()
+			params_mdp[i] -= dp
+			
+			dr = _residuals_lsq(params_pdp) - _residuals_lsq(params_mdp)
+			jac.append(dr/(2*dp))
+		
+		return np.array(jac).transpose()
+	
+	def _jac_3(params):
 		jac = []
 		for i in range(len(params)):
 			#Step size below minimizes combined truncation and roundoff error for a finite-difference scheme with m-th order error.
@@ -305,7 +336,7 @@ def fit_mode(
 			max_nfev = 1e4*model.nparams,
 			ftol = None,
 			x_scale='jac',
-			jac=_jacobian,
+			jac=_jac_3,
 			)
 		
 		model.popt = res.x
