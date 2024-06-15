@@ -96,6 +96,7 @@ def test_fit_auto_2():
 		poly_order = 1,
 		om_guess = [0.4],
 		gamma_max = 0.1,
+		threshold_p = 0.5,
 		)
 	
 	omt = dset['omt_near_target']
