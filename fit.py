@@ -121,6 +121,28 @@ class AbstractModelMaker(abc.ABC):
 		Returns a list of indices of the line parameters that need to be positive. This is used by fit_mode to set bounds on the parameters.
 		"""
 		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
+	def _amplitude_like_params(self):
+		"""
+		Returns a list of indices of the line parameters that should be scaled when the data is scaled. This is used by scale_params
+		"""
+		raise NotImplementedError
+	
+	def scale_params(self, params, factor):
+		"""
+		Given a vector of params, apply a scaling factor to the polynomial and to the amplitudes of the lines, and return the vector of scaled params. This is useful if you want to pass a scaled version of the data to a fitting routine, but want to finally obtain parameters corresponding to the unscaled data.
+		"""
+		params_poly, params_lines = self.unpack_params(params)
+		
+		params_poly = params_poly * factor
+		
+		for i in range(np.shape(params_lines)[1]):
+			if i in self._amplitude_like_params:
+				params_lines[:,i] = params_lines[:,i]*factor
+		
+		return self.pack_params(params_poly, params_lines)
 
 class ModelMakerLorentzian(AbstractModelMaker):
 	"""
@@ -131,6 +153,7 @@ class ModelMakerLorentzian(AbstractModelMaker):
 	_ind_line_freq = 1
 	_width_like_params = [2]
 	_positive_params = [0,2]
+	_amplitude_like_params = [0]
 	
 	def line(self, om, A, om_0, gam):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
@@ -147,6 +170,7 @@ class ModelMakerVoigt(AbstractModelMaker):
 	_ind_line_freq = 1
 	_width_like_params = [2,3]
 	_positive_params = [0,2,3]
+	_amplitude_like_params = [0]
 	
 	def line(self, om, A, om_0, gam, sigma):
 		return A*scipy.special.voigt_profile(om-om_0, sigma, gam)
