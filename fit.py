@@ -270,19 +270,12 @@ def fit_mode(
 	
 	def _positive_constraint(params):
 		"""
-		For use with scipy.optimize.minimize(method='trust-constr')
+		For use with scipy.optimize.minimize(method='trust-constr').
+		Here, we impose a constraint that ensures the polynomial fit is positive. We assume that the bounds on the line parameters are sufficient to ensure that the line profiles are positive.
 		"""
-		con = np.full(model.n_lines + 1, np.nan)
-		
-		params_poly, params_lines = model.unpack_params(params)
+		params_poly, _ = model.unpack_params(params)
 		poly = model.poly(omt_near_target, *params_poly)
-		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
-		
-		for i, comp in enumerate(itertools.chain([poly], lines)):
-			#TODO: another option (in case the below doesn't work out) may be to use np.max(np.where(comp < 0, comp, 0)) and make the constraint an equality constraint (set lb==ub)
-			con[i] = np.min(comp)
-		
-		return con
+		return np.sum(np.where(poly < 0, poly, 0))
 	
 	try:
 		res = scipy.optimize.minimize(
@@ -294,7 +287,7 @@ def fit_mode(
 			constraints = scipy.optimize.NonlinearConstraint(
 				_positive_constraint,
 				0,
-				np.inf,
+				0,
 				jac='2-point',
 				),
 			options = {
