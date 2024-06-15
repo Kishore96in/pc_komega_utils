@@ -266,11 +266,11 @@ def fit_mode(
 	
 	def _jacobian(params):
 		jac = []
-		for i, p in enumerate(params):
+		for i in range(len(params)):
 			#Step size below minimizes combined truncation and roundoff error
 			dp = np.sqrt(np.finfo(float).eps)
 			params_shift = params.copy()
-			params_shift[i] = p + dp
+			params_shift[i] += dp
 			
 			dr = _residuals_lsq(params_shift) - _residuals_lsq(params)
 			jac.append(dr/dp)
