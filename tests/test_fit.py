@@ -1,5 +1,4 @@
 import numpy as np
-import subprocess
 import pytest
 
 from pc_komega_utils.fit import fit_mode, fit_mode_auto
