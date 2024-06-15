@@ -230,6 +230,11 @@ def fit_mode(
 	if len(data_near_target) < model.nparams:
 		raise RuntimeError("Data series is too short for fit.")
 	
+	#If the values are very small (e.g. 1e-13), the fits get drastically affected (presumably due to accumulation of rounding errors). Before passing the data to the optimization routine, we thus scale it. The inverse of this scaling will later be applied to the returned optimal parameters.
+	scale = np.max(data_near_target)
+	data_near_target = data_near_target/scale
+	sigma = sigma/scale
+	
 	#initial guesses for the parameters.
 	guess_poly = np.polynomial.polynomial.Polynomial.fit(
 		omt_near_target,
@@ -269,7 +274,7 @@ def fit_mode(
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	try:
-		model.popt, model.pcov, infodict, mesg, _ = scipy.optimize.curve_fit(
+		popt, _, infodict, mesg, _ = scipy.optimize.curve_fit(
 			model,
 			omt_near_target,
 			data_near_target,
@@ -284,6 +289,8 @@ def fit_mode(
 			absolute_sigma = True,
 			full_output = True,
 			)
+		
+		model.popt = model.scale_params(popt, scale)
 	except Exception as e:
 		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, with error: {e} {identifier}")
 	
