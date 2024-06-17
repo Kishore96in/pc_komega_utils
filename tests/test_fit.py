@@ -4,6 +4,7 @@ import pytest
 from pc_komega_utils.fit import (
 	fit_mode,
 	fit_mode_auto,
+	get_mode_eigenfunction,
 	)
 from pc_komega_utils.models import (
 	ModelBaselineExp,
@@ -238,3 +239,24 @@ def test_fit_4():
 	assert np.isclose(1e-5, params_lorentz[i2,0], rtol=1e-1)
 	assert np.isclose(0.6, params_lorentz[i2,1], atol=2*d_omt)
 	assert np.isclose(0.02, params_lorentz[i2,2], rtol=1e-1)
+
+def test_get_mode_eigenfunction():
+	dset = get_dataset_1()
+	
+	dummy_getter = lambda *args: dset
+	mass, = get_mode_eigenfunction(
+		omega_0=0.5,
+		om_tilde_min=0.3,
+		om_tilde_max=0.7,
+		poly_order = 1,
+		#
+		dr=None,
+		k_tilde=None,
+		z_list=[1],
+		omega_tol = 0.05,
+		mode_mass_method="sum",
+		getter = dummy_getter,
+		gamma_max=0.1
+		)
+	
+	assert np.isclose(mass, 2.4e-3, rtol=1e-2)
