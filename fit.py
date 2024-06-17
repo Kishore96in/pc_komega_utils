@@ -52,7 +52,7 @@ def fit_mode(
 	om_tilde_max = max(omt_near_target)
 	
 	if gamma_max is None:
-		gamma_max = om_tilde_max - om_tilde_min
+		gamma_max = (om_tilde_max - om_tilde_min)/6
 	
 	if (len(identifier) > 0 and identifier[0] != '('):
 			identifier = f"({identifier})"
@@ -96,12 +96,12 @@ def fit_mode(
 	lbound_lor = np.full((model.n_lines,model.n_lineparams), -np.inf)
 	for i in model._positive_params:
 		lbound_lor[:,i] = 0
-	lbound_lor[:,i_om] = om_tilde_min
+	lbound_lor[:,i_om] = om_tilde_min + gamma_max
 	lbound = model.pack_params(lbound_poly, lbound_lor)
 	
 	ubound_poly = np.full(model.poly_order+1, np.inf)
 	ubound_lor = np.full((model.n_lines,model.n_lineparams), np.inf)
-	ubound_lor[:,i_om] = om_tilde_max
+	ubound_lor[:,i_om] = om_tilde_max - gamma_max
 	for i in model._width_like_params:
 		ubound_lor[:,i] = gamma_max
 	ubound = model.pack_params(ubound_poly, ubound_lor)
