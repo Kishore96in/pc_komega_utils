@@ -176,7 +176,7 @@ class AbstractModelMaker(abc.ABC):
 		
 		return self.pack_params(params_poly, params_lines)
 
-class BaselinePoly():
+class ModelBaselinePoly():
 	_baseline_ensure_positive = True
 	
 	@property
@@ -214,7 +214,7 @@ class ModelBaselineExp():
 		a, b = params_poly
 		return a*np.exp(-b*abs(om))
 
-class ModelMakerLorentzian(BaselinePoly, AbstractModelMaker):
+class ModelMakerLorentzian(ModelBaselinePoly, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
 	"""
@@ -231,7 +231,7 @@ class ModelMakerLorentzian(BaselinePoly, AbstractModelMaker):
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
-class ModelMakerVoigt(BaselinePoly, AbstractModelMaker):
+class ModelMakerVoigt(ModelBaselinePoly, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
 	"""
