@@ -240,7 +240,7 @@ def test_fit_4():
 	assert np.isclose(0.6, params_lorentz[i2,1], atol=2*d_omt)
 	assert np.isclose(0.02, params_lorentz[i2,2], rtol=1e-1)
 
-def test_get_mode_eigenfunction():
+def test_get_mode_eigenfunction_1():
 	dset = get_dataset_1()
 	
 	dummy_getter = lambda *args: dset
@@ -257,6 +257,28 @@ def test_get_mode_eigenfunction():
 		mode_mass_method="sum",
 		getter = dummy_getter,
 		gamma_max=0.1
+		)
+	
+	assert np.isclose(mass, 2.4e-3, rtol=1e-2)
+
+def test_get_mode_eigenfunction_1_err():
+	dset = get_dataset_1()
+	
+	dummy_getter = lambda *args: dset
+	[mass], [err] = get_mode_eigenfunction(
+		omega_0=0.5,
+		om_tilde_min=0.3,
+		om_tilde_max=0.7,
+		poly_order = 1,
+		#
+		dr=None,
+		k_tilde=None,
+		z_list=[1],
+		omega_tol = 0.05,
+		mode_mass_method="sum",
+		getter = dummy_getter,
+		gamma_max=0.1,
+		estimate_error = True,
 		)
 	
 	assert np.isclose(mass, 2.4e-3, rtol=1e-2)
