@@ -12,6 +12,7 @@ import warnings
 import numpy as np
 import scipy.optimize
 import scipy.stats
+import scipy.linalg
 
 from .utils import stdev_central
 from .getters import getter_kyeq0 as _default_getter
@@ -140,6 +141,36 @@ def fit_mode(
 		model.popt = model.scale_params(res.x, scale)
 		mesg = res.message
 		nfev = res.nfev
+		
+		"""
+		Attempt to estimate the errors in the parameters.
+		
+		The idea is that we don't completely trust the value of sigma given to us by the user, so we assume the actual error is S*sigma. S is fixed by requiring the reduced chi-squared to be 1.
+		
+		Implementation here is from scipy.optimize.curve_fit (file scipy/optimize/_minpack_py.py)
+		"""
+		# Do Moore-Penrose inverse discarding zero singular values.
+		_, s, VT = scipy.linalg.svd(res.jac, full_matrices=False)
+		threshold = np.finfo(float).eps * max(res.jac.shape) * s[0]
+		s = s[s > threshold]
+		VT = VT[:s.size]
+		pcov = np.dot(VT.T / s**2, VT)
+		
+		if np.isnan(pcov).any():
+			# indeterminate covariance
+			pcov = np.full((len(popt), len(popt)), np.inf, dtype=float)
+		
+		ysize = len(omt_near_target)
+		#In scipy, this is the branch `if not absolute_sigma:`
+		if ysize > res.x.size:
+			s_sq = np.sum(res.fun**2) / (ysize - model.nparams)
+			pcov = pcov * s_sq
+		else:
+			pcov.fill(inf)
+		
+		model.perr = np.sqrt(np.diag(pcov))
+		
+		assert len(model.popt) == len(model.perr)
 	except Exception as e:
 		raise RuntimeError(f"Failed for {om_tilde_min = }, {om_tilde_max = }, {poly_order = }, {n_lorentz = }, {om_guess = }, with error: {e} {identifier}")
 	
