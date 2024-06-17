@@ -214,11 +214,7 @@ class ModelBaselineExp():
 		a, b = params_poly
 		return a*np.exp(-b*abs(om))
 
-class ModelMakerLorentzian(ModelBaselinePoly, AbstractModelMaker):
-	"""
-	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
-	"""
-	
+class ModelLineLorentzian():
 	n_lineparams = 3
 	_ind_line_freq = 1
 	_width_like_params = [2]
@@ -231,11 +227,7 @@ class ModelMakerLorentzian(ModelBaselinePoly, AbstractModelMaker):
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
-class ModelMakerVoigt(ModelBaselinePoly, AbstractModelMaker):
-	"""
-	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
-	"""
-	
+class ModeLineVoigt():
 	n_lineparams = 4
 	_ind_line_freq = 1
 	_width_like_params = [2,3]
@@ -253,6 +245,18 @@ class ModelMakerVoigt(ModelBaselinePoly, AbstractModelMaker):
 		f_G = 2.3548200450309493*sigma
 		f = 0.5346*f_L + np.sqrt(0.2166*f_L**2 + f_G**2)
 		return f/2
+
+class ModelMakerLorentzian(ModelBaselinePoly, ModelLineLorentzian, AbstractModelMaker):
+	"""
+	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
+	"""
+	pass
+
+class ModelMakerVoigt(ModelBaselinePoly, ModeLineVoigt, AbstractModelMaker):
+	"""
+	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
+	"""
+	pass
 
 def fit_mode(
 	data_near_target,

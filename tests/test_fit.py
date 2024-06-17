@@ -5,7 +5,8 @@ from pc_komega_utils.fit import (
 	fit_mode,
 	fit_mode_auto,
 	ModelBaselineExp,
-	ModelMakerLorentzian,
+	ModelLineLorentzian,
+	AbstractModelMaker,
 	)
 
 def get_dataset_1():
@@ -201,7 +202,7 @@ def get_dataset_4():
 		'sigma': sigma,
 		}
 
-class ModelMakerLorentzianWithExp(ModelBaselineExp, ModelMakerLorentzian): pass
+class ModelMakerLorentzianWithExp(ModelBaselineExp, ModelLineLorentzian, AbstractModelMaker): pass
 
 def test_fit_4():
 	dset = get_dataset_4()
