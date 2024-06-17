@@ -142,6 +142,15 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		raise NotImplementedError
 	
+	@property
+	@abc.abstractmethod
+	def _baseline_ensure_positive(self):
+		"""
+		If the function used for the baseline is such that one cannot easily ensure its positivity by constraining the parameters, one can instead set this property to True.
+		
+		When this property is True, fit_mode uses a modified expression for the least-squares residual that prefers a positive baseline. If False, no such special handling is done.
+		"""
+		raise NotImplementedError
 	
 	def scale_params(self, params, factor):
 		"""
@@ -160,6 +169,8 @@ class AbstractModelMaker(abc.ABC):
 		return self.pack_params(params_poly, params_lines)
 
 class BaselinePoly():
+	_baseline_ensure_positive = True
+	
 	@property
 	def _baseline_amplitude_like_params(self):
 		return list(range(self.poly_order + 1))
@@ -308,16 +319,14 @@ def fit_mode(
 	def _residuals(params):
 		total = model(omt_near_target, *params)
 		
-		params_poly, _ = model.unpack_params(params)
-		poly = model.poly(omt_near_target, *params_poly)
-		
-		res = 0
-		
-		#First, add a term to the residual (res) that ensures positivity of the polynomial component. We assume that the parameters of the mode profile are already constrained in such a manner that the mode profile itself is non-negative.
-		res += np.where(poly < 0, abs(poly/sigma), 0)
-		
 		#The usual residual
-		res += abs((total - data_near_target)/sigma)
+		res = abs((total - data_near_target)/sigma)
+		
+		if model._baseline_ensure_positive:
+			params_poly, _ = model.unpack_params(params)
+			poly = model.poly(omt_near_target, *params_poly)
+			
+			res += np.where(poly < 0, abs(poly/sigma), 0)
 		
 		return res
 	
