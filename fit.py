@@ -143,7 +143,7 @@ def fit_mode(
 		nfev = res.nfev
 		
 		"""
-		Attempt to estimate the errors in the parameters.
+		Estimate the errors in the parameters.
 		
 		The idea is that we don't completely trust the value of sigma given to us by the user, so we assume the actual error is S*sigma. S is fixed by requiring the reduced chi-squared to be 1.
 		
