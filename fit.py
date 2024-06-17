@@ -78,7 +78,11 @@ def fit_mode(
 	
 	i_om = model._ind_line_freq
 	
-	guess_lor[:,i_om] = np.linspace(om_tilde_min, om_tilde_max, model.n_lines+2)[1:-1]
+	guess_lor[:,i_om] = np.linspace(
+		om_tilde_min + gamma_max,
+		om_tilde_max - gamma_max,
+		model.n_lines,
+		)
 	if om_guess is not None:
 		for i in range(min(model.n_lines, len(om_guess))):
 			guess_lor[i,i_om] = om_guess[i]
