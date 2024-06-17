@@ -1,2 +1,12 @@
-from . import read, plot, fit, default, wrap
-
+from . import (
+	default,
+	fit,
+	getters,
+	memmap_wrappers,
+	models,
+	plot,
+	power_cached,
+	read,
+	utils,
+	wrap,
+	)
