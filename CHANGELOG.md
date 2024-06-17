@@ -8,6 +8,9 @@
 - fit_mode now also imposes the constraint that each component of the fit should be positive.
 - fit_mode now requires the central frequency of the mode to be at least a distance of gamma_max from user-specified frequency bounds
 
+### Added
+- pcko.models submodule
+
 ## 1.0
 
 ### Changed
