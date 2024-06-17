@@ -311,13 +311,22 @@ def fit_mode(
 		sigma = sigma/scale
 	
 	#initial guesses for the parameters.
-	guess_poly = np.polynomial.polynomial.Polynomial.fit(
-		omt_near_target,
-		data_near_target,
-		model.poly_order,
-		domain = [omt_near_target[0], omt_near_target[-1]],
-		window = [omt_near_target[0], omt_near_target[-1]],
-		).coef
+	if n_lorentz == 0:
+		guess_poly = np.zeros(model.poly_order + 1)
+	else:
+		fit_poly = fit_mode(
+			data_near_target,
+			omt_near_target,
+			poly_order,
+			n_lorentz = 0,
+			sigma = sigma,
+			om_guess = om_guess,
+			gamma_max = gamma_max,
+			debug = debug,
+			identifier = identifier,
+			ModelMaker = ModelMaker,
+			)
+		guess_poly = fit_poly.popt
 	
 	guess_lor = np.zeros((model.n_lines,model.n_lineparams))
 	i_om = model._ind_line_freq
