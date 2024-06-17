@@ -471,3 +471,24 @@ def _get_mode_mass(
 		mode_mass += np.sum(residuals)
 	
 	return mode_mass
+
+def _get_mode_mass_derivative(popt, **kwargs):
+	"""
+	Derivative of the mode mass with respect to the fit parameters. This is required in order to propagate errors.
+	"""
+	der = np.full_like(popt, np.nan)
+	
+	#Step size that minimizes the sum of roundoff and truncation errors (for a finite difference scheme for the first derivative that has second-order errors)
+	dp = np.finfo(float).eps**(1/3)
+	
+	for i in range(len(der)):
+		popt_mdp = np.array(popt)
+		popt_mdp[i] -= dp
+		
+		popt_pdp = np.array(popt)
+		popt_pdp[i] += dp
+		
+		dm = _get_mode_mass(popt = popt_pdp, **kwargs) - _get_mode_mass(popt = popt_mdp, **kwargs)
+		der[i] = dm/(2*dp)
+	
+	return der
