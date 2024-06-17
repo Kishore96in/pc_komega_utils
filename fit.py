@@ -148,6 +148,8 @@ def fit_mode(
 		The idea is that we don't completely trust the value of sigma given to us by the user, so we assume the actual error is S*sigma. S is fixed by requiring the reduced chi-squared to be 1.
 		
 		Implementation here is from scipy.optimize.curve_fit (file scipy/optimize/_minpack_py.py)
+		
+		Note that the expression used below assumes we are doing linear least squares, and thus may not be completely correct in our case.
 		"""
 		# Do Moore-Penrose inverse discarding zero singular values.
 		_, s, VT = scipy.linalg.svd(res.jac, full_matrices=False)
