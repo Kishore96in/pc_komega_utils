@@ -6,6 +6,7 @@
 
 - fit_mode and its wrappers now take an optional 'model' kwarg (AbstractModelMaker subclass; see the 'models' submodule) that allows the user to customize how the mode profile is modelled (e.g., using a Gaussian rather than a Lorentzian)
 - fit_mode now also imposes the constraint that each component of the fit should be positive.
+- fit_mode now requires the central frequency of the mode to be at least a distance of gamma_max from user-specified frequency bounds
 
 ## 1.0
 
