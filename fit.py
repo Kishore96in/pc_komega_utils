@@ -294,6 +294,7 @@ def get_mode_eigenfunction(
 	debug = 0,
 	getter = _default_getter,
 	identifier = "",
+	estimate_error = False,
 	**kwargs,
 	):
 	"""
@@ -317,6 +318,7 @@ def get_mode_eigenfunction(
 				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
 		getter: function. Instance of getters.AbstractGetter
 		identifier: str. Use to get more informative error messages in wrapped functions.
+		estimate_error: bool. Whether to estimate the error in the mode mass by propagating the errors in the fit parameters.
 	
 	Other kwargs are passed to either fit_mode or fit_mode_auto depending on the value of force_n_lorentz.
 	"""
@@ -327,6 +329,7 @@ def get_mode_eigenfunction(
 		omega_tol = np.inf
 	
 	P_list = []
+	P_err_list = []
 	for z in z_list:
 		if debug > 0:
 			print(f"get_mode_eigenfunction: {z = }")
@@ -372,8 +375,23 @@ def get_mode_eigenfunction(
 			debug = debug,
 			))
 		
+		if estimate_error:
+			mder = _get_mode_mass_derivative(
+				model = fit,
+				popt = fit.popt,
+				omega_0 = omega_0,
+				omega_tol = omega_tol,
+				omt_near_target = omt_near_target,
+				mode_mass_method = mode_mass_method,
+				debug = debug,
+				)
+			err = np.sqrt(np.sum((mder*fit.perr)**2))
+			P_err_list.append(err)
 	
-	return np.array(P_list)
+	if estimate_error:
+		return np.array(P_list), np.array(P_err_list)
+	else:
+		return np.array(P_list)
 
 def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
 	"""
