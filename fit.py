@@ -323,14 +323,6 @@ def get_mode_eigenfunction(
 	if not om_tilde_min < omega_0 < om_tilde_max:
 		raise ValueError("Cannot fit mode that is outside search band.")
 	
-	if mode_mass_method not in [
-		"sum",
-		"sum_full",
-		"integral",
-		"sum_multi",
-		]:
-		raise ValueError(f"Unsupported mode_mass_method: {mode_mass_method}")
-	
 	if omega_tol is None:
 		omega_tol = np.inf
 	
@@ -370,58 +362,16 @@ def get_mode_eigenfunction(
 				**kwargs,
 				)
 		
-		_, params_lorentz = fit.unpack_params(fit.popt)
-		i_om = fit._ind_line_freq
+		P_list.append(_get_mode_mass(
+			model = fit,
+			popt = fit.popt,
+			omega_0 = omega_0,
+			omega_tol = omega_tol,
+			omt_near_target = omt_near_target,
+			mode_mass_method = mode_mass_method,
+			debug = debug,
+			))
 		
-		if len(params_lorentz) > 0:
-			"""
-			Among all Lorentzians which are within omega_tol of omega_0, we choose the Lorentzian with the highest mode mass. Lorentzians which are closer to the center of this mode than its width are considered as part of the same mode.
-			"""
-			selected = params_lorentz[np.abs(params_lorentz[:,i_om] - omega_0) < omega_tol]
-			
-			if len(selected) > 0:
-				modes = [fit.line(omt_near_target, *params) for params in selected]
-				if mode_mass_method == "integral":
-					mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
-				elif mode_mass_method in ["sum", "sum_full", "sum_multi"]:
-					mode_masses = np.array([np.sum(mode) for mode in modes])
-				else:
-					raise ValueError(f"Unsupported {mode_mass_method = }")
-				
-				main_mode = np.argmax(mode_masses)
-				width = fit.get_line_hwhm(*selected[main_mode])
-				omega_c = fit.get_line_freq(*selected[main_mode])
-				
-				if debug > 0:
-					print(f"get_mode_eigenfunction: {omega_c = :.2e}, {width = :.2e}")
-				
-				if mode_mass_method == "sum_multi":
-					mode_mass = np.sum(mode_masses)
-				else:
-					mode_mass = np.sum(np.where(
-						np.abs(selected[:,i_om] - omega_c) < width,
-						mode_masses,
-						0,
-						))
-			else:
-				mode_mass = 0
-		elif np.any(data_near_target != 0):
-			"""
-			u_z is nonzero, but no Lorentzian was fitted.
-			Setting these to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
-			"""
-			mode_mass = np.nan
-		else:
-			mode_mass = 0
-		
-		if mode_mass_method == "sum_full":
-			"""
-			Nishant suggested that this may be required to get a good-looking fit for the eigenfunction.
-			"""
-			residuals = data_near_target - fit(omt_near_target, *fit.popt)
-			mode_mass += np.sum(residuals)
-		
-		P_list.append(mode_mass)
 	
 	return np.array(P_list)
 
@@ -451,3 +401,73 @@ def get_mode_eigenfunction_from_simset(dr_list, *args, **kwargs):
 		err = np.std(mass_list, axis=0)/np.sqrt(len(dr_list))
 	
 	return mean, err
+
+def _get_mode_mass(
+	model,
+	popt,
+	omega_0,
+	omega_tol,
+	omt_near_target,
+	mode_mass_method,
+	debug,
+	):
+	if mode_mass_method not in [
+		"sum",
+		"sum_full",
+		"integral",
+		"sum_multi",
+		]:
+		raise ValueError(f"Unsupported mode_mass_method: {mode_mass_method}")
+	
+	_, params_lorentz = model.unpack_params(popt)
+	i_om = model._ind_line_freq
+	
+	if len(params_lorentz) > 0:
+		"""
+		Among all Lorentzians which are within omega_tol of omega_0, we choose the Lorentzian with the highest mode mass. Lorentzians which are closer to the center of this mode than its width are considered as part of the same mode.
+		"""
+		selected = params_lorentz[np.abs(params_lorentz[:,i_om] - omega_0) < omega_tol]
+		
+		if len(selected) > 0:
+			modes = [model.line(omt_near_target, *params) for params in selected]
+			if mode_mass_method == "integral":
+				mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
+			elif mode_mass_method in ["sum", "sum_full", "sum_multi"]:
+				mode_masses = np.array([np.sum(mode) for mode in modes])
+			else:
+				raise ValueError(f"Unsupported {mode_mass_method = }")
+			
+			main_mode = np.argmax(mode_masses)
+			width = model.get_line_hwhm(*selected[main_mode])
+			omega_c = model.get_line_freq(*selected[main_mode])
+			
+			if debug > 0:
+				print(f"get_mode_eigenfunction: {omega_c = :.2e}, {width = :.2e}")
+			
+			if mode_mass_method == "sum_multi":
+				mode_mass = np.sum(mode_masses)
+			else:
+				mode_mass = np.sum(np.where(
+					np.abs(selected[:,i_om] - omega_c) < width,
+					mode_masses,
+					0,
+					))
+		else:
+			mode_mass = 0
+	elif np.any(data_near_target != 0):
+		"""
+		u_z is nonzero, but no Lorentzian was fitted.
+		Setting these to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
+		"""
+		mode_mass = np.nan
+	else:
+		mode_mass = 0
+	
+	if mode_mass_method == "sum_full":
+		"""
+		Nishant suggested that this may be required to get a good-looking fit for the eigenfunction.
+		"""
+		residuals = data_near_target - model(omt_near_target, *popt)
+		mode_mass += np.sum(residuals)
+	
+	return mode_mass
