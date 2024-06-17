@@ -194,6 +194,26 @@ class BaselinePoly():
 			ret += a*om**i
 		return ret
 
+class ModelBaselineExp():
+	_baseline_ensure_positive = False
+	
+	@property
+	def _baseline_amplitude_like_params(self):
+		return [0]
+	
+	@property
+	def _baseline_positive_params(self):
+		return [0,1]
+	
+	def baseline(self, om, *params_poly):
+		if len(params_poly) != 2:
+			raise ValueError
+		
+		assert len(params_poly) == self.poly_order + 1
+		
+		a, b = params_poly
+		return a*np.exp(-b*abs(om))
+
 class ModelMakerLorentzian(BaselinePoly, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
