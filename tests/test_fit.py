@@ -4,6 +4,8 @@ import pytest
 from pc_komega_utils.fit import (
 	fit_mode,
 	fit_mode_auto,
+	)
+from pc_komega_utils.models import (
 	ModelBaselineExp,
 	ModelLineLorentzian,
 	AbstractModelMaker,
