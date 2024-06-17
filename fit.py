@@ -306,17 +306,15 @@ def fit_mode(
 	ubound = model.pack_params(ubound_poly, ubound_lor)
 	
 	def _residuals(params):
-		res = 0
-		total = 0
+		total = model(omt_near_target, *params)
 		
-		params_poly, params_lines = model.unpack_params(params)
+		params_poly, _ = model.unpack_params(params)
 		poly = model.poly(omt_near_target, *params_poly)
-		lines = [model.line(omt_near_target, *(params_lines[i])) for i in range(model.n_lines)]
 		
-		#First, add terms to the residual (res) that ensure positivity of each component. Along the way, we also add up the components (in total) so that we can get the total model prediction without calculating each component twice.
-		for comp in itertools.chain([poly], lines):
-			total += comp
-			res += np.where(comp < 0, abs(comp), 0)
+		res = 0
+		
+		#First, add a term to the residual (res) that ensures positivity of the polynomial component. We assume that the parameters of the mode profile are already constrained in such a manner that the mode profile itself is non-negative.
+		res += np.where(poly < 0, abs(poly/sigma), 0)
 		
 		#The usual residual
 		res += abs((total - data_near_target)/sigma)
