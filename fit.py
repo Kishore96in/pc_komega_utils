@@ -41,12 +41,9 @@ class AbstractModelMaker(abc.ABC):
 		assert np.shape(params_lorentz) == (self.n_lines, self.n_lineparams)
 		return tuple([*params_poly, *np.reshape(params_lorentz, self.n_lineparams*self.n_lines)])
 	
-	def poly(self, om, *params_poly):
-		assert len(params_poly) == self.poly_order + 1
-		ret = 0
-		for i,a in enumerate(params_poly):
-			ret += a*om**i
-		return ret
+	@abc.abstractmethod
+	def baseline(self, om, *params_poly):
+		raise NotImplementedError
 	
 	def __call__(self, om, *args):
 		assert self.pack_params(*self.unpack_params(args)) == args, f"{args = }\n{self.pack_params(*self.unpack_params(args)) = }"
@@ -69,6 +66,12 @@ class AbstractModelMaker(abc.ABC):
 		For backwards compatibility
 		"""
 		return self.line(*args, **kwargs)
+	
+	def poly(self, *args, **kwargs):
+		"""
+		For backwards compatibility
+		"""
+		return self.baseline(*args, **kwargs)
 	
 	@property
 	@abc.abstractmethod
@@ -130,13 +133,24 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		raise NotImplementedError
 	
+	@property
+	@abc.abstractmethod
+	def _baseline_amplitude_like_params(self):
+		"""
+		Returns a list of indices of the baseline parameters that should be scaled when the data is scaled. This is used by scale_params
+		"""
+		raise NotImplementedError
+	
+	
 	def scale_params(self, params, factor):
 		"""
 		Given a vector of params, apply a scaling factor to the polynomial and to the amplitudes of the lines, and return the vector of scaled params. This is useful if you want to pass a scaled version of the data to a fitting routine, but want to finally obtain parameters corresponding to the unscaled data.
 		"""
 		params_poly, params_lines = self.unpack_params(params)
 		
-		params_poly = params_poly * factor
+		for i in range(len(params_poly)):
+			if i in self._baseline_amplitude_like_params:
+				params_poly[i] = params_poly[i]*factor
 		
 		for i in range(np.shape(params_lines)[1]):
 			if i in self._amplitude_like_params:
@@ -144,7 +158,19 @@ class AbstractModelMaker(abc.ABC):
 		
 		return self.pack_params(params_poly, params_lines)
 
-class ModelMakerLorentzian(AbstractModelMaker):
+class BaselinePoly():
+	@property
+	def _baseline_amplitude_like_params(self):
+		return list(range(self.poly_order + 1))
+	
+	def baseline(self, om, *params_poly):
+		assert len(params_poly) == self.poly_order + 1
+		ret = 0
+		for i,a in enumerate(params_poly):
+			ret += a*om**i
+		return ret
+
+class ModelMakerLorentzian(BaselinePoly, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Lorentzians.
 	"""
@@ -161,7 +187,7 @@ class ModelMakerLorentzian(AbstractModelMaker):
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
-class ModelMakerVoigt(AbstractModelMaker):
+class ModelMakerVoigt(BaselinePoly, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
 	"""
