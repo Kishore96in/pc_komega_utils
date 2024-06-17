@@ -1,3 +1,14 @@
+"""
+Objects intended for public use:
+	step
+	calc_K_prof
+	fig_saver
+	get_av
+	smooth_tophat
+	stdev_central
+	smooth_gauss
+"""
+
 import scipy.special
 import os
 import numpy as np

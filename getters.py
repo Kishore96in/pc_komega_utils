@@ -1,3 +1,11 @@
+"""
+Objects intended for public use:
+	AbstractGetter
+	get_sigma_stdev
+	getter_kyeq0
+	getter_kxeq0
+"""
+
 import numpy as np
 import abc
 import warnings

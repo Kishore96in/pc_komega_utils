@@ -1,5 +1,8 @@
 """
 Helpers to handle arrays and lists larger than RAM.
+
+Objects intended for public use:
+	mmap_array
 """
 
 import numpy as np

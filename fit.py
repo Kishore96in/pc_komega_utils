@@ -1,10 +1,11 @@
 """
 Fit mode amplitudes and profiles given simulation data.
 
-Functions:
+Objects intended for public use:
 	fit_mode
 	fit_mode_auto
 	get_mode_eigenfunction
+	get_mode_eigenfunction_from_simset
 """
 
 import warnings

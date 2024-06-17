@@ -2,6 +2,13 @@
 Wrappers for dr_base instances, that perform various postprocessing tricks (e.g. jackknifing or smoothing) without rereading the underlying simulation data.
 
 Also contains a convenience class, drs_holder, to handle multiple realizations of the same simulation.
+
+Objects intended for public use:
+	dr_stat
+	dr_sm
+	dr_stat_smsig
+	drs_holder
+	
 """
 
 import numpy as np

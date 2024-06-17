@@ -1,5 +1,9 @@
 """
 Replacement for pc.read.powers.Power that stores the data in a HDF5 file, rather than in memory.
+
+Objects intended for public use:
+	InvalidCacheWarning
+	read_power
 """
 
 import pencil as pc

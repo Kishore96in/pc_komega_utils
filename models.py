@@ -1,5 +1,14 @@
 """
 Models used to fit mode profiles
+
+Objects intended for public use:
+	AbstractModelMaker
+	ModelBaselinePoly
+	ModelBaselineExp
+	ModelLineLorentzian
+	ModelLineVoigt
+	ModelMakerLorentzian
+	ModelMakerVoigt
 """
 
 import numpy as np

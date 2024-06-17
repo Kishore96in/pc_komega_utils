@@ -1,5 +1,8 @@
 """
 Theoretical dispersion relations which I may want to mark on k-omega diagrams.
+
+Objects intended for public use:
+	fmode
 """
 
 import numpy as np
