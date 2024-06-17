@@ -144,6 +144,14 @@ class AbstractModelMaker(abc.ABC):
 	
 	@property
 	@abc.abstractmethod
+	def _baseline_positive_params(self):
+		"""
+		Returns a list of indices of the baseline parameters that should be constrained to be positive. This is used by fit_mode to set bounds on the parameters.
+		"""
+		raise NotImplementedError
+	
+	@property
+	@abc.abstractmethod
 	def _baseline_ensure_positive(self):
 		"""
 		If the function used for the baseline is such that one cannot easily ensure its positivity by constraining the parameters, one can instead set this property to True.
@@ -174,6 +182,10 @@ class BaselinePoly():
 	@property
 	def _baseline_amplitude_like_params(self):
 		return list(range(self.poly_order + 1))
+	
+	@property
+	def _baseline_positive_params(self):
+		return []
 	
 	def baseline(self, om, *params_poly):
 		assert len(params_poly) == self.poly_order + 1
@@ -303,6 +315,8 @@ def fit_mode(
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
+	for i in model._baseline_positive_params:
+		lbound_poly[i] = 0
 	lbound_lor = np.full((model.n_lines,model.n_lineparams), -np.inf)
 	for i in model._positive_params:
 		lbound_lor[:,i] = 0
