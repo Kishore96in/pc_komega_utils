@@ -214,7 +214,7 @@ class ModelLineLorentzian():
 	def get_line_hwhm(self, A, om_0, gam):
 		return gam
 
-class ModeLineVoigt():
+class ModelLineVoigt():
 	n_lineparams = 4
 	_ind_line_freq = 1
 	_width_like_params = [2,3]
@@ -239,7 +239,7 @@ class ModelMakerLorentzian(ModelBaselinePoly, ModelLineLorentzian, AbstractModel
 	"""
 	pass
 
-class ModelMakerVoigt(ModelBaselinePoly, ModeLineVoigt, AbstractModelMaker):
+class ModelMakerVoigt(ModelBaselinePoly, ModelLineVoigt, AbstractModelMaker):
 	"""
 	An instance of this class behaves like a function which is the sum of a polynomial of order poly_order and n_lorentz Voigt functions.
 	"""
