@@ -404,9 +404,9 @@ def get_mode_eigenfunction(
 				omega_0 = omega_0,
 				omega_tol = omega_tol,
 				omt_near_target = omt_near_target,
+				data_near_target = data_near_target,
 				mode_mass_method = mode_mass_method,
 				debug = debug,
-				data_near_target = data_near_target,
 				)
 			err = np.sqrt(np.sum((mder*fit.perr)**2))
 			P_err_list.append(err)
@@ -457,10 +457,10 @@ def _get_mode_mass(
 	omega_0,
 	omega_tol,
 	omt_near_target,
+	data_near_target,
 	mode_mass_method,
 	debug,
 	extra_info = False,
-	data_near_target,
 	):
 	if mode_mass_method not in [
 		"sum",
