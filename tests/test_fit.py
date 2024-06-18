@@ -265,7 +265,7 @@ def test_get_mode_eigenfunction_1_err():
 	dset = get_dataset_1()
 	
 	dummy_getter = lambda *args: dset
-	[mass], [err] = get_mode_eigenfunction(
+	res = get_mode_eigenfunction(
 		omega_0=0.5,
 		om_tilde_min=0.3,
 		om_tilde_max=0.7,
@@ -278,9 +278,13 @@ def test_get_mode_eigenfunction_1_err():
 		mode_mass_method="sum",
 		getter = dummy_getter,
 		gamma_max=0.1,
-		estimate_error = True,
+		full_output = True,
 		)
 	
 	#Values below are directly copied from the output; have not independently checked them.
-	assert np.isclose(mass, 2.4e-3, rtol=1e-2)
-	assert np.isclose(err, 4.9e-5, rtol=1e-2)
+	mass_list = res.mass
+	err_list = res.error
+	assert len(mass_list) == 1
+	assert len(err_list) == 1
+	assert np.isclose(mass_list[0], 2.4e-3, rtol=1e-2)
+	assert np.isclose(err_list[0], 4.9e-5, rtol=1e-2)
