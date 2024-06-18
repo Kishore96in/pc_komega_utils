@@ -287,13 +287,15 @@ class Eigenprofile():
 	
 	Properties:
 		mass: np.ndarray. Mode mass as a function of z
-		error: np.ndarray: Error in the mode mass at each z
+		error: np.ndarray. Error in the mode mass at each z
 		fit: list of AbstractModelMaker instances. The optimal fit at each z
+		omega_c: np.ndarray. Central frequency of the most massive mode that was considered for computation of the mode mass
 	"""
-	def __init__(self, mass, error, fit):
+	def __init__(self, mass, error, fit, omega_c):
 		self.mass = mass
 		self.error = error
 		self.fit = fit
+		self.omega_c = omega_c
 
 def get_mode_eigenfunction(
 	dr,
@@ -346,6 +348,7 @@ def get_mode_eigenfunction(
 	P_list = []
 	P_err_list = []
 	fit_list = []
+	omega_c_list = []
 	for z in z_list:
 		if debug > 0:
 			print(f"get_mode_eigenfunction: {z = }")
@@ -381,7 +384,7 @@ def get_mode_eigenfunction(
 				**kwargs,
 				)
 		
-		P_list.append(_get_mode_mass(
+		mode_mass, mode_info = _get_mode_mass(
 			model = fit,
 			popt = fit.popt,
 			omega_0 = omega_0,
@@ -389,7 +392,9 @@ def get_mode_eigenfunction(
 			omt_near_target = omt_near_target,
 			mode_mass_method = mode_mass_method,
 			debug = debug,
-			))
+			extra_info = True,
+			)
+		P_list.append(mode_mass)
 		
 		if full_output:
 			mder = _get_mode_mass_derivative(
@@ -405,12 +410,14 @@ def get_mode_eigenfunction(
 			P_err_list.append(err)
 			
 			fit_list.append(fit)
+			omega_c_list.append(mode_info['omega_c'])
 	
 	if full_output:
 		return Eigenprofile(
 			mass = np.array(P_list),
 			error = np.array(P_err_list),
 			fit = fit_list,
+			omega_c = np.array(omega_c_list),
 			)
 	else:
 		return np.array(P_list)
@@ -450,6 +457,7 @@ def _get_mode_mass(
 	omt_near_target,
 	mode_mass_method,
 	debug,
+	extra_info = False,
 	):
 	if mode_mass_method not in [
 		"sum",
@@ -510,7 +518,15 @@ def _get_mode_mass(
 		residuals = data_near_target - model(omt_near_target, *popt)
 		mode_mass += np.sum(residuals)
 	
-	return mode_mass
+	if extra_info:
+		return (
+			mode_mass,
+			{
+				'omega_c': omega_c,
+				}
+			)
+	else:
+		return mode_mass
 
 def _get_mode_mass_derivative(popt, **kwargs):
 	"""
