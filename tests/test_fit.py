@@ -281,4 +281,6 @@ def test_get_mode_eigenfunction_1_err():
 		estimate_error = True,
 		)
 	
+	#Values below are directly copied from the output; have not independently checked them.
 	assert np.isclose(mass, 2.4e-3, rtol=1e-2)
+	assert np.isclose(err, 4.9e-5, rtol=1e-2)
