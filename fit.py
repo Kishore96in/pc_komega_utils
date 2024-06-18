@@ -289,7 +289,7 @@ class Eigenprofile():
 		mass: np.ndarray. Mode mass as a function of z
 		error: np.ndarray. Error in the mode mass at each z
 		fit: list of AbstractModelMaker instances. The optimal fit at each z
-		omega_c: np.ndarray. Central frequency of the most massive mode that was considered for computation of the mode mass
+		omega_c: np.ndarray. Central frequency of the most massive mode that was considered for computation of the mode mass, at each z
 	"""
 	def __init__(self, mass, error, fit, omega_c):
 		self.mass = mass
