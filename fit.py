@@ -284,6 +284,10 @@ def fit_mode_auto(
 class Eigenprofile():
 	"""
 	Holds the result of get_mode_eigenfunction
+	
+	Properties:
+		mass: np.ndarray. Mode mass as a function of z
+		error: np.ndarray: Error in the mode mass at each z
 	"""
 	def __init__(self, mass, error):
 		self.mass = mass
