@@ -170,7 +170,8 @@ def fit_mode(
 		else:
 			pcov.fill(inf)
 		
-		model.perr = np.sqrt(np.diag(pcov))
+		#Errors need to be scaled in the same way as the data
+		model.perr =  model.scale_params(np.sqrt(np.diag(pcov)), scale)
 		
 		assert len(model.popt) == len(model.perr)
 	except Exception as e:
