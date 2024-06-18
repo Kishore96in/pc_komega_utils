@@ -281,6 +281,14 @@ def fit_mode_auto(
 	warnings.warn(f"Improvement in fit has not converged even with {n_lorentz = } ({om_tilde_min = }) ({om_tilde_max = }) ({om_guess = }) {identifier}")
 	return fit
 
+class Eigenprofile():
+	"""
+	Holds the result of get_mode_eigenfunction
+	"""
+	def __init__(self, mass, error):
+		self.mass = mass
+		self.error = error
+
 def get_mode_eigenfunction(
 	dr,
 	omega_0,
@@ -295,7 +303,7 @@ def get_mode_eigenfunction(
 	debug = 0,
 	getter = _default_getter,
 	identifier = "",
-	estimate_error = False,
+	full_output = False,
 	**kwargs,
 	):
 	"""
@@ -319,7 +327,7 @@ def get_mode_eigenfunction(
 				"sum_multi": like "sum", but consider all Lorentzians that are within omega_tol of omega_0
 		getter: function. Instance of getters.AbstractGetter
 		identifier: str. Use to get more informative error messages in wrapped functions.
-		estimate_error: bool. Whether to estimate the error in the mode mass by propagating the errors in the fit parameters.
+		full_output: bool. If True, return an object containing both the mode masses and the errors. If False, return an array of the mode masses.
 	
 	Other kwargs are passed to either fit_mode or fit_mode_auto depending on the value of force_n_lorentz.
 	"""
@@ -376,7 +384,7 @@ def get_mode_eigenfunction(
 			debug = debug,
 			))
 		
-		if estimate_error:
+		if full_output:
 			mder = _get_mode_mass_derivative(
 				model = fit,
 				popt = fit.popt,
@@ -389,8 +397,11 @@ def get_mode_eigenfunction(
 			err = np.sqrt(np.sum((mder*fit.perr)**2))
 			P_err_list.append(err)
 	
-	if estimate_error:
-		return np.array(P_list), np.array(P_err_list)
+	if full_output:
+		return Eigenprofile(
+			mass = np.array(P_list),
+			error = np.array(P_err_list),
+			)
 	else:
 		return np.array(P_list)
 
