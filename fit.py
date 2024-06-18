@@ -502,14 +502,17 @@ def _get_mode_mass(
 					))
 		else:
 			mode_mass = 0
+			omega_c = np.nan
 	elif np.any(data_near_target != 0):
 		"""
 		u_z is nonzero, but no Lorentzian was fitted.
 		Setting these to zero leads to jarring discontinuities in the plot of the mode eigenfunction. It feels dishonest to add an extra lorentzian there by hand and then get a fit, so I shall just set them to nan to indicate that the amplitude of the mode was too close to the noise threshold to say anything.
 		"""
 		mode_mass = np.nan
+		omega_c = np.nan
 	else:
 		mode_mass = 0
+		omega_c = np.nan
 	
 	if mode_mass_method == "sum_full":
 		"""
