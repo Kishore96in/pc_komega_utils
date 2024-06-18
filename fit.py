@@ -406,7 +406,7 @@ def get_mode_eigenfunction(
 				omt_near_target = omt_near_target,
 				data_near_target = data_near_target,
 				mode_mass_method = mode_mass_method,
-				debug = debug,
+				debug = 0,
 				)
 			err = np.sqrt(np.sum((mder*fit.perr)**2))
 			P_err_list.append(err)
