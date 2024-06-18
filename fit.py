@@ -288,10 +288,12 @@ class Eigenprofile():
 	Properties:
 		mass: np.ndarray. Mode mass as a function of z
 		error: np.ndarray: Error in the mode mass at each z
+		fit: list of AbstractModelMaker instances. The optimal fit at each z
 	"""
-	def __init__(self, mass, error):
+	def __init__(self, mass, error, fit):
 		self.mass = mass
 		self.error = error
+		self.fit = fit
 
 def get_mode_eigenfunction(
 	dr,
@@ -343,6 +345,7 @@ def get_mode_eigenfunction(
 	
 	P_list = []
 	P_err_list = []
+	fit_list = []
 	for z in z_list:
 		if debug > 0:
 			print(f"get_mode_eigenfunction: {z = }")
@@ -400,11 +403,14 @@ def get_mode_eigenfunction(
 				)
 			err = np.sqrt(np.sum((mder*fit.perr)**2))
 			P_err_list.append(err)
+			
+			fit_list.append(fit)
 	
 	if full_output:
 		return Eigenprofile(
 			mass = np.array(P_list),
 			error = np.array(P_err_list),
+			fit = fit_list,
 			)
 	else:
 		return np.array(P_list)
