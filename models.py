@@ -195,15 +195,6 @@ class ModelBaselinePoly():
 		for i,a in enumerate(params_poly):
 			ret += a*om**i
 		return ret
-	
-	def _baseline_guesser(self, omt, data):
-		return np.polynomial.polynomial.Polynomial.fit(
-			omt,
-			data,
-			self.poly_order,
-			domain = [omt[0], omt[-1]],
-			window = [omt[0], omt[-1]],
-			).coef
 
 class ModelBaselineExp():
 	_baseline_ensure_positive = False
