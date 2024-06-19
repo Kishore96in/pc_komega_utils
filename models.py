@@ -203,7 +203,7 @@ class ModelBaselineExp():
 	
 	def baseline(self, om, *params_poly):
 		if len(params_poly) != 2:
-			raise ValueError
+			raise ValueError("ModelBaselineExp requires poly_order = 1")
 		
 		assert len(params_poly) == self.poly_order + 1
 		
