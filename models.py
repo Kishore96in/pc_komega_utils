@@ -171,6 +171,12 @@ class AbstractModelMaker(abc.ABC):
 				params_lines[:,i] = params_lines[:,i]*factor
 		
 		return self.pack_params(params_poly, params_lines)
+	
+	def _baseline_guesser(self, omt, data):
+		"""
+		Given the data, return a guess for the parameters of the baseline.
+		"""
+		return np.zeros(self.poly_order + 1)
 
 class ModelBaselinePoly():
 	_baseline_ensure_positive = True

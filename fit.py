@@ -75,7 +75,7 @@ def fit_mode(
 		sigma = sigma/scale
 	
 	#initial guesses for the parameters.
-	guess_poly = np.zeros(model.poly_order + 1)
+	guess_poly = model._baseline_guesser(omt_near_target, data_near_target)
 	guess_lor = np.zeros((model.n_lines,model.n_lineparams))
 	
 	i_om = model._ind_line_freq
