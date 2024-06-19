@@ -379,7 +379,7 @@ def get_mode_eigenfunction(
 				poly_order=poly_order,
 				om_guess=[omega_0],
 				n_lorentz=force_n_lorentz,
-				debug=debug-1,
+				debug=debug-2,
 				identifier = ide,
 				**kwargs,
 				)
