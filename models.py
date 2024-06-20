@@ -79,7 +79,7 @@ class AbstractModelMaker(abc.ABC):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
-	def line(self, om, *args):
+	def line(self, om, *args, **kwargs):
 		"""
 		Model for the profile of an individual mode. The first argument is a 1D array of angular frequencies, and the ones that follow are the parameters of the mode profile.
 		"""
@@ -223,7 +223,7 @@ class ModelLineLorentzian():
 	_positive_params = [0,2]
 	_amplitude_like_params = [0]
 	
-	def line(self, om, A, om_0, gam):
+	def line(self, om, A, om_0, gam, **kwargs):
 		return (A*gam/np.pi)/((om - om_0)**2 + gam**2)
 	
 	def get_line_hwhm(self, A, om_0, gam):
@@ -236,7 +236,7 @@ class ModelLineVoigt():
 	_positive_params = [0,2,3]
 	_amplitude_like_params = [0]
 	
-	def line(self, om, A, om_0, gam, sigma):
+	def line(self, om, A, om_0, gam, sigma, **kwargs):
 		return A*scipy.special.voigt_profile(om-om_0, sigma, gam)
 	
 	def get_line_hwhm(self, A, om_0, gam, sigma):
