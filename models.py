@@ -48,7 +48,7 @@ class AbstractModelMaker(abc.ABC):
 		params_poly, params_lorentz = self.unpack_params(args)
 		ret = self.poly(om, *params_poly)
 		for i in range(self.n_lines):
-			ret += self.line(om, *params_lorentz[i])
+			ret += self.line(om, *params_lorentz[i], params_poly = params_poly)
 		return ret
 	
 	@property

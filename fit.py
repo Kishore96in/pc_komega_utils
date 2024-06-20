@@ -470,7 +470,7 @@ def _get_mode_mass(
 		]:
 		raise ValueError(f"Unsupported mode_mass_method: {mode_mass_method}")
 	
-	_, params_lorentz = model.unpack_params(popt)
+	params_poly, params_lorentz = model.unpack_params(popt)
 	i_om = model._ind_line_freq
 	
 	if len(params_lorentz) > 0:
@@ -480,7 +480,7 @@ def _get_mode_mass(
 		selected = params_lorentz[np.abs(params_lorentz[:,i_om] - omega_0) < omega_tol]
 		
 		if len(selected) > 0:
-			modes = [model.line(omt_near_target, *params) for params in selected]
+			modes = [model.line(omt_near_target, *params, params_poly = params_poly) for params in selected]
 			if mode_mass_method == "integral":
 				mode_masses = np.array([np.trapz(mode, omt_near_target) for mode in modes])
 			elif mode_mass_method in ["sum", "sum_full", "sum_multi"]:
