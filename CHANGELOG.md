@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0 (upcoming)
+
+### Changed
+- pcko.getters.AbstractModelMaker.line is now expected to accept arbitrary kwargs.
+- Internal calls of AbstractModelMaker.line now pass params_poly as a kwarg (to allow line profiles that depend on some parameter(s) of the continuum)
+
 ## 1.1
 
 ### Changed
