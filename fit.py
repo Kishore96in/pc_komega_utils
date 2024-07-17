@@ -86,8 +86,20 @@ def fit_mode(
 		model.n_lines,
 		)
 	if om_guess is not None:
+		"""
+		If om_guess is given, for each om_guess, find the closest guessed frequency populated above and shift it to om_guess.
+		"""
+		inds_to_change = []
+		marker_val = 1e3*max(om_guess)
+		
 		for i in range(min(model.n_lines, len(om_guess))):
-			guess_lor[i,i_om] = om_guess[i]
+			i_min = np.argmin(np.abs(guess_lor[:,i_om] - om_guess[i]))
+			
+			inds_to_change.append(i_min)
+			guess_lor[i_min,i_om] = marker_val
+		
+		for i, ind in enumerate(inds_to_change):
+			guess_lor[ind,i_om] = om_guess[i]
 	
 	for i in model._width_like_params:
 		d_omt = omt_near_target[1] - omt_near_target[0]
