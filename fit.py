@@ -324,6 +324,7 @@ def get_mode_eigenfunction(
 	getter = _default_getter,
 	identifier = "",
 	full_output = False,
+	omega_0_other = None,
 	**kwargs,
 	):
 	"""
@@ -348,6 +349,7 @@ def get_mode_eigenfunction(
 		getter: function. Instance of getters.AbstractGetter
 		identifier: str. Use to get more informative error messages in wrapped functions.
 		full_output: bool. If True, return an object containing both the mode masses and the errors. If False, return an array of the mode masses.
+		omega_0_other: list of float. If multiple lines are being fit, this specifies the guessed frequencies to use for the lines (in addition to omega_0)
 	
 	Other kwargs are passed to either fit_mode or fit_mode_auto depending on the value of force_n_lorentz.
 	"""
@@ -356,6 +358,8 @@ def get_mode_eigenfunction(
 	
 	if omega_tol is None:
 		omega_tol = np.inf
+	if omega_0_other is None:
+		omega_0_other = []
 	
 	P_list = []
 	P_err_list = []
@@ -378,7 +382,7 @@ def get_mode_eigenfunction(
 				omt_near_target=omt_near_target,
 				sigma=sigma,
 				poly_order=poly_order,
-				om_guess=[omega_0],
+				om_guess=[omega_0, *omega_0_other],
 				debug=debug-1,
 				identifier = ide,
 				**kwargs,
@@ -389,7 +393,7 @@ def get_mode_eigenfunction(
 				omt_near_target=omt_near_target,
 				sigma=sigma,
 				poly_order=poly_order,
-				om_guess=[omega_0],
+				om_guess=[omega_0, *omega_0_other],
 				n_lorentz=force_n_lorentz,
 				debug=debug-2,
 				identifier = ide,
