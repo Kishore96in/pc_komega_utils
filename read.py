@@ -5,6 +5,14 @@ Class naming scheme
 	dr_*: read simulation data and plot k-omega diagrams
 	m_scl_*: mixin classes defining omega_0 and L_0
 	m_dscl_*: mixin classes defining how the data should be normalized
+
+Objects intended for public use:
+	dr_yaver_base
+	dr_dvar_base
+	dr_pxy_base
+	dr_pxy_cached_base
+	dr_pxy_cached_filterz_base
+	m_*
 """
 
 import os
