@@ -558,6 +558,9 @@ def _get_mode_mass(
 		residuals = data_near_target - model(omt_near_target, *popt)
 		mode_mass += np.sum(residuals)
 	
+	if (not np.isnan(mode_mass)) and mode_mass < 0:
+		raise RuntimeError(f"Negative mode mass for {popt = }, {omega_0 = }")
+	
 	if extra_info:
 		return (
 			mode_mass,
