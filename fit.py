@@ -627,7 +627,7 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 				return par
 	
 	mode_masses = []
-	for i in range(100):
+	for i in range(10000):
 		mode_masses.append(
 			_get_mode_mass(popt=get_realization(), **kwargs)
 			)
