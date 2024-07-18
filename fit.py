@@ -624,6 +624,6 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 	err_minus = mass - llim
 	
 	if not (np.all(err_plus > 0) and np.all(err_minus > 0)):
-		raise RuntimeError(f"Non-positive errors:\n\t{err_minus = }\n\t{err_plus = }\n\t{llim = }\n\t{ulim}\n\t{mass = }")
+		raise RuntimeError(f"Non-positive errors:\n\t{err_minus = }\n\t{err_plus = }\n\t{llim = }\n\t{ulim = }\n\t{mass = }")
 	
 	return err_minus, err_plus
