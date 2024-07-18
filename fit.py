@@ -320,6 +320,7 @@ def get_mode_eigenfunction(
 	force_n_lorentz = None,
 	omega_tol = None,
 	mode_mass_method="sum",
+	error_method="derivative",
 	debug = 0,
 	getter = _default_getter,
 	identifier = "",
@@ -414,17 +415,34 @@ def get_mode_eigenfunction(
 		P_list.append(mode_mass)
 		
 		if full_output:
-			mder = _get_mode_mass_derivative(
-				model = fit,
-				popt = fit.popt,
-				omega_0 = omega_0,
-				omega_tol = omega_tol,
-				omt_near_target = omt_near_target,
-				data_near_target = data_near_target,
-				mode_mass_method = mode_mass_method,
-				debug = 0,
-				)
-			err = np.sqrt(np.sum((mder*fit.perr)**2))
+			if error_method == "derivative":
+				"""
+				Estimate the error in the mode mass from the error in the fit parameters by using the numerical derivative of the former.
+				"""
+				mder = _get_mode_mass_derivative(
+					model = fit,
+					popt = fit.popt,
+					omega_0 = omega_0,
+					omega_tol = omega_tol,
+					omt_near_target = omt_near_target,
+					data_near_target = data_near_target,
+					mode_mass_method = mode_mass_method,
+					)
+				err = np.sqrt(np.sum((mder*fit.perr)**2))
+			elif error_method == "monte-carlo":
+				err = _get_mode_mass_err_mc(
+					model = fit,
+					popt = fit.popt,
+					perr = fit.perr,
+					omega_0 = omega_0,
+					omega_tol = omega_tol,
+					omt_near_target = omt_near_target,
+					mode_mass_method = mode_mass_method,
+					data_near_target = data_near_target,
+					)
+			else:
+				raise ValueError(f"Given error_method ({error_method}) is invalid")
+			
 			P_err_list.append(err)
 			
 			fit_list.append(fit)
@@ -570,3 +588,34 @@ def _get_mode_mass_derivative(popt, **kwargs):
 		der[i] = dm/(2*dp)
 	
 	return der
+
+def _get_mode_mass_error_der(popt, perr, **kwargs):
+	"""
+	Estimate the error in the mode mass from the error in the fit parameters by using the numerical derivative of the former.
+	"""
+	mder = _get_mode_mass_derivative(
+				popt = popt,
+				**kwargs,
+				)
+	return np.sqrt(np.sum((mder*perr)**2))
+
+def _get_mode_mass_err_mc(popt, perr, **kwargs):
+	"""
+	Use a Monte-Carlo method to estimate the error in the mode mass, given the error in the fit parameters.
+	
+	Returns an array [lower_limit, upper_limit]
+	"""
+	gen = np.random.default_rng()
+	
+	mode_masses = []
+	for i in range(100):
+		par = gen.normal(loc=popt, scale=perr)
+		mode_masses.append(_get_mode_mass(popt=par, **kwargs))
+	
+	mode_masses=np.array(mode_masses)
+	
+	#The percentiles below correspond to 1-sigma deviation for a Gaussian distribution
+	ulim = np.percentile(mode_masses, 84.1)
+	llim = np.percentile(mode_masses, 15.9)
+	
+	return np.array([llim, ulim])
