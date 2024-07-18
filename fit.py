@@ -608,12 +608,23 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 	
 	Returns an array [lower_limit, upper_limit]
 	"""
+	model = kwargs['model']
 	gen = np.random.default_rng()
+	
+	def get_realization():
+		"""
+		Draw a realization which satisfies the positivity constraints.
+		"""
+		while True:
+			par = gen.normal(loc=popt, scale=perr)
+			if np.all(par[model._positive_params]) > 0:
+				return par
 	
 	mode_masses = []
 	for i in range(100):
-		par = gen.normal(loc=popt, scale=perr)
-		mode_masses.append(_get_mode_mass(popt=par, **kwargs))
+		mode_masses.append(
+			_get_mode_mass(popt=get_realization(), **kwargs)
+			)
 	
 	mode_masses = np.array(mode_masses)
 	
