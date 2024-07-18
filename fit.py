@@ -451,7 +451,7 @@ def get_mode_eigenfunction(
 	if full_output:
 		return Eigenprofile(
 			mass = np.array(P_list),
-			error = np.array(P_err_list),
+			error = np.array(P_err_list).transpose(),
 			fit = fit_list,
 			omega_c = np.array(omega_c_list),
 			)
