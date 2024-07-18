@@ -612,13 +612,12 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 		par = gen.normal(loc=popt, scale=perr)
 		mode_masses.append(_get_mode_mass(popt=par, **kwargs))
 	
-	mode_masses=np.array(mode_masses)
+	mode_masses = np.array(mode_masses)
 	
 	#The percentiles below correspond to 1-sigma deviation for a Gaussian distribution
-	ulim = np.percentile(mode_masses, 84.1)
-	llim = np.percentile(mode_masses, 15.9)
+	ulim, llim = np.percentile(mode_masses, [84.1, 15.9])
 	
-	mass = _get_mode_mass(popt = popt, **kwargs)
+	mass = _get_mode_mass(popt=popt, **kwargs)
 	
 	err_plus = ulim - mass
 	err_minus = mass - llim
