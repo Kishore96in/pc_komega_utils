@@ -475,7 +475,7 @@ def _get_mode_mass(
 	omt_near_target,
 	data_near_target,
 	mode_mass_method,
-	debug,
+	debug = 0,
 	extra_info = False,
 	):
 	if mode_mass_method not in [
