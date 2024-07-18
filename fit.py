@@ -617,7 +617,13 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 		"""
 		while True:
 			par = gen.normal(loc=popt, scale=perr)
-			if np.all(par[model._positive_params]) > 0:
+			
+			par_poly, par_lor = model.unpack_params(par)
+			
+			if (
+				np.all(par_lor[:,model._positive_params] > 0) and
+				np.all(par_poly[model._baseline_positive_params] > 0)
+				):
 				return par
 	
 	mode_masses = []
