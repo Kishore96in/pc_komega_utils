@@ -636,13 +636,24 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 	
 	#The percentiles below correspond to 1-sigma deviation for a Gaussian distribution
 	ulim, llim = np.percentile(mode_masses, [84.1, 15.9])
+	max_mass = max(mode_masses)
+	min_mass = min(mode_masses)
 	
 	mass = _get_mode_mass(popt=popt, **kwargs)
 	
-	err_plus = ulim - mass
-	err_minus = mass - llim
+	#When popt is at a feasibility bound, it is possible for the one-sided errors towards the bound to become zero.
+	if ulim >= mass:
+		err_plus = ulim - mass
+	elif max_mass >= mass:
+		err_plus = 0
+	else:
+		raise RuntimeError(f"Optimal mode mass is outside the estimated confidence interval:\n\t{mass = }\n\t{max_mass = }\n\t{ulim = }")
 	
-	if not (np.all(err_plus >= 0) and np.all(err_minus >= 0)):
-		raise RuntimeError(f"Negative errors:\n\t{err_minus = }\n\t{err_plus = }\n\t{llim = }\n\t{ulim = }\n\t{mass = }")
+	if llim <= mass:
+		err_minus = mass - llim
+	elif min_mass <= mass:
+		err_minus = 0
+	else:
+		raise RuntimeError(f"Optimal mode mass is outside the estimated confidence interval:\n\t{mass = }\n\t{min_mass = }\n\t{llim = }")
 	
 	return err_minus, err_plus
