@@ -618,8 +618,10 @@ def _get_mode_mass_err_mc(popt, perr, **kwargs):
 	ulim = np.percentile(mode_masses, 84.1)
 	llim = np.percentile(mode_masses, 15.9)
 	
-	err_plus = ulim - popt
-	err_minus = popt - llim
+	mass = _get_mode_mass(popt = popt, **kwargs)
+	
+	err_plus = ulim - mass
+	err_minus = popt - mass
 	
 	if not (np.all(err_plus > 0) and np.all(err_minus > 0)):
 		raise RuntimeError(f"Non-positive errors:\n\t{err_minus = }\n\t{err_plus = }")
