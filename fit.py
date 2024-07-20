@@ -102,8 +102,7 @@ def fit_mode(
 			guess_lor[ind,i_om] = om_guess[i]
 	
 	for i in model._width_like_params:
-		d_omt = omt_near_target[1] - omt_near_target[0]
-		guess_lor[:,i] = np.sqrt(d_omt*gamma_max)
+		guess_lor[:,i] = 0.9*gamma_max
 	
 	guess = model.pack_params(guess_poly, guess_lor)
 	
