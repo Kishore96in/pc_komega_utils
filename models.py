@@ -216,6 +216,57 @@ class ModelBaselineExp():
 		a, b = params_poly
 		return a*np.exp(-b*abs(om))
 
+class ModelBaselinePowerLaw():
+	_baseline_ensure_positive = False
+	
+	@property
+	def _baseline_amplitude_like_params(self):
+		return [0]
+	
+	@property
+	def _baseline_positive_params(self):
+		return [0,1]
+	
+	def baseline(self, om, *params_poly):
+		if len(params_poly) != 2:
+			raise ValueError("ModelBaselinePowerLaw requires poly_order = 2")
+		
+		assert len(params_poly) == self.poly_order + 1
+		
+		a, b = params_poly
+		return a*abs(om)**(-b)
+	
+	def _baseline_guesser(self, omt, data):
+		"""
+		In the variable names below, prefix l stands for 'log'
+		"""
+		if not np.all(omt > 0):
+			raise ValueError
+		if np.any(data < 0):
+			raise ValueError
+		
+		if np.all(data == 0):
+			return np.array([0,0])
+		else:
+			lP1 = np.log(data[0])
+			lP2 = np.log(data[-1])
+			lo1 = np.log(omt[0])
+			lo2 = np.log(omt[-1])
+			
+			la = (lo2*lP1 - lo1*lP2)/(lo2-lo1)
+			b = (la - lP1)/lo1
+			
+			if b < 0:
+				#We impose positivity of b.
+				b = 0
+			return np.array([np.exp(la), b])
+	
+	def _get_power_law_slope(self, params_poly):
+		"""
+		For use with ModelLineLorentzianWithPowerLawForcing
+		"""
+		return params_poly[1]
+
 class ModelLineLorentzian():
 	n_lineparams = 3
 	_ind_line_freq = 1
