@@ -116,7 +116,7 @@ def smooth_gauss(data, n, axis=0):
 	data: numpy array
 	n: int, such that FWHM of the smoothing filter (Gaussian) is 2*n+1.
 	"""
-	data = np.moveaxis(data, -1, axis)
+	data = np.moveaxis(data, axis, -1)
 	
 	sig = (2*n+1)/2.355
 	wlen = int(np.round(6*sig))
