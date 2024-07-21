@@ -111,13 +111,20 @@ def stdev_central(arr, frac, adjust=False):
 	else:
 		return std
 
-def smooth_gauss(data, n):
+def smooth_gauss(data, n, axis=0):
 	"""
 	data: numpy array
 	n: int, such that FWHM of the smoothing filter (Gaussian) is 2*n+1.
 	"""
+	data = np.moveaxis(data, -1, axis)
+	
 	sig = (2*n+1)/2.355
 	wlen = int(np.round(6*sig))
 	weight = scipy.signal.windows.gaussian(wlen, std=sig)
 	weight = weight/np.sum(weight)
-	return scipy.signal.convolve(data, weight, mode='same')
+	
+	weight = np.reshape(weight, (*[1]*(data.ndim-1), wlen))
+	conv = scipy.signal.convolve(data, weight, mode='same')
+	
+	conv = np.moveaxis(conv, -1, axis)
+	return conv
