@@ -16,7 +16,7 @@ class InvalidCacheWarning(RuntimeWarning): pass
 
 class PowerCached():
 	"""
-	Read power_xy data from a HDF5 file
+	Class which acts as a wrapper around a HDF5 file.
 	"""
 	def __init__(
 		self,
