@@ -27,13 +27,6 @@ class PowerCached():
 		):
 		self._cache = h5py.File(filename, 'r')
 	
-	def _h5cache(self, name, value):
-		"""
-		name : str
-		value : numpy array
-		"""
-		dset = self._cache.create_dataset(name, data=value)
-	
 	def __getattr__(self, name):
 		if name != '_cache' and name in self._cache.keys():
 			data = self._cache[name]
@@ -94,6 +87,15 @@ class read_power(PowerCached):
 			self._cache.close()
 		
 		self._cache = h5py.File(fname, 'r')
+	
+	def _h5cache(self, name, value):
+		"""
+		Add a key-value pair (name:value) to the HDF5 cache
+		
+		name : str
+		value : numpy array
+		"""
+		dset = self._cache.create_dataset(name, data=value)
 
 class h5py_dataset_wrapper():
 	"""
