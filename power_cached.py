@@ -14,7 +14,46 @@ import warnings
 
 class InvalidCacheWarning(RuntimeWarning): pass
 
-class read_power():
+class PowerCached():
+	"""
+	Read power_xy data from a HDF5 file
+	"""
+	def __init__(
+		self,
+		filename,
+		):
+		self._cache = h5py.File(filename, 'r')
+	
+	def _h5cache(self, name, value):
+		"""
+		name : str
+		value : numpy array
+		"""
+		dset = self._cache.create_dataset(name, data=value)
+	
+	def __getattr__(self, name):
+		if name != '_cache' and name in self._cache.keys():
+			data = self._cache[name]
+			if data.ndim == 0:
+				return data[()]
+			else:
+				return h5py_dataset_wrapper(data)
+		else:
+			raise AttributeError
+	
+	def __del__(self):
+		self._cache.close()
+	
+	def keys(self):
+		return set(self._cache.keys())
+	
+	def __getstate__(self):
+		return self._cache.filename
+	
+	def __setstate__(self, cachename):
+		self._cache = h5py.File(cachename, 'r')
+
+class read_power(PowerCached):
 	"""
 	Stores the output of pc.read.power in a HDF5 file. When an attribute is requested, it is looked up in the HDF5 file. This avoids the need to always keep the Power() object in memory (a problem for large simulations).
 	"""
@@ -52,35 +91,6 @@ class read_power():
 			self._cache.close()
 		
 		self._cache = h5py.File(fname, 'r')
-	
-	def _h5cache(self, name, value):
-		"""
-		name : str
-		value : numpy array
-		"""
-		dset = self._cache.create_dataset(name, data=value)
-	
-	def __getattr__(self, name):
-		if name != '_cache' and name in self._cache.keys():
-			data = self._cache[name]
-			if data.ndim == 0:
-				return data[()]
-			else:
-				return h5py_dataset_wrapper(data)
-		else:
-			raise AttributeError
-	
-	def __del__(self):
-		self._cache.close()
-	
-	def keys(self):
-		return set(self._cache.keys())
-	
-	def __getstate__(self):
-		return self._cache.filename
-	
-	def __setstate__(self, cachename):
-		self._cache = h5py.File(cachename, 'r')
 
 class h5py_dataset_wrapper():
 	"""
