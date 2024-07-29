@@ -17,6 +17,9 @@ class InvalidCacheWarning(RuntimeWarning): pass
 class PowerCached():
 	"""
 	Class which acts as a wrapper around a HDF5 file.
+	
+	Arguments:
+		filename: string. Path to HFD5 file.
 	"""
 	def __init__(
 		self,
