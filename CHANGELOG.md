@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0 (upcoming)
+## 2.0
 
 ### Changed
 - pcko.getters.AbstractModelMaker.line is now expected to accept arbitrary kwargs.
