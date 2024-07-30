@@ -618,6 +618,9 @@ class dr_pxy_base(dr_3d_base):
 	def z(self):
 		return self.pxy.zpos
 	
+	def read_power(self):
+		return pc.read.power(datadir=self.datadir, quiet=True)
+	
 	def read(self):
 		#check if the right values were passed to power_spectrum_run_pars
 		if not self.param.lcomplex:
@@ -636,7 +639,7 @@ class dr_pxy_base(dr_3d_base):
 		sim = pc.sim.get(self.simdir, quiet=True)
 		
 		self.ts = pc.read.ts(sim=sim, quiet=True)
-		self.pxy = pc.read.power(datadir=self.datadir, quiet=True)
+		self.pxy = self.read_power()
 		self.av_xy = pc.read.aver(
 			datadir=self.datadir,
 			simdir=self.simdir,
@@ -670,34 +673,12 @@ class dr_pxy_cached_base(dr_pxy_base):
 		
 		super().__init__(*args, **kwargs)
 	
-	def read(self):
-		#check if the right values were passed to power_spectrum_run_pars
-		if not self.param.lcomplex:
-			raise ValueError("Need lcomplex=T")
-		if self.param.lintegrate_shell:
-			raise ValueError("Need lintegrate_shell=F")
-		if self.param.lintegrate_z:
-			raise ValueError("Need lintegrate_z=F")
-		
-		#The following two cause problems because the size-one axis is compressed by Power.read.
-		if self.dim.nxgrid == 1:
-			raise ValueError("Need nxgrid > 1")
-		if self.dim.nygrid == 1:
-			raise ValueError("Need nygrid > 1")
-		
-		sim = pc.sim.get(self.simdir, quiet=True)
-		
-		self.ts = pc.read.ts(sim=sim, quiet=True)
-		self.pxy = read_power(
+	def read_power(self):
+		return read_power(
 			datadir = self.datadir,
 			quiet = True,
 			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
 			ignore_cache = self._ignore_cache,
-			)
-		self.av_xy = pc.read.aver(
-			datadir=self.datadir,
-			simdir=self.simdir,
-			plane_list=['xy'],
 			)
 	
 	def do_ft(self):
