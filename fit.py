@@ -29,6 +29,7 @@ def fit_mode(
 	debug = 0,
 	identifier = "",
 	ModelMaker = ModelMakerLorentzian,
+	guess_params = None,
 	):
 	"""
 	Given a dr_yaver_base instance, find the amplitude of a particular mode as a function of depth
@@ -46,6 +47,7 @@ def fit_mode(
 		debug: int. Set >0 to print debug output.
 		identifier: str. Used by wrapper functions to allow more informative error messages.
 		ModelMaker: AbstractModelMaker. Describes what function to use to fit the mode profiles.
+		guess_params: iterable. Initial guess for the model parameters. om_guess will be ignored if this is passed.
 	
 	Returns:
 		model: ModelMaker instance. This will have an attribute popt that gives the optimal fit values. To plot the resulting model returned by this function, you can do plt.plot(omt_near_target, model(omt_near_target, *model.popt))
@@ -74,37 +76,43 @@ def fit_mode(
 	else:
 		sigma = sigma/scale
 	
-	#initial guesses for the parameters.
-	guess_poly = model._baseline_guesser(omt_near_target, data_near_target)
-	guess_lor = np.zeros((model.n_lines,model.n_lineparams))
-	
-	i_om = model._ind_line_freq
-	
-	guess_lor[:,i_om] = np.linspace(
-		om_tilde_min + gamma_max,
-		om_tilde_max - gamma_max,
-		model.n_lines,
-		)
-	if om_guess is not None:
-		"""
-		If om_guess is given, for each om_guess, find the closest guessed frequency populated above and shift it to om_guess.
-		"""
-		inds_to_change = []
-		marker_val = 1e3*max(om_guess)
+	if guess_params is None:
+		#initial guesses for the parameters.
+		guess_poly = model._baseline_guesser(omt_near_target, data_near_target)
+		guess_lor = np.zeros((model.n_lines,model.n_lineparams))
 		
-		for i in range(min(model.n_lines, len(om_guess))):
-			i_min = np.argmin(np.abs(guess_lor[:,i_om] - om_guess[i]))
+		i_om = model._ind_line_freq
+		
+		guess_lor[:,i_om] = np.linspace(
+			om_tilde_min + gamma_max,
+			om_tilde_max - gamma_max,
+			model.n_lines,
+			)
+		if om_guess is not None:
+			"""
+			If om_guess is given, for each om_guess, find the closest guessed frequency populated above and shift it to om_guess.
+			"""
+			inds_to_change = []
+			marker_val = 1e3*max(om_guess)
 			
-			inds_to_change.append(i_min)
-			guess_lor[i_min,i_om] = marker_val
+			for i in range(min(model.n_lines, len(om_guess))):
+				i_min = np.argmin(np.abs(guess_lor[:,i_om] - om_guess[i]))
+				
+				inds_to_change.append(i_min)
+				guess_lor[i_min,i_om] = marker_val
+			
+			for i, ind in enumerate(inds_to_change):
+				guess_lor[ind,i_om] = om_guess[i]
 		
-		for i, ind in enumerate(inds_to_change):
-			guess_lor[ind,i_om] = om_guess[i]
-	
-	for i in model._width_like_params:
-		guess_lor[:,i] = 0.9*gamma_max
-	
-	guess = model.pack_params(guess_poly, guess_lor)
+		for i in model._width_like_params:
+			guess_lor[:,i] = 0.9*gamma_max
+		
+		
+		guess = model.pack_params(guess_poly, guess_lor)
+	else:
+		if len(guess_params) != model.nparams:
+			raise ValueError(f"Specified model requires {model.nparams} parameters, but I was given {guess_params = }")
+		guess = guess_params
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
