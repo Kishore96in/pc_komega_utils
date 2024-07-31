@@ -76,12 +76,12 @@ def fit_mode(
 	else:
 		sigma = sigma/scale
 	
+	i_om = model._ind_line_freq
+	
 	if guess_params is None:
 		#initial guesses for the parameters.
 		guess_poly = model._baseline_guesser(omt_near_target, data_near_target)
 		guess_lor = np.zeros((model.n_lines,model.n_lineparams))
-		
-		i_om = model._ind_line_freq
 		
 		guess_lor[:,i_om] = np.linspace(
 			om_tilde_min + gamma_max,
