@@ -112,7 +112,9 @@ def fit_mode(
 	else:
 		if len(guess_params) != model.nparams:
 			raise ValueError(f"Specified model requires {model.nparams} parameters, but I was given {guess_params = }")
-		guess = guess_params
+		
+		#Account for the scaling of the data.
+		guess = model.scale_params(guess_params, 1/scale)
 	
 	#Bounds for the parameters
 	lbound_poly = np.full(model.poly_order+1, -np.inf)
