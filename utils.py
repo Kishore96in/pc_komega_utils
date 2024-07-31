@@ -7,6 +7,7 @@ Objects intended for public use:
 	smooth_tophat
 	stdev_central
 	smooth_gauss
+	smooth_lor
 """
 
 import scipy.special
@@ -122,6 +123,33 @@ def smooth_gauss(data, n, axis=0):
 	wlen = int(np.round(6*sig))
 	weight = scipy.signal.windows.gaussian(wlen, std=sig)
 	weight = weight/np.sum(weight)
+	
+	weight = np.reshape(weight, (*[1]*(data.ndim-1), wlen))
+	conv = scipy.signal.convolve(data, weight, mode='same')
+	
+	conv = np.moveaxis(conv, -1, axis)
+	return conv
+
+def smooth_lor(data, n, axis=0):
+	"""
+	data: numpy array
+	n: int, such that HWHM of the smoothing filter (Lorentzian) is n.
+	"""
+	data = np.moveaxis(data, axis, -1)
+	
+	if n==0:
+		wlen = 1
+		weight = np.array([1])
+	else:
+		wlen = int(np.round(10*n))
+		
+		x = np.arange(wlen)
+		if wlen%2 == 0:
+			x_0 = (wlen-1)/2
+		else:
+			x_0 = np.floor(wlen/2)
+		weight = 1/((x-x_0)**2 + n**2)
+		weight = weight/np.sum(weight)
 	
 	weight = np.reshape(weight, (*[1]*(data.ndim-1), wlen))
 	conv = scipy.signal.convolve(data, weight, mode='same')
