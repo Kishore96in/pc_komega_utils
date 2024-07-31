@@ -45,7 +45,7 @@ class AbstractGetter(abc.ABC):
 		raise NotImplementedError
 	
 	@abc.abstractmethod
-	def get_sigma(self, *args, data, omt, **kwargs):
+	def get_sigma(self, *args, **kwargs):
 		raise NotImplementedError
 
 class get_sigma_stdev():
