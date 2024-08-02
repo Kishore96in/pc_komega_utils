@@ -35,7 +35,7 @@ class PowerCached():
 			else:
 				return h5py_dataset_wrapper(data)
 		else:
-			raise AttributeError
+			raise AttributeError(name)
 	
 	def __del__(self):
 		self._cache.close()
