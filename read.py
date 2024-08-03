@@ -707,8 +707,6 @@ class m_pxy_filterz():
 		n_omega, _, _, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
-		self.kx = kx[()] #convert from h5py_dataset_wrapper to array
-		self.ky = ky[()]
 		self.data = self.scale_data(data)
 	
 	@property
@@ -733,8 +731,9 @@ class m_pxy_filterz():
 		return ret
 
 class dr_pxy_cached_filterz_base(
+	m_pxy_cached,
 	m_pxy_filterz,
-	dr_pxy_cached_base,
+	dr_pxy_base,
 	): pass
 
 class m_dscl_dbyD2():
