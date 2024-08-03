@@ -28,7 +28,7 @@ import abc
 
 from dataclasses import dataclass
 
-from .power.cached import read_power
+from .power.cached import m_pxy_cached
 from .utils import smooth_tophat
 
 class plot_container():
@@ -666,34 +666,6 @@ class dr_pxy_base(dr_3d_base):
 		self.kx = kx
 		self.ky = ky
 		self.data = self.scale_data(data)
-
-class m_pxy_cached():
-	"""
-	Mixin to be used with dr_pxy_base.
-	
-	This uses the cached power reader provided by pcko.power.cached.
-	
-	DANGER: if you override do_ft provided here, you will need some special handling for the kx and ky attributes.
-	"""
-	def __init__(self, *args, **kwargs):
-		self._ignore_cache = kwargs.pop('ignore_cache', False)
-		
-		super().__init__(*args, **kwargs)
-	
-	def read_power(self):
-		return read_power(
-			datadir = self.datadir,
-			quiet = True,
-			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
-			ignore_cache = self._ignore_cache,
-			)
-	
-	def do_ft(self):
-		super().do_ft()
-		
-		#Convert the following attributes from h5py_dataset_wrapper to numpy arrays (to allow pickling).
-		self.kx = self.kx[()]
-		self.ky = self.ky[()]
 
 class dr_pxy_cached_base(
 	m_pxy_cached,

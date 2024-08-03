@@ -4,6 +4,7 @@ Replacement for pc.read.powers.Power that stores the data in a HDF5 file, rather
 Objects intended for public use:
 	InvalidCacheWarning
 	read_power
+	m_pxy_cached
 """
 
 import pencil as pc
@@ -161,3 +162,31 @@ class h5py_dataset_wrapper():
 		return np.greater_equal(self, other)
 	def __gt__(self, other):
 		return np.greater(self, other)
+
+class m_pxy_cached():
+	"""
+	Mixin to be used with dr_pxy_base.
+	
+	This uses the cached power reader provided by pcko.power.cached.
+	
+	DANGER: if you override do_ft provided here, you will need some special handling for the kx and ky attributes.
+	"""
+	def __init__(self, *args, **kwargs):
+		self._ignore_cache = kwargs.pop('ignore_cache', False)
+		
+		super().__init__(*args, **kwargs)
+	
+	def read_power(self):
+		return read_power(
+			datadir = self.datadir,
+			quiet = True,
+			cachedir = os.path.join(self.simdir, "postprocess_power_cache"),
+			ignore_cache = self._ignore_cache,
+			)
+	
+	def do_ft(self):
+		super().do_ft()
+		
+		#Convert the following attributes from h5py_dataset_wrapper to numpy arrays (to allow pickling).
+		self.kx = self.kx[()]
+		self.ky = self.ky[()]
