@@ -12,6 +12,8 @@ import warnings
 import numpy as np
 import copy
 
+from ..cached import PowerCached
+
 def make_decimated_power(simdir):
 	"""
 	Arguments:
@@ -101,4 +103,4 @@ class m_pxy_decimated():
 		filename = os.path.join(self.datadir, "power_decimated.h5")
 		if not os.path.isfile(filename):
 			raise FileNotFoundError(filename)
-		return pcko.power.cached.PowerCached(filename)
+		return PowerCached(filename)
