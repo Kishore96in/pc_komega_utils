@@ -5,6 +5,9 @@
 ### Changed
 - power_cached has been moved to power.cached
 
+### Added
+- power.decimate: postprocessing utility to extract power_spectra only at a subset of z values and save them to a HDF5 file.
+
 ## 2.0
 
 ### Changed
