@@ -2,7 +2,7 @@
 
 Utilities to plot dispersion relations and fit modes in simulations that use the Pencil code (<https://github.com/pencil-code/pencil-code>).
 
-`power_cached` contains a replacement for `pc.read.power` that caches the results in a HDF5 file (allows faster reads and loading only a part of the array into memory)
+`power.cached` contains a replacement for `pc.read.power` that caches the results in a HDF5 file (allows faster reads and loading only a part of the array into memory)
 
 # Dependencies
 1. numpy

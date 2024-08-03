@@ -5,7 +5,7 @@ from . import (
 	memmap_wrappers,
 	models,
 	plot,
-	power_cached,
+	power,
 	read,
 	utils,
 	wrap,

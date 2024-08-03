@@ -1,5 +1,10 @@
 # Changelog
 
+## (upcoming)
+
+### Changed
+- power_cached has been moved to power.cached
+
 ## 2.0
 
 ### Changed

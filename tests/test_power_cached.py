@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 
 import pc_komega_utils
-from pc_komega_utils.power_cached import read_power
+from pc_komega_utils.power.cached import read_power
 
-ignore_invalid_cache = pytest.mark.filterwarnings("ignore::pc_komega_utils.power_cached.InvalidCacheWarning")
+ignore_invalid_cache = pytest.mark.filterwarnings("ignore::pc_komega_utils.power.cached.InvalidCacheWarning")
 
 def get_datadir():
 	module_loc = os.path.dirname(pc_komega_utils.__file__)
