@@ -98,9 +98,18 @@ def make_decimated_power(simdir):
 class m_pxy_decimated():
 	"""
 	Mixin to be used with pcko.read.dr_pxy_base
+	
+	DANGER: if you override do_ft provided here, you will need some special handling for the kx and ky attributes.
 	"""
 	def read_power(self):
 		filename = os.path.join(self.datadir, "power_decimated.h5")
 		if not os.path.isfile(filename):
 			raise FileNotFoundError(filename)
 		return PowerCached(filename)
+	
+	def do_ft(self):
+		super().do_ft()
+		
+		#Convert the following attributes from h5py_dataset_wrapper to numpy arrays (to allow pickling).
+		self.kx = self.kx[()]
+		self.ky = self.ky[()]
