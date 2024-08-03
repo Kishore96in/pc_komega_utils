@@ -667,7 +667,14 @@ class dr_pxy_base(dr_3d_base):
 		self.ky = ky
 		self.data = self.scale_data(data)
 
-class dr_pxy_cached_base(dr_pxy_base):
+class m_pxy_cached():
+	"""
+	Mixin to be used with dr_pxy_base.
+	
+	This uses the cached power reader provided by pcko.power.cached.
+	
+	DANGER: if you override do_ft provided here, you will need some special handling for the kx and ky attributes.
+	"""
 	def __init__(self, *args, **kwargs):
 		self._ignore_cache = kwargs.pop('ignore_cache', False)
 		
@@ -688,8 +695,15 @@ class dr_pxy_cached_base(dr_pxy_base):
 		self.kx = self.kx[()]
 		self.ky = self.ky[()]
 
-class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
+class dr_pxy_cached_base(
+	m_pxy_cached,
+	dr_pxy_base,
+	): pass
+
+class m_pxy_filterz():
 	"""
+	Mixin to be used with dr_pxy_base.
+	
 	Since we are typically only interested in a small set of z values, this class only does the Fourier transform etc for those z values (rather than doing computations for the entire data series).
 	
 	Needs to be passed z (list of the z values to consider) during initialization.
@@ -745,6 +759,11 @@ class dr_pxy_cached_filterz_base(dr_pxy_cached_base):
 			ret[(*ind_pre, i, *ind_post)] = arr[(*ind_pre, iz, *ind_post)]
 		
 		return ret
+
+class dr_pxy_cached_filterz_base(
+	m_pxy_filterz,
+	dr_pxy_cached_base,
+	): pass
 
 class m_dscl_dbyD2():
 	@property
