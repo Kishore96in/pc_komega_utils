@@ -707,6 +707,8 @@ class m_pxy_filterz():
 		n_omega, _, _, _ = np.shape(data)
 		
 		self.omega = 2*np.pi*fftshift(fftfreq(n_omega, d = (max(t)-min(t))/n_omega ))
+		self.kx = kx
+		self.ky = ky
 		self.data = self.scale_data(data)
 	
 	@property
