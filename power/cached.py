@@ -39,7 +39,8 @@ class PowerCached():
 			raise AttributeError(name)
 	
 	def __del__(self):
-		self._cache.close()
+		if hasattr(self, "_cache"):
+			self._cache.close()
 	
 	def keys(self):
 		return set(self._cache.keys())
