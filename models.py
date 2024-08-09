@@ -97,6 +97,9 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		Get the central angular frequency of a line, given the line parameters
 		"""
+		if len(args) != self.n_lineparams:
+			raise ValueError(f"Wrong number of parameters for line (expected {self.n_lineparams}; got {len(args)}")
+		
 		return args[self._ind_line_freq]
 	
 	@abc.abstractmethod
