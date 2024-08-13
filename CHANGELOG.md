@@ -1,5 +1,10 @@
 # Changelog
 
+## (upcoming)
+
+### Added
+- model.AbstractModelMaker has a new property, ind_line_freq
+
 ## 3.0
 
 ### Changed
