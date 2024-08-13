@@ -93,6 +93,10 @@ class AbstractModelMaker(abc.ABC):
 		"""
 		raise NotImplementedError
 	
+	@property
+	def ind_line_freq(self):
+		return self._ind_line_freq
+	
 	def get_line_freq(self, *args):
 		"""
 		Get the central angular frequency of a line, given the line parameters
