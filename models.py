@@ -87,7 +87,7 @@ class AbstractModelMaker(abc.ABC):
 	
 	@property
 	@abc.abstractmethod
-	def _ind_line_freq(self, *args):
+	def _ind_line_freq(self):
 		"""
 		Index of the central angular frequency of a line in the tuple of line parameters
 		"""
