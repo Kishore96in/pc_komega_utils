@@ -24,7 +24,7 @@ def _decimate_power_obj(p, z_vals, izax):
 		z_vals: list of float
 		izax: int, index of the axis corresponding to z
 	"""
-	#`p_d = copy.copy(p)` would be dangerous if p were a PowerCached instance.
+	#`p_d = copy.copy(p)` does not seem correct with p is a PowerCached instance.
 	p_d = types.SimpleNamespace()
 	
 	for key, arr in p.__dict__.items():
