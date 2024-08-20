@@ -14,43 +14,14 @@ import copy
 
 from ..cached import PowerCached
 
-def make_decimated_power(simdir):
+def _decimate_power_obj(p, z_vals, izax):
 	"""
 	Arguments:
-		simdir: str. Path to the simulation directory.
-	
-	The list of z values to save is read from a config file (decimate_power.conf) located in simdir. An example of the content of the config file:
-	```
-	[decimate_power]
-	z: [-0.1, 0.5, 0.9, 1]
-	```
+		p: Pencil power object
+		z_vals: list of float
+		izax: int, index of the axis corresponding to z
 	"""
-	sim = pc.sim.get(simdir, quiet=True)
-	
-	if isinstance(sim, bool):
-		raise RuntimeError(f"Simulation not found in {simdir}")
-	
-	p = pc.read.power(
-		datadir = sim.datadir,
-		quiet = True,
-		)
-	izax = 1 #Index of the axis corresponding to z
-	
-	conf_file = os.path.join(simdir, "decimate_power.conf")
-	if not os.path.isfile(conf_file):
-		raise RuntimeError(f"Configuration file not found in {simdir}")
-	
-	conf = ConfigParser()
-	conf.optionxform = str #Preserve case of keys
-	conf.read(conf_file)
-	
-	z_vals = literal_eval(conf['decimate_power']['z'])
-	z_vals = np.sort(z_vals)
-	
 	p_d = copy.copy(p)
-	
-	if sim.param['lintegrate_z']:
-		raise ValueError("Simulation was run with lintegrate_z=T")
 	
 	for key, arr in p.__dict__.items():
 		if key in ['kx', 'ky', 'k', 't']:
@@ -85,6 +56,46 @@ def make_decimated_power(simdir):
 	
 	if np.any(np.diff(p_d.zpos) == 0):
 		warnings.warn("Requested z values are closer than the grid spacing. Decimated power file will contain duplicated values.")
+	
+	return p_d
+
+def make_decimated_power(simdir):
+	"""
+	Arguments:
+		simdir: str. Path to the simulation directory.
+	
+	The list of z values to save is read from a config file (decimate_power.conf) located in simdir. An example of the content of the config file:
+	```
+	[decimate_power]
+	z: [-0.1, 0.5, 0.9, 1]
+	```
+	"""
+	sim = pc.sim.get(simdir, quiet=True)
+	
+	if isinstance(sim, bool):
+		raise RuntimeError(f"Simulation not found in {simdir}")
+	
+	p = pc.read.power(
+		datadir = sim.datadir,
+		quiet = True,
+		)
+	izax = 1 #Index of the axis corresponding to z
+	
+	conf_file = os.path.join(simdir, "decimate_power.conf")
+	if not os.path.isfile(conf_file):
+		raise RuntimeError(f"Configuration file not found in {simdir}")
+	
+	conf = ConfigParser()
+	conf.optionxform = str #Preserve case of keys
+	conf.read(conf_file)
+	
+	z_vals = literal_eval(conf['decimate_power']['z'])
+	z_vals = np.sort(z_vals)
+	
+	if sim.param['lintegrate_z']:
+		raise ValueError("Simulation was run with lintegrate_z=T")
+	
+	p_d = _decimate_power_obj(p, z_vals, izax)
 	
 	tmpfile = os.path.join(sim.path, "data", "power_decimated.h5.tmp")
 	finalfile = os.path.join(sim.path, "data", "power_decimated.h5")
