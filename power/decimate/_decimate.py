@@ -16,6 +16,8 @@ from ..cached import PowerCached
 
 def _decimate_power_obj(p, z_vals, izax):
 	"""
+	Filter a Pencil power object such that it only contains the power at the z values specified in z_vals. The latter is used as-is (no sorting is performed).
+	
 	Arguments:
 		p: Pencil power object
 		z_vals: list of float
