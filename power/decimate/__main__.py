@@ -4,7 +4,7 @@ import time
 from ._decimate import make_decimated_power
 
 parser = argparse.ArgumentParser(
-	prog = "python -m pyStrFun",
+	prog = "python -m pc_komega_utils.power.decimate",
 	formatter_class = argparse.ArgumentDefaultsHelpFormatter,
 	)
 parser.add_argument(
