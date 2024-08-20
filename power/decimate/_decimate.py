@@ -11,22 +11,27 @@ import h5py
 import warnings
 import numpy as np
 import copy
+import types
 
-from ..cached import PowerCached
+from ..cached import PowerCached, h5py_dataset_wrapper
 
 def _decimate_power_obj(p, z_vals, izax):
 	"""
-	Filter a Pencil power object such that it only contains the power at the z values specified in z_vals. The latter is used as-is (no sorting is performed).
+	Filter a Pencil Power object or a PowerCached instance such that it only contains the power at the z values specified in z_vals. z_vals is used as-is (no sorting is performed).
 	
 	Arguments:
-		p: Pencil power object
+		p: Pencil Power object or PowerCached instance
 		z_vals: list of float
 		izax: int, index of the axis corresponding to z
 	"""
-	p_d = copy.copy(p)
+	#`p_d = copy.copy(p)` would be dangerous if p were a PowerCached instance.
+	p_d = types.SimpleNamespace()
 	
 	for key, arr in p.__dict__.items():
+		arr = np.array(arr) #convert hdf5 datasets to numpy arrays.
+		
 		if key in ['kx', 'ky', 'k', 't']:
+			setattr(p_d, key, arr)
 			continue
 		elif key == "nzpos":
 			setattr(p_d, "nzpos", len(z_vals))
