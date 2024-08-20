@@ -88,7 +88,7 @@ class read_power(PowerCached):
 				self._h5cache(k, getattr(p,k))
 			self._cache.close()
 		
-		self._cache = h5py.File(fname, 'r')
+		super().__init__(fname)
 	
 	def _h5cache(self, name, value):
 		"""
