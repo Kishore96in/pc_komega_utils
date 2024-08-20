@@ -27,16 +27,15 @@ class PowerCached():
 		filename,
 		):
 		self._cache = h5py.File(filename, 'r')
+		self._populate_keys_from_cache()
 	
-	def __getattr__(self, name):
-		if name != '_cache' and name in self._cache.keys():
-			data = self._cache[name]
+	def _populate_keys_from_cache(self):
+		for k in self._cache.keys():
+			data = self._cache[k]
 			if data.ndim == 0:
-				return data[()]
+				setattr(self, k, data[()])
 			else:
-				return h5py_dataset_wrapper(data)
-		else:
-			raise AttributeError(name)
+				setattr(self, k, h5py_dataset_wrapper(data))
 	
 	def __del__(self):
 		if hasattr(self, "_cache"):
@@ -50,6 +49,7 @@ class PowerCached():
 	
 	def __setstate__(self, cachename):
 		self._cache = h5py.File(cachename, 'r')
+		self._populate_keys_from_cache()
 
 class read_power(PowerCached):
 	"""
