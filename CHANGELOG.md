@@ -4,6 +4,7 @@
 
 ### Added
 - model.AbstractModelMaker has a new property, ind_line_freq
+- power.decimate.decimate_power_obj
 
 ## 3.0
 

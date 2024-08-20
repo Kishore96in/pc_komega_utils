@@ -3,7 +3,7 @@ import numpy as np
 import pencil as pc
 
 import pc_komega_utils
-from pc_komega_utils.power.decimate._decimate import _decimate_power_obj
+from pc_komega_utils.power.decimate import decimate_power_obj
 
 def get_datadir():
 	module_loc = os.path.dirname(pc_komega_utils.__file__)
@@ -21,7 +21,7 @@ def test_make_decimated_power():
 	
 	z_vals = [1, 0.4, 0.8]
 	
-	p = _decimate_power_obj(p_src, z_vals, izax=1)
+	p = decimate_power_obj(p_src, z_vals, izax=1)
 	
 	assert len(p.zpos) == len(z_vals)
 	assert len(p.kx) == 101
