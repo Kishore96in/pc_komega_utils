@@ -1,7 +1,4 @@
 import os
-import datetime
-from pathlib import Path
-import shutil
 import numpy as np
 import pencil as pc
 
@@ -11,11 +8,6 @@ from pc_komega_utils.power.decimate._decimate import _decimate_power_obj
 def get_datadir():
 	module_loc = os.path.dirname(pc_komega_utils.__file__)
 	return os.path.join(module_loc, "tests", "data")
-
-def get_tmp_datadir():
-	tmpdir = Path(f"/tmp/test_power_decimate-{os.getpid()}-{datetime.datetime.now().isoformat()}")
-	tmpdir.mkdir(parents=True)
-	return shutil.copytree(get_datadir(), tmpdir/"data")
 
 def test_make_decimated_power():
 	datadir = get_datadir()
