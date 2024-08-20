@@ -2,6 +2,8 @@
 
 ## (upcoming)
 
+## 3.1
+
 ### Changed
 - PowerCached: keys from the HDF5 file are now added to `__dict__`
 
