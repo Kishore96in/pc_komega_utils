@@ -36,6 +36,9 @@ def _decimate_power_obj(p, z_vals, izax):
 		elif key == "nzpos":
 			setattr(p_d, "nzpos", len(z_vals))
 			continue
+		elif key.startswith("_"):
+			#PowerCached._cache needs to be skipped.
+			continue
 		elif key == "zpos":
 			pass
 		else:
