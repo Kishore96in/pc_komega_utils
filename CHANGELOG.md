@@ -2,6 +2,9 @@
 
 ## (upcoming)
 
+### Changed
+- PowerCached: keys from the HDF5 file are now added to `__dict__`
+
 ### Added
 - model.AbstractModelMaker has a new property, ind_line_freq
 - power.decimate.decimate_power_obj
