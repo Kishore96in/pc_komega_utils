@@ -2,6 +2,9 @@
 
 ## (upcoming)
 
+### Added
+- power.decimate.decimate_power_obj takes an optional argument `keeponly`
+
 ## 3.1
 
 ### Changed
