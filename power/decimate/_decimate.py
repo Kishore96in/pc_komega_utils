@@ -15,7 +15,7 @@ import types
 
 from ..cached import PowerCached, h5py_dataset_wrapper
 
-def _decimate_power_obj(p, z_vals, izax):
+def _decimate_power_obj(p, z_vals, izax, keeponly=None):
 	"""
 	Filter a Pencil Power object or a PowerCached instance such that it only contains the power at the z values specified in z_vals. z_vals is used as-is (no sorting is performed).
 	
@@ -23,6 +23,9 @@ def _decimate_power_obj(p, z_vals, izax):
 		p: Pencil Power object or PowerCached instance
 		z_vals: list of float
 		izax: int, index of the axis corresponding to z
+	
+	Optional arguments:
+		keeponly: list of strings. If passed, keep only these keys (kx, ky, k, t, nzpos, and zpos will be kept regardless)
 	"""
 	#`p_d = copy.copy(p)` does not seem correct with p is a PowerCached instance.
 	p_d = types.SimpleNamespace()
@@ -41,6 +44,8 @@ def _decimate_power_obj(p, z_vals, izax):
 			continue
 		elif key == "zpos":
 			pass
+		elif keeponly is not None and key not in keeponly:
+			continue
 		else:
 			#Assume that any array not handled above has a z axis at izax.
 			arr = np.moveaxis(arr, izax, 0)
