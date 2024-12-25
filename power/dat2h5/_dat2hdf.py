@@ -31,10 +31,7 @@ def powerxy_to_hdf5(
 	
 	datadir = pathlib.Path(datadir)
 	
-	if file_name[-4:] == ".dat":
-		basename = file_name[:-4]
-	else:
-		basename = file_name
+	basename = file_name.removesuffix(".dat")
 	
 	if out_file is None:
 		out_file = datadir/f"{basename}.h5"
