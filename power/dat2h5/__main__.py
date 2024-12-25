@@ -30,10 +30,12 @@ args = parser.parse_args()
 
 if args.verbose:
 	t_start = time.time()
-	print(f"Processing {args.SIMDIR}")
 
 sim = pc.sim.get(args.SIMDIR)
 simdir = sim.path
+
+if args.verbose:
+	print(f"Processing {sim.path}")
 
 for file_name in sim.datadir.glob("power*_xy.dat"):
 	power_name = file_name.removeprefix("power").removesuffix(".dat")
