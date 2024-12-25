@@ -1,7 +1,5 @@
 import argparse
 import time
-from configparser import ConfigParser
-from ast import literal_eval
 import os
 
 from ._dat2hdf import powerxy_to_hdf5
@@ -21,12 +19,6 @@ parser.add_argument(
 	action = 'store_true',
 	)
 parser.add_argument(
-	'--conf-file',
-	help = "Name of the config file (located in the simulation directory)",
-	default = "decimate_power.conf",
-	type = str,
-	)
-parser.add_argument(
 	'--compress',
 	default = False,
 	help = "Whether to compress the resulting HDF5 datasets",
@@ -41,17 +33,6 @@ if args.verbose:
 
 sim = pc.sim.get(args.SIMDIR)
 simdir = sim.path
-
-conf_file = simdir/args.conf_file
-if not os.path.isfile(conf_file):
-	raise RuntimeError(f"Configuration file not found in {simdir}")
-
-conf = ConfigParser()
-conf.optionxform = str #Preserve case of keys
-conf.read(conf_file)
-
-z_vals = literal_eval(conf['powerxy_to_hdf5']['z'])
-z_vals = np.sort(z_vals)
 
 for file_name in sim.datadir.glob("power*_xy.dat"):
 	power_name = file_name.removeprefix("power").removesuffix(".dat")
