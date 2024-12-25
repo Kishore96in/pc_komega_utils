@@ -9,6 +9,8 @@ import pytest
 
 from pc_komega_utils.memmap_wrappers import mmap_array
 
+from .fixtures import cachedir
+
 def memory_limit(max_mem):
 	"""
 	Slightly modified version of the code from
@@ -33,8 +35,8 @@ def memory_limit(max_mem):
 		return wrapper
 	return decorator
 
-def test_create_delete():
-	a = mmap_array("/tmp")
+def test_create_delete(cachedir):
+	a = mmap_array(cachedir)
 	
 	assert os.path.isfile(a.tmpfilename)
 	
@@ -42,19 +44,19 @@ def test_create_delete():
 	del a
 	assert not os.path.exists(tmpfilename)
 
-def test_create_2():
-	a = mmap_array("/tmp", shape=(3,4,5), dtype=int)
+def test_create_2(cachedir):
+	a = mmap_array(cachedir, shape=(3,4,5), dtype=int)
 	
 	assert a.shape == (3,4,5)
 	assert a.dtype == int
 
-def test_pickle():
+def test_pickle(cachedir):
 	src = np.reshape(np.arange(6), (2,3))
 	
-	a = mmap_array("/tmp", shape=src.shape)
+	a = mmap_array(cachedir, shape=src.shape)
 	a[:] = src
 	
-	tmpfile = f"/tmp/test_mmap_wrapper-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	tmpfile = cachedir/"tmp.pickle"
 	
 	with open(tmpfile, 'wb') as f:
 		pickle.dump(a, f)
@@ -87,17 +89,17 @@ def test_memory_limit_3():
 
 @pytest.mark.xfail #currently fails. See the note below.
 @memory_limit(0.4)
-def test_pickle_large():
+def test_pickle_large(cachedir):
 	"""
 	NOTE: The failure of this test suggests that the entire array is being loaded into memory during pickle.dump(a, f) (this is corroborated by a comment in https://github.com/numpy/numpy/issues/22213#issuecomment-1238255808 ). This makes mmap_array useless for my purposes.
 	"""
 	
 	src = np.arange(3e7)
 	
-	a = mmap_array("/tmp", shape=src.shape)
+	a = mmap_array(cachedir, shape=src.shape)
 	a[:] = src
 	
-	tmpfile = f"/tmp/test_mmap_wrapper-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	tmpfile = cachedir/"tmp.pickle"
 	
 	with open(tmpfile, 'wb') as f:
 		pickle.dump(a, f)
