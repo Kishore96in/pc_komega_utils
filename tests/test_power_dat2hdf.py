@@ -5,9 +5,13 @@ import datetime
 import pathlib
 import h5py
 import pytest
+import shutil
 
 import pc_komega_utils
-from pc_komega_utils.power.dat2hdf import powerxy_to_hdf5
+from pc_komega_utils.power.dat2hdf import (
+	powerxy_to_hdf5,
+	read_power,
+	)
 
 @pytest.fixture
 def datadir():
@@ -23,7 +27,15 @@ def cachedir():
 	elif not os.path.isdir(cachedir):
 		raise ValueError(f"Cache directory '{cachedir}' is not a directory")
 	
-	return cachedir
+	yield cachedir
+	
+	#Clean up
+	shutil.rmtree(cachedir)
+
+@pytest.fixture
+def datadir_tmp(datadir, cachedir):
+	shutil.copytree(datadir, cachedir/"data")
+	return cachedir/"data"
 
 def test_powerxy_to_hdf5(datadir, cachedir):
 	grid = pc.read.grid(datadir=datadir)
@@ -56,3 +68,26 @@ def test_powerxy_to_hdf5(datadir, cachedir):
 		
 		it = f['times/it'][1]
 		assert np.all(p_src.uz_xy[1] == f['uz_xy'][str(it)])
+
+def test_read_power(datadir_tmp):
+	datadir=datadir_tmp
+	
+	grid = pc.read.grid(datadir=datadir)
+	
+	p_src = pc.read.power(
+		datadir = datadir,
+		quiet = True,
+		)
+	
+	powerxy_to_hdf5(
+		power_name = "uz_xy",
+		file_name = "poweruz_xy.dat",
+		datadir = datadir,
+		)
+	
+	p = read_power(datadir, z=[1])
+	
+	assert p.uz_xy.shape[1] == 1
+	
+	iz = np.argmin(np.abs(p_src.zpos - 1))
+	assert np.all(p_src.uz_xy[:,iz] == p.uz_xy[:,0])
