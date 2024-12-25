@@ -22,7 +22,7 @@ parser.add_argument(
 	)
 parser.add_argument(
 	'--conf-file',
-	help = "Name of the config file (located in the simulation directory)"
+	help = "Name of the config file (located in the simulation directory)",
 	default = "decimate_power.conf",
 	type = str,
 	)
