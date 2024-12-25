@@ -64,3 +64,47 @@ def test_read_power(datadir_tmp):
 	
 	iz = np.argmin(np.abs(p_src.zpos - 1))
 	assert np.all(p_src.uz_xy[:,iz] == p.uz_xy[:,0])
+
+def test_read_power2(datadir_tmp):
+	datadir=datadir_tmp
+	
+	grid = pc.read.grid(datadir=datadir)
+	
+	p_src = pc.read.power(
+		datadir = datadir,
+		quiet = True,
+		)
+	
+	powerxy_to_hdf5(
+		power_name = "uz_xy",
+		file_name = "poweruz_xy.dat",
+		datadir = datadir,
+		)
+	
+	p = read_power(datadir, z=[0,1])
+	
+	assert p.uz_xy.shape[1] == 2
+	
+	iz0 = np.argmin(np.abs(p_src.zpos - 0))
+	iz1 = np.argmin(np.abs(p_src.zpos - 1))
+	assert np.all(p_src.uz_xy[:,[iz0,iz1]] == p.uz_xy)
+
+def test_read_power3(datadir_tmp):
+	datadir=datadir_tmp
+	
+	grid = pc.read.grid(datadir=datadir)
+	
+	p_src = pc.read.power(
+		datadir = datadir,
+		quiet = True,
+		)
+	
+	powerxy_to_hdf5(
+		power_name = "uz_xy",
+		file_name = "poweruz_xy.dat",
+		datadir = datadir,
+		)
+	
+	p = read_power(datadir)
+	
+	assert np.all(p_src.uz_xy == p.uz_xy)
