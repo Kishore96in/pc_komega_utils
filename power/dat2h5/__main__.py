@@ -7,7 +7,7 @@ import os
 from ._dat2hdf import powerxy_to_hdf5
 
 parser = argparse.ArgumentParser(
-	prog = "python -m pc_komega_utils.power.dat2hdf",
+	prog = "python -m pc_komega_utils.power.dat2h5",
 	formatter_class = argparse.ArgumentDefaultsHelpFormatter,
 	)
 parser.add_argument(

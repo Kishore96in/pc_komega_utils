@@ -4,7 +4,7 @@ import h5py
 import pytest
 
 import pc_komega_utils
-from pc_komega_utils.power.dat2hdf import (
+from pc_komega_utils.power.dat2h5 import (
 	powerxy_to_hdf5,
 	read_power,
 	)
