@@ -1,5 +1,5 @@
 """
-Convert power*_xy.dat to a HDF5 file containing the same information
+Replace power*_xy.dat with HDF5 files containing the same information
 """
 
 import h5py
