@@ -1,6 +1,7 @@
 import argparse
 import time
 import os
+import pencil as pc
 
 from ._dat2hdf import powerxy_to_hdf5
 
