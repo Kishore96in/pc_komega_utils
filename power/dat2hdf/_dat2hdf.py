@@ -162,3 +162,45 @@ def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
 		f_out['times'].create_dataset("t", data=np.array(time, dtype=dtype_f))
 		
 		f_out.create_dataset("nzpos", data=nzpos, dtype=dtype_i)
+
+class read_power():
+	def __init__(self, datadir="./data", z=None):
+		datadir = pathlib.Path(datadir)
+		files = datadir.glob("power*_xy.h5")
+		
+		for file_name in files:
+			with h5py.File(file_name) as f:
+				for k in ["nzpos", "kx", "ky", "k"]:
+					if k in f.keys():
+						self.safe_setattr(k, f[k][()])
+				
+				self.safe_setattr("t", f['times/t'][()])
+				
+				z_full = f['zpos'][()]
+				if z is None:
+					self.safe_setattr("z", z_full)
+					izs = range(len(z_full))
+				else:
+					izs = []
+					for i, z_val in enumerate(z):
+						izs.append(np.argmin(np.abs(z_full - z_val)))
+					self.safe_setattr("z", z_full[izs])
+				
+				[power_name] = [name for name in f.keys() if name[-3:] == "_xy"]
+				its = f['times/it'][()]
+				
+				power_array = []
+				
+				for it in its:
+					power = f[power_name][str(it)]
+					power_array.append(power[izs])
+					dtype = power.dtype
+				
+				self.safe_setattr(power_name, np.array(power_array, dtype=dtype))
+	
+	def safe_setattr(self, attr, value):
+		if hasattr(self, attr):
+			if not np.all(getattr(self, attr) == value):
+				raise RuntimeError(f"Mismatch in values of key {attr}")
+		else:
+			setattr(self, attr, value)
