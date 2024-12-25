@@ -1,6 +1,7 @@
 import numpy as np
 import pencil as pc
 import h5py
+import pytest
 
 import pc_komega_utils
 from pc_komega_utils.power.dat2hdf import (
@@ -10,9 +11,17 @@ from pc_komega_utils.power.dat2hdf import (
 
 from .fixtures import datadir, cachedir, datadir_tmp
 
-def test_powerxy_to_hdf5(datadir, cachedir):
-	grid = pc.read.grid(datadir=datadir)
+@pytest.fixture
+def datadir_tmp_w_h5(datadir_tmp):
+	powerxy_to_hdf5(
+		power_name = "uz_xy",
+		file_name = "poweruz_xy.dat",
+		datadir = datadir_tmp,
+		)
 	
+	return datadir_tmp
+
+def test_powerxy_to_hdf5(datadir, cachedir):
 	p_src = pc.read.power(
 		datadir = datadir,
 		quiet = True,
@@ -42,20 +51,12 @@ def test_powerxy_to_hdf5(datadir, cachedir):
 		it = f['times/it'][1]
 		assert np.all(p_src.uz_xy[1] == f['uz_xy'][str(it)])
 
-def test_read_power(datadir_tmp):
-	datadir=datadir_tmp
-	
-	grid = pc.read.grid(datadir=datadir)
+def test_read_power(datadir_tmp_w_h5):
+	datadir=datadir_tmp_w_h5
 	
 	p_src = pc.read.power(
 		datadir = datadir,
 		quiet = True,
-		)
-	
-	powerxy_to_hdf5(
-		power_name = "uz_xy",
-		file_name = "poweruz_xy.dat",
-		datadir = datadir,
 		)
 	
 	p = read_power(datadir, z=[1])
@@ -65,20 +66,12 @@ def test_read_power(datadir_tmp):
 	iz = np.argmin(np.abs(p_src.zpos - 1))
 	assert np.all(p_src.uz_xy[:,iz] == p.uz_xy[:,0])
 
-def test_read_power2(datadir_tmp):
-	datadir=datadir_tmp
-	
-	grid = pc.read.grid(datadir=datadir)
+def test_read_power2(datadir_tmp_w_h5):
+	datadir=datadir_tmp_w_h5
 	
 	p_src = pc.read.power(
 		datadir = datadir,
 		quiet = True,
-		)
-	
-	powerxy_to_hdf5(
-		power_name = "uz_xy",
-		file_name = "poweruz_xy.dat",
-		datadir = datadir,
 		)
 	
 	p = read_power(datadir, z=[0,1])
@@ -89,20 +82,12 @@ def test_read_power2(datadir_tmp):
 	iz1 = np.argmin(np.abs(p_src.zpos - 1))
 	assert np.all(p_src.uz_xy[:,[iz0,iz1]] == p.uz_xy)
 
-def test_read_power3(datadir_tmp):
-	datadir=datadir_tmp
-	
-	grid = pc.read.grid(datadir=datadir)
+def test_read_power3(datadir_tmp_w_h5):
+	datadir=datadir_tmp_w_h5
 	
 	p_src = pc.read.power(
 		datadir = datadir,
 		quiet = True,
-		)
-	
-	powerxy_to_hdf5(
-		power_name = "uz_xy",
-		file_name = "poweruz_xy.dat",
-		datadir = datadir,
 		)
 	
 	p = read_power(datadir)
