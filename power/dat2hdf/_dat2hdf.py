@@ -111,17 +111,21 @@ def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
 		f_out.create_group(power_name)
 		f_out.create_dataset("version", data=np.array([1,0,0], dtype=dtype_i))
 		
+		
+		def _write_power_array(power_array, it):
+			if param.lintegrate_shell or (dim.nxgrid == 1 or dim.nygrid == 1):
+				power_array = power_array.reshape([nzpos, nk])
+			else:
+				power_array = power_array.reshape([nzpos, nky, nkx])
+			
+			f_out[power_name].create_dataset(str(it), data=power_array)
+		
 		first = True
 		it = 0
 		for line_idx, line in enumerate(f):
 			if line_idx % block_size == 0:
 				if not first:
-					if param.lintegrate_shell or (dim.nxgrid == 1 or dim.nygrid == 1):
-						power_array = power_array.reshape([nzpos, nk])
-					else:
-						power_array = power_array.reshape([nzpos, nky, nkx])
-					
-					f_out[power_name].create_dataset(str(it), data=power_array)
+					_write_power_array(power_array, it)
 				
 				first = False
 				
@@ -150,6 +154,9 @@ def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
 					for value_string in lsp:
 						power_array[ik] = float(value_string)
 						ik += 1
+		
+		#Last one has still not been written
+		_write_power_array(power_array, it)
 		
 		f_out.create_group("times")
 		f_out['times'].create_dataset("it", data=np.array(its, dtype=dtype_i))
