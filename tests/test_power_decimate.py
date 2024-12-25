@@ -1,17 +1,11 @@
-import os
 import numpy as np
 import pencil as pc
 
-import pc_komega_utils
 from pc_komega_utils.power.decimate import decimate_power_obj
 
-def get_datadir():
-	module_loc = os.path.dirname(pc_komega_utils.__file__)
-	return os.path.join(module_loc, "tests", "data")
+from .fixtures import datadir
 
-def test_make_decimated_power():
-	datadir = get_datadir()
-	
+def test_make_decimated_power(datadir):
 	grid = pc.read.grid(datadir=datadir)
 	
 	p_src = pc.read.power(

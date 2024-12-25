@@ -1,11 +1,6 @@
-import os
 import numpy as np
 import pencil as pc
-import datetime
-import pathlib
 import h5py
-import pytest
-import shutil
 
 import pc_komega_utils
 from pc_komega_utils.power.dat2hdf import (
@@ -13,29 +8,7 @@ from pc_komega_utils.power.dat2hdf import (
 	read_power,
 	)
 
-@pytest.fixture
-def datadir():
-	module_loc = os.path.dirname(pc_komega_utils.__file__)
-	return os.path.join(module_loc, "tests", "data")
-
-@pytest.fixture
-def cachedir():
-	cachedir = pathlib.Path(f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}")
-	
-	if not os.path.exists(cachedir):
-		os.makedirs(cachedir)
-	elif not os.path.isdir(cachedir):
-		raise ValueError(f"Cache directory '{cachedir}' is not a directory")
-	
-	yield cachedir
-	
-	#Clean up
-	shutil.rmtree(cachedir)
-
-@pytest.fixture
-def datadir_tmp(datadir, cachedir):
-	shutil.copytree(datadir, cachedir/"data")
-	return cachedir/"data"
+from .fixtures import datadir, cachedir, datadir_tmp
 
 def test_powerxy_to_hdf5(datadir, cachedir):
 	grid = pc.read.grid(datadir=datadir)

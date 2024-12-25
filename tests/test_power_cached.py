@@ -1,27 +1,15 @@
-import os
-import datetime
 import pickle
 import numpy as np
 import pytest
-import pathlib
 
-import pc_komega_utils
 from pc_komega_utils.power.cached import read_power
+
+from .fixtures import cachedir, datadir
 
 ignore_invalid_cache = pytest.mark.filterwarnings("ignore::pc_komega_utils.power.cached.InvalidCacheWarning")
 
-def get_datadir():
-	module_loc = os.path.dirname(pc_komega_utils.__file__)
-	return os.path.join(module_loc, "tests", "data")
-
-def get_cachedir():
-	return pathlib.Path(f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}")
-
 @ignore_invalid_cache
-def test_read():
-	datadir = get_datadir()
-	cachedir = get_cachedir()
-	
+def test_read(datadir, cachedir):
 	p = read_power(
 		datadir = datadir,
 		cachedir = cachedir,
@@ -35,10 +23,7 @@ def test_read():
 	assert p.uz_xy.shape == (2, 288, 1, 101)
 
 @ignore_invalid_cache
-def test_pickle():
-	datadir = get_datadir()
-	cachedir = get_cachedir()
-	
+def test_pickle(datadir, cachedir):
 	p = read_power(
 		datadir = datadir,
 		cachedir = cachedir,
@@ -56,13 +41,10 @@ def test_pickle():
 	assert np.all(p2.uz_xy == uz_xy)
 
 @ignore_invalid_cache
-def test_coexist():
+def test_coexist(datadir, cachedir):
 	"""
 	Check that it is possible to open multiple instances at the same time in the same data directory.
 	"""
-	datadir = get_datadir()
-	cachedir = get_cachedir()
-	
 	p = read_power(
 		datadir = datadir,
 		cachedir = cachedir,
@@ -76,10 +58,7 @@ def test_coexist():
 		)
 
 @ignore_invalid_cache
-def test_math():
-	datadir = get_datadir()
-	cachedir = get_cachedir()
-	
+def test_math(datadir, cachedir):
 	p = read_power(
 		datadir = datadir,
 		cachedir = cachedir,
