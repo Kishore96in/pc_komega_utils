@@ -37,7 +37,8 @@ simdir = sim.path
 if args.verbose:
 	print(f"Processing {sim.path}")
 
-for file_name in sim.datadir.glob("power*_xy.dat"):
+for f in sim.datadir.glob("power*_xy.dat"):
+	file_name = f.name
 	power_name = file_name.removeprefix("power").removesuffix(".dat")
 	
 	if args.compress:
