@@ -3,6 +3,7 @@ import datetime
 import pickle
 import numpy as np
 import pytest
+import pathlib
 
 import pc_komega_utils
 from pc_komega_utils.power.cached import read_power
@@ -14,7 +15,7 @@ def get_datadir():
 	return os.path.join(module_loc, "tests", "data")
 
 def get_cachedir():
-	return f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}"
+	return pathlib.Path(f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}")
 
 @ignore_invalid_cache
 def test_read():
