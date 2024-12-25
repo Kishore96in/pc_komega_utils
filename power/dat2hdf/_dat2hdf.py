@@ -7,9 +7,18 @@ import pathlib
 import numpy as np
 import pencil as pc
 
-def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
+def powerxy_to_hdf5(
+	power_name,
+	file_name,
+	datadir,
+	out_file = None,
+	compression = None,
+	):
 	"""
 	Logic is copied from pc.read.powers.Power._read_power2d
+	
+	Arguments:
+		compression: None or str. Controls compression of the HDF5 dataset. Legal values are 'gzip', 'szip', 'lzf'.  If an integer in range(10), this indicates gzip compression level.
 	"""
 	
 	datadir = pathlib.Path(datadir)
@@ -117,7 +126,11 @@ def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
 			else:
 				power_array = power_array.reshape([nzpos, nky, nkx])
 			
-			f_out[power_name].create_dataset(str(it), data=power_array)
+			f_out[power_name].create_dataset(
+				str(it),
+				data=power_array,
+				compression=compression,
+				)
 		
 		first = True
 		it = 0
