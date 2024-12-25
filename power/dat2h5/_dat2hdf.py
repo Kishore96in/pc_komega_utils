@@ -237,3 +237,21 @@ class read_power():
 				raise RuntimeError(f"Mismatch in values of key {attr}")
 		else:
 			setattr(self, attr, value)
+
+class m_pxy_h5():
+	"""
+	Mixin to be used with dr_pxy_base.
+	
+	This uses read_power.
+	
+	"""
+	def __init__(self, *args, **kwargs):
+		self._z_to_keep = kwargs.pop('z', None)
+		
+		super().__init__(*args, **kwargs)
+	
+	def read_power(self):
+		return read_power(
+			datadir = self.datadir,
+			z = self._z_to_keep,
+			)
