@@ -6,6 +6,7 @@ import h5py
 import pathlib
 import numpy as np
 import pencil as pc
+import warnings
 
 def powerxy_to_hdf5(
 	power_name,
@@ -210,6 +211,12 @@ class read_power():
 					izs = []
 					for i, z_val in enumerate(z):
 						izs.append(np.argmin(np.abs(z_full - z_val)))
+					
+					izs = np.unique(izs)
+					
+					if len(izs) < len(z):
+						warnings.warn("Spacing between the specified z values is less than the grid spacing; dropping duplicates.")
+					
 					self.safe_setattr("z", z_full[izs])
 				
 				[power_name] = [name for name in f.keys() if name[-3:] == "_xy"]
