@@ -4,15 +4,18 @@ import pencil as pc
 import datetime
 import pathlib
 import h5py
+import pytest
 
 import pc_komega_utils
 from pc_komega_utils.power.dat2hdf import powerxy_to_hdf5
 
-def get_datadir():
+@pytest.fixture
+def datadir():
 	module_loc = os.path.dirname(pc_komega_utils.__file__)
 	return os.path.join(module_loc, "tests", "data")
 
-def get_cachedir():
+@pytest.fixture
+def cachedir():
 	cachedir = pathlib.Path(f"/tmp/test_power_cached-{os.getpid()}-{datetime.datetime.now().isoformat()}")
 	
 	if not os.path.exists(cachedir):
@@ -22,10 +25,7 @@ def get_cachedir():
 	
 	return cachedir
 
-def test_powerxy_to_hdf5():
-	datadir = get_datadir()
-	cachedir = get_cachedir()
-	
+def test_powerxy_to_hdf5(datadir, cachedir):
 	grid = pc.read.grid(datadir=datadir)
 	
 	p_src = pc.read.power(
