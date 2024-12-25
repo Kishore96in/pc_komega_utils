@@ -22,7 +22,6 @@ def powerxy_to_hdf5(power_name, file_name, datadir, out_file=None):
 	if out_file is None:
 		out_file = datadir/f"{basename}.h5"
 	
-	#TODO: think about whether I should be using np.csingle or just complex
 	dtype_f = np.single
 	dtype_c = np.csingle
 	dtype_i = np.int64
