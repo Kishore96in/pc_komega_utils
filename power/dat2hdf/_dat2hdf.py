@@ -15,9 +15,15 @@ def powerxy_to_hdf5(
 	compression = None,
 	):
 	"""
+	Convert power*_xy.dat to a HDF5 file containing the same information
+	
 	Logic is copied from pc.read.powers.Power._read_power2d
 	
 	Arguments:
+		power_name: str. Key to use for the spectrum in the resulting HDF5 file (e.g. "uz_xy").
+		file_name: str. Name of the .dat file (e.g. "poweruz_xy.dat").
+		datadir: str or pathlib.Path (e.g. "./data").
+		outfile: str or pathlib.Path. The path at which the HDF5 file should be created (e.g. "./data/poweruz_xy.h5").
 		compression: None or str. Controls compression of the HDF5 dataset. Legal values are 'gzip', 'szip', 'lzf'.  If an integer in range(10), this indicates gzip compression level.
 	"""
 	
