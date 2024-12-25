@@ -46,6 +46,9 @@ for f in sim.datadir.glob("power*_xy.dat"):
 	else:
 		compression = None
 	
+	if args.verbose:
+		print(f"\tProcessing {file_name}")
+	
 	powerxy_to_hdf5(
 		power_name,
 		file_name,
