@@ -31,7 +31,7 @@ args = parser.parse_args()
 if args.verbose:
 	t_start = time.time()
 
-sim = pc.sim.get(args.SIMDIR)
+sim = pc.sim.get(args.SIMDIR, quiet=True)
 simdir = sim.path
 
 if args.verbose:
