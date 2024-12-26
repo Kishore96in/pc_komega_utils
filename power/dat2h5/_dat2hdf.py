@@ -205,7 +205,7 @@ class read_power():
 				
 				z_full = f['zpos'][()]
 				if z is None:
-					self.safe_setattr("z", z_full)
+					self.safe_setattr("zpos", z_full)
 					izs = range(len(z_full))
 				else:
 					izs = []
@@ -217,7 +217,7 @@ class read_power():
 					if len(izs) < len(z):
 						warnings.warn("Spacing between the specified z values is less than the grid spacing; dropping duplicates.")
 					
-					self.safe_setattr("z", z_full[izs])
+					self.safe_setattr("zpos", z_full[izs])
 				
 				[power_name] = [name for name in f.keys() if name[-3:] == "_xy"]
 				its = f['times/it'][()]
