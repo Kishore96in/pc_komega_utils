@@ -239,6 +239,7 @@ class dr_base(metaclass=abc.ABCMeta):
 				coord_val = kwargs[name]
 			else:
 				coord_val = None
+			
 			try:
 				sl = self._generate_slicer(coord_val, coord_list)
 			except Exception as e:
